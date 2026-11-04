@@ -7,7 +7,7 @@ compatibility_date = "2026-10-01"
 workers_dev = true
 
 [vars]
-APP_ID = "0"
+APP_ID = "5607051"
 
 [observability]
 enabled = true
