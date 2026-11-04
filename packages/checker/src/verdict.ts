@@ -75,6 +75,12 @@ function runs(pr: PullRequest, gate: Gate, claim?: Claim): Check[] {
   );
 }
 
+/** "`ci` does not say what it ran", "`a`, `b` do not say what they ran". */
+function silent(checks: readonly Check[]): string {
+  const one = new Set(checks.map((c) => c.name)).size === 1;
+  return `${named(checks)} ${one ? "does not say what it ran" : "do not say what they ran"}`;
+}
+
 const onHead = (pr: PullRequest, checks: readonly Check[]): Check[] => checks.filter((c) => c.sha === pr.headSha);
 
 /** A check whose name names no gate and whose log was not read: it may have run anything. */
@@ -84,7 +90,7 @@ function missing(pr: PullRequest, gate: Gate): Verdict {
   if (pr.checks.length === 0) return unbacked("missing", "no check ran on this pull request");
   const opaque = pr.checks.filter(isOpaque);
   if (opaque.length > 0) {
-    return unverifiable(`no check says it runs ${WHAT[gate]}, and ${named(opaque)} does not say what it ran`);
+    return unverifiable(`no check says it runs ${WHAT[gate]}, and ${silent(opaque)}`);
   }
   return unbacked("missing", `no check on this pull request runs ${WHAT[gate]} (checks: ${named(pr.checks)})`);
 }
@@ -114,7 +120,7 @@ function gate(pr: PullRequest, g: Gate, claim?: Claim, fallback?: Gate): Verdict
   if (head.length === 0) {
     const opaque = onHead(pr, pr.checks).filter(isOpaque);
     return opaque.length > 0
-      ? unverifiable(`no check on the head commit says it runs ${WHAT[g]}, and ${named(opaque)} does not say what it ran`)
+      ? unverifiable(`no check on the head commit says it runs ${WHAT[g]}, and ${silent(opaque)}`)
       : stale(pr, matching, g);
   }
   const failed = head.filter((c) => c.state === "failure");

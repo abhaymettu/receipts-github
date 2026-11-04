@@ -20066,13 +20066,17 @@ function runs(pr, gate2, claim2) {
     (c) => c.state !== "skipped" && (NAME[gate2].test(c.name) || c.commands.some((cmd) => COMMAND[gate2].test(cmd) || claimed.some((t) => cmd.toLowerCase().includes(t))))
   );
 }
+function silent(checks) {
+  const one = new Set(checks.map((c) => c.name)).size === 1;
+  return `${named(checks)} ${one ? "does not say what it ran" : "do not say what they ran"}`;
+}
 var onHead = (pr, checks) => checks.filter((c) => c.sha === pr.headSha);
 var isOpaque = (c) => c.commands.length === 0 && !GATES.some((g) => NAME[g].test(c.name));
 function missing(pr, gate2) {
   if (pr.checks.length === 0) return unbacked("missing", "no check ran on this pull request");
   const opaque = pr.checks.filter(isOpaque);
   if (opaque.length > 0) {
-    return unverifiable(`no check says it runs ${WHAT[gate2]}, and ${named(opaque)} does not say what it ran`);
+    return unverifiable(`no check says it runs ${WHAT[gate2]}, and ${silent(opaque)}`);
   }
   return unbacked("missing", `no check on this pull request runs ${WHAT[gate2]} (checks: ${named(pr.checks)})`);
 }
@@ -20095,7 +20099,7 @@ function gate(pr, g, claim2, fallback) {
   const head = onHead(pr, matching);
   if (head.length === 0) {
     const opaque = onHead(pr, pr.checks).filter(isOpaque);
-    return opaque.length > 0 ? unverifiable(`no check on the head commit says it runs ${WHAT[g]}, and ${named(opaque)} does not say what it ran`) : stale(pr, matching, g);
+    return opaque.length > 0 ? unverifiable(`no check on the head commit says it runs ${WHAT[g]}, and ${silent(opaque)}`) : stale(pr, matching, g);
   }
   const failed = head.filter((c) => c.state === "failure");
   if (failed.length > 0) return unbacked("contradicted", `${named(failed)} failed on the head commit`, byCheck(failed));
