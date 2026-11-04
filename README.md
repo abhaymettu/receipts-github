@@ -8,6 +8,8 @@ It reads the claims in a pull request's title, description and commit messages (
 diff, the check runs and statuses, the commands its Actions jobs ran, and its commits. Each claim comes back
 **verified**, **unbacked** or **unverifiable**, in one check run, with a link to the receipt that decided it.
 
+![The receipts check run on this repository's first pull request: 0 unbacked, 1 unverifiable, 5 verified of 6 claims](docs/check-run.png)
+
 It is the pull request side of [receipts](https://github.com/abhaymettu/receipts), which checks the same claims
 against an agent's own session log.
 
@@ -32,8 +34,9 @@ https://github.com/Open-MBEE/OpenSysML/pull/1908 @ eb8e5c7: 1 unbacked, 2 unveri
 ran on any of its 12 commits. That one comes back `unbacked: no check ran on this pull request`.
 
 This repository runs the action on its own pull requests. On [#1](https://github.com/abhaymettu/receipts-github/pull/1)
-it checked the description I wrote. Six claims were verified against the `test` job, the diff and the commits. One
-was unverifiable, and rightly. I ran the prefilter benchmark on my laptop against private labels, and no pull
+it checked the description I wrote ([the check run](https://github.com/abhaymettu/receipts-github/runs/126409817430),
+pictured above). Five claims were verified against the `test` job, the diff and the commits. One was unverifiable,
+and rightly. I ran the prefilter benchmark on my laptop against private labels, and no pull
 request can carry that receipt.
 
 ## Install
