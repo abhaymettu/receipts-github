@@ -1,0 +1,236 @@
+{
+  "definitions": {
+    "inputs": {
+      "labels": "labelled claim spans: gold labels on test-split turns plus rater A labels on dev-split turns",
+      "reports": "the REPORT section of each sampled turn's dossier",
+      "sessions": "end-of-turn reports from the frame's non-excluded sessions still on disk, at most 5,000",
+      "synthetic": "random strings over the patterns' vocabulary and the Unicode hazards, seed 20261104",
+      "codepoints": "every code point below U+30000 but surrogates, placed in each of 9 probe sentences"
+    },
+    "M1": "share of inputs whose ordered claims {kind, text, files, sha} equal the Python output exactly",
+    "M2": "share of labelled claims whose span yields at least one claim",
+    "M3": "share of labelled claims whose family is among the families extracted from the span",
+    "M4": "M3 count over M2 count",
+    "M5": "share of distinct (turn, span) pairs whose extracted families equal the labelled families on that span",
+    "intervals": "Wilson score, 95%"
+  },
+  "runtimes": {
+    "node": "v26.13.0",
+    "node_unicode": "18.0",
+    "python": "3.14.7",
+    "unicode": "16.0.0"
+  },
+  "M1_identical_output": {
+    "labels": {
+      "k": 2082,
+      "n": 2082,
+      "rate": 1,
+      "ci95": [
+        0.9982,
+        1
+      ]
+    },
+    "reports": {
+      "k": 400,
+      "n": 400,
+      "rate": 1,
+      "ci95": [
+        0.9905,
+        1
+      ]
+    },
+    "sessions": {
+      "k": 4373,
+      "n": 4373,
+      "rate": 1,
+      "ci95": [
+        0.9991,
+        1
+      ]
+    },
+    "synthetic": {
+      "k": 20000,
+      "n": 20000,
+      "rate": 1,
+      "ci95": [
+        0.9998,
+        1
+      ]
+    },
+    "codepoints": {
+      "k": 1745478,
+      "n": 1751040,
+      "rate": 0.9968,
+      "ci95": [
+        0.9967,
+        0.9969
+      ]
+    }
+  },
+  "M1_residual": {
+    "unassigned_in_python": 5562,
+    "other": 0
+  },
+  "agreement": {
+    "typescript": {
+      "M2_detection": {
+        "k": 403,
+        "n": 2082,
+        "rate": 0.1936,
+        "ci95": [
+          0.1772,
+          0.2111
+        ]
+      },
+      "M3_category_agreement": {
+        "k": 278,
+        "n": 2082,
+        "rate": 0.1335,
+        "ci95": [
+          0.1196,
+          0.1488
+        ]
+      },
+      "M4_conditional_category_agreement": {
+        "k": 278,
+        "n": 403,
+        "rate": 0.6898,
+        "ci95": [
+          0.6431,
+          0.733
+        ]
+      },
+      "M5_exact_span_agreement": {
+        "k": 176,
+        "n": 1857,
+        "rate": 0.0948,
+        "ci95": [
+          0.0823,
+          0.1089
+        ]
+      },
+      "per_family": {
+        "tests": {
+          "labelled": 151,
+          "detected": 72,
+          "agreed": 69
+        },
+        "build": {
+          "labelled": 33,
+          "detected": 13,
+          "agreed": 7
+        },
+        "files": {
+          "labelled": 698,
+          "detected": 82,
+          "agreed": 52
+        },
+        "git": {
+          "labelled": 153,
+          "detected": 72,
+          "agreed": 66
+        },
+        "ship": {
+          "labelled": 70,
+          "detected": 18,
+          "agreed": 13
+        },
+        "ran": {
+          "labelled": 404,
+          "detected": 45,
+          "agreed": 16
+        },
+        "verified": {
+          "labelled": 391,
+          "detected": 73,
+          "agreed": 39
+        },
+        "works": {
+          "labelled": 182,
+          "detected": 28,
+          "agreed": 16
+        }
+      }
+    },
+    "python": {
+      "M2_detection": {
+        "k": 403,
+        "n": 2082,
+        "rate": 0.1936,
+        "ci95": [
+          0.1772,
+          0.2111
+        ]
+      },
+      "M3_category_agreement": {
+        "k": 278,
+        "n": 2082,
+        "rate": 0.1335,
+        "ci95": [
+          0.1196,
+          0.1488
+        ]
+      },
+      "M4_conditional_category_agreement": {
+        "k": 278,
+        "n": 403,
+        "rate": 0.6898,
+        "ci95": [
+          0.6431,
+          0.733
+        ]
+      },
+      "M5_exact_span_agreement": {
+        "k": 176,
+        "n": 1857,
+        "rate": 0.0948,
+        "ci95": [
+          0.0823,
+          0.1089
+        ]
+      },
+      "per_family": {
+        "tests": {
+          "labelled": 151,
+          "detected": 72,
+          "agreed": 69
+        },
+        "build": {
+          "labelled": 33,
+          "detected": 13,
+          "agreed": 7
+        },
+        "files": {
+          "labelled": 698,
+          "detected": 82,
+          "agreed": 52
+        },
+        "git": {
+          "labelled": 153,
+          "detected": 72,
+          "agreed": 66
+        },
+        "ship": {
+          "labelled": 70,
+          "detected": 18,
+          "agreed": 13
+        },
+        "ran": {
+          "labelled": 404,
+          "detected": 45,
+          "agreed": 16
+        },
+        "verified": {
+          "labelled": 391,
+          "detected": 73,
+          "agreed": 39
+        },
+        "works": {
+          "labelled": 182,
+          "detected": 28,
+          "agreed": 16
+        }
+      }
+    }
+  }
+}

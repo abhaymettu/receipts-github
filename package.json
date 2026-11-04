@@ -20,7 +20,8 @@
   "scripts": {
     "build": "npm run build -w packages/checker && node scripts/bundle.mjs",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bench:prefilter": "nice -n 19 python3 bench/prefilter.py && node --conditions=source bench/prefilter.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
