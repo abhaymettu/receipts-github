@@ -1,0 +1,1455 @@
+{
+ "frozen": "2026-11-04",
+ "seed": 20261104,
+ "window": {
+  "from": "2026-09-01",
+  "to": "2026-10-31"
+ },
+ "rules": {
+  "total": 200,
+  "own": "author:abhaymettu, public repos, description of 40+ characters outside HTML comments",
+  "public": "per agent query, 50 newest per week in the window, seeded shuffle; repo public, not archived, 10+ stars, 3+ PRs from that agent in the window; at most 3 per repo; Dependabot and Renovate excluded; equal quotas, an agent short of its quota hands the rest round-robin to the others",
+  "agents": [
+   {
+    "agent": "copilot",
+    "query": "author:app/copilot-swe-agent"
+   },
+   {
+    "agent": "devin",
+    "query": "author:app/devin-ai-integration"
+   },
+   {
+    "agent": "jules",
+    "query": "author:app/google-labs-jules"
+   },
+   {
+    "agent": "cursor",
+    "query": "author:app/cursor"
+   },
+   {
+    "agent": "claude-app",
+    "query": "author:app/claude"
+   },
+   {
+    "agent": "claude-code",
+    "query": "\"Generated with Claude Code\" in:body"
+   },
+   {
+    "agent": "codex",
+    "query": "\"chatgpt.com/codex/tasks\" in:body"
+   }
+  ]
+ },
+ "counts": {
+  "own": 8,
+  "copilot": 46,
+  "devin": 34,
+  "jules": 10,
+  "cursor": 16,
+  "claude-app": 38,
+  "claude-code": 43,
+  "codex": 5
+ },
+ "prs": [
+  {
+   "id": "oneirum/aliquot#2",
+   "url": "https://github.com/oneirum/aliquot/pull/2",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-30"
+  },
+  {
+   "id": "oneirum/aliquot#1",
+   "url": "https://github.com/oneirum/aliquot/pull/1",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-30"
+  },
+  {
+   "id": "pingdotgg/t3code#26285",
+   "url": "https://github.com/pingdotgg/t3code/pull/26285",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-28"
+  },
+  {
+   "id": "pingdotgg/t3code#26284",
+   "url": "https://github.com/pingdotgg/t3code/pull/26284",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-28"
+  },
+  {
+   "id": "NousResearch/hermes-agent#145795",
+   "url": "https://github.com/NousResearch/hermes-agent/pull/145795",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-28"
+  },
+  {
+   "id": "ZingerLittleBee/Heeler#433",
+   "url": "https://github.com/ZingerLittleBee/Heeler/pull/433",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-09"
+  },
+  {
+   "id": "commaai/connect#791",
+   "url": "https://github.com/commaai/connect/pull/791",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-10-08"
+  },
+  {
+   "id": "punkpeye/awesome-mcp-servers#14962",
+   "url": "https://github.com/punkpeye/awesome-mcp-servers/pull/14962",
+   "source": "own",
+   "agent": "own",
+   "created": "2026-09-23"
+  },
+  {
+   "id": "githubnext/gh-cao#14609",
+   "url": "https://github.com/githubnext/gh-cao/pull/14609",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "github/gh-aw-firewall#9160",
+   "url": "https://github.com/github/gh-aw-firewall/pull/9160",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "github/replica#121",
+   "url": "https://github.com/github/replica/pull/121",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "sintaxasn/Fluence.Wpf#79",
+   "url": "https://github.com/sintaxasn/Fluence.Wpf/pull/79",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "github/gh-aw#62494",
+   "url": "https://github.com/github/gh-aw/pull/62494",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "Viritura/Viritura#55",
+   "url": "https://github.com/Viritura/Viritura/pull/55",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "github/gh-aw-firewall#8576",
+   "url": "https://github.com/github/gh-aw-firewall/pull/8576",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "filecxx/FileCentipede#956",
+   "url": "https://github.com/filecxx/FileCentipede/pull/956",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "SpaceGass/space-gass-api#144",
+   "url": "https://github.com/SpaceGass/space-gass-api/pull/144",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "github/replica#120",
+   "url": "https://github.com/github/replica/pull/120",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "cjmalloy/jasper#905",
+   "url": "https://github.com/cjmalloy/jasper/pull/905",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "github/gh-aw-mcpg#13173",
+   "url": "https://github.com/github/gh-aw-mcpg/pull/13173",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "SpaceGass/space-gass-api#141",
+   "url": "https://github.com/SpaceGass/space-gass-api/pull/141",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "intro-skipper/intro-skipper#998",
+   "url": "https://github.com/intro-skipper/intro-skipper/pull/998",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "githubnext/gh-cao#14610",
+   "url": "https://github.com/githubnext/gh-cao/pull/14610",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "open-telemetry/opentelemetry-java-instrumentation#20741",
+   "url": "https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/20741",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "CherryHQ/cherry-studio#23278",
+   "url": "https://github.com/CherryHQ/cherry-studio/pull/23278",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "envoyproxy/envoy#48749",
+   "url": "https://github.com/envoyproxy/envoy/pull/48749",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "mlflow/mlflow#26699",
+   "url": "https://github.com/mlflow/mlflow/pull/26699",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "githubnext/gh-cao#5178",
+   "url": "https://github.com/githubnext/gh-cao/pull/5178",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "Brainydaps/Brainydaps#9",
+   "url": "https://github.com/Brainydaps/Brainydaps/pull/9",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "az-digital/arizona-bootstrap#2404",
+   "url": "https://github.com/az-digital/arizona-bootstrap/pull/2404",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "CherryHQ/cherry-studio#23277",
+   "url": "https://github.com/CherryHQ/cherry-studio/pull/23277",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "Viritura/Viritura#56",
+   "url": "https://github.com/Viritura/Viritura/pull/56",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "open-telemetry/opentelemetry-java-instrumentation#20996",
+   "url": "https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/20996",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "Azure/AgentBaker#9648",
+   "url": "https://github.com/Azure/AgentBaker/pull/9648",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "bitdriftlabs/capture-sdk#1195",
+   "url": "https://github.com/bitdriftlabs/capture-sdk/pull/1195",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "orinks-games/Freight-Fate#198",
+   "url": "https://github.com/orinks-games/Freight-Fate/pull/198",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "Open-MBEE/OpenSysML#1560",
+   "url": "https://github.com/Open-MBEE/OpenSysML/pull/1560",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "BerriAI/litellm#40171",
+   "url": "https://github.com/BerriAI/litellm/pull/40171",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "kody-hq/kody#4713",
+   "url": "https://github.com/kody-hq/kody/pull/4713",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "BerriAI/litellm#42359",
+   "url": "https://github.com/BerriAI/litellm/pull/42359",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "goat-si/goat#1795",
+   "url": "https://github.com/goat-si/goat/pull/1795",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "BerriAI/litellm#43642",
+   "url": "https://github.com/BerriAI/litellm/pull/43642",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "jzone3/new-media-writer#42",
+   "url": "https://github.com/jzone3/new-media-writer/pull/42",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "diggerhq/opencomputer#839",
+   "url": "https://github.com/diggerhq/opencomputer/pull/839",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "kody-hq/kody#4710",
+   "url": "https://github.com/kody-hq/kody/pull/4710",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "Open-MBEE/OpenSysML#1814",
+   "url": "https://github.com/Open-MBEE/OpenSysML/pull/1814",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "Open-MBEE/OpenSysML#1114",
+   "url": "https://github.com/Open-MBEE/OpenSysML/pull/1114",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "airbytehq/airbyte#88493",
+   "url": "https://github.com/airbytehq/airbyte/pull/88493",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "tamaratran/jev-pruner#91",
+   "url": "https://github.com/tamaratran/jev-pruner/pull/91",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "airbytehq/airbyte-python-cdk#1159",
+   "url": "https://github.com/airbytehq/airbyte-python-cdk/pull/1159",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "airbytehq/airbyte-python-cdk#1154",
+   "url": "https://github.com/airbytehq/airbyte-python-cdk/pull/1154",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "Orinks/AccessiWeather#748",
+   "url": "https://github.com/Orinks/AccessiWeather/pull/748",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "airbytehq/airbyte-python-cdk#1160",
+   "url": "https://github.com/airbytehq/airbyte-python-cdk/pull/1160",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "airbytehq/airbyte#89094",
+   "url": "https://github.com/airbytehq/airbyte/pull/89094",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "airbytehq/airbyte#88491",
+   "url": "https://github.com/airbytehq/airbyte/pull/88491",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "BerriAI/litellm-docs#1255",
+   "url": "https://github.com/BerriAI/litellm-docs/pull/1255",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "goat-si/goat#1798",
+   "url": "https://github.com/goat-si/goat/pull/1798",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "sapiom/sapiom-js#1243",
+   "url": "https://github.com/sapiom/sapiom-js/pull/1243",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "sapiom/sapiom-js#1240",
+   "url": "https://github.com/sapiom/sapiom-js/pull/1240",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "kunchenguid/firstmate#6082",
+   "url": "https://github.com/kunchenguid/firstmate/pull/6082",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "sapiom/sapiom-js#1241",
+   "url": "https://github.com/sapiom/sapiom-js/pull/1241",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "goat-si/goat#1796",
+   "url": "https://github.com/goat-si/goat/pull/1796",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "rutaabali3/all-craft#53",
+   "url": "https://github.com/rutaabali3/all-craft/pull/53",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "rutaabali3/all-craft#9",
+   "url": "https://github.com/rutaabali3/all-craft/pull/9",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "blopa/musclog-app#304",
+   "url": "https://github.com/blopa/musclog-app/pull/304",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "blopa/musclog-app#287",
+   "url": "https://github.com/blopa/musclog-app/pull/287",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "rutaabali3/all-craft#89",
+   "url": "https://github.com/rutaabali3/all-craft/pull/89",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "blopa/musclog-app#305",
+   "url": "https://github.com/blopa/musclog-app/pull/305",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "rutaabali3/gmail#21",
+   "url": "https://github.com/rutaabali3/gmail/pull/21",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "rutaabali3/gmail#9",
+   "url": "https://github.com/rutaabali3/gmail/pull/9",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "rutaabali3/gmail#28",
+   "url": "https://github.com/rutaabali3/gmail/pull/28",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "yuanjian-org/app#1471",
+   "url": "https://github.com/yuanjian-org/app/pull/1471",
+   "source": "public",
+   "agent": "jules",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "check-technologies/mcp-server-check#112",
+   "url": "https://github.com/check-technologies/mcp-server-check/pull/112",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "hyperlocalise/hyperlocalise#2911",
+   "url": "https://github.com/hyperlocalise/hyperlocalise/pull/2911",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "hyperlocalise/hyperlocalise#2839",
+   "url": "https://github.com/hyperlocalise/hyperlocalise/pull/2839",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "Official-MoonDao/MoonDAO#1715",
+   "url": "https://github.com/Official-MoonDao/MoonDAO/pull/1715",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "matda59/ChoresRewards#29",
+   "url": "https://github.com/matda59/ChoresRewards/pull/29",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "macanderson/stella#6552",
+   "url": "https://github.com/macanderson/stella/pull/6552",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "mattermost/mattermost#38699",
+   "url": "https://github.com/mattermost/mattermost/pull/38699",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "kody-hq/kody#3583",
+   "url": "https://github.com/kody-hq/kody/pull/3583",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "macanderson/stella#6551",
+   "url": "https://github.com/macanderson/stella/pull/6551",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "langfuse/langfuse#18658",
+   "url": "https://github.com/langfuse/langfuse/pull/18658",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "hyperlocalise/hyperlocalise#2283",
+   "url": "https://github.com/hyperlocalise/hyperlocalise/pull/2283",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "cursor/plugins#968",
+   "url": "https://github.com/cursor/plugins/pull/968",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "matda59/ChoresRewards#43",
+   "url": "https://github.com/matda59/ChoresRewards/pull/43",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "harness/mcp-server#1026",
+   "url": "https://github.com/harness/mcp-server/pull/1026",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "sanity-io/sanity#15310",
+   "url": "https://github.com/sanity-io/sanity/pull/15310",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "macanderson/stella#6550",
+   "url": "https://github.com/macanderson/stella/pull/6550",
+   "source": "public",
+   "agent": "cursor",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "electron/electron#55380",
+   "url": "https://github.com/electron/electron/pull/55380",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "PublicDataWorks/verdad#83",
+   "url": "https://github.com/PublicDataWorks/verdad/pull/83",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "PublicDataWorks/verdad#82",
+   "url": "https://github.com/PublicDataWorks/verdad/pull/82",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "dosemu2/dosemu2#3111",
+   "url": "https://github.com/dosemu2/dosemu2/pull/3111",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "modelcontextprotocol/modelcontextprotocol#3459",
+   "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/pull/3459",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "1111philo/plato#375",
+   "url": "https://github.com/1111philo/plato/pull/375",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "electron-userland/electron-builder#10278",
+   "url": "https://github.com/electron-userland/electron-builder/pull/10278",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "electron/clerk#208",
+   "url": "https://github.com/electron/clerk/pull/208",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "AICMO/Autonomous-Agent-X-Bluesky#4943",
+   "url": "https://github.com/AICMO/Autonomous-Agent-X-Bluesky/pull/4943",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "safety-research/thimble#43",
+   "url": "https://github.com/safety-research/thimble/pull/43",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "theypsilon/MultiDatabases_MiSTer#5",
+   "url": "https://github.com/theypsilon/MultiDatabases_MiSTer/pull/5",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "Infisical/infisical#8579",
+   "url": "https://github.com/Infisical/infisical/pull/8579",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "PublicDataWorks/verdad#84",
+   "url": "https://github.com/PublicDataWorks/verdad/pull/84",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "electron/electron#55381",
+   "url": "https://github.com/electron/electron/pull/55381",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "electron/electron#55121",
+   "url": "https://github.com/electron/electron/pull/55121",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "Comfy-Org/ComfyUI_frontend#21391",
+   "url": "https://github.com/Comfy-Org/ComfyUI_frontend/pull/21391",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "swampratnz/community-agent#1326",
+   "url": "https://github.com/swampratnz/community-agent/pull/1326",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "aurelio-labs/semantic-chunkers#72",
+   "url": "https://github.com/aurelio-labs/semantic-chunkers/pull/72",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "Comfy-Org/ComfyUI_frontend#21379",
+   "url": "https://github.com/Comfy-Org/ComfyUI_frontend/pull/21379",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "Comfy-Org/ComfyUI_frontend#20244",
+   "url": "https://github.com/Comfy-Org/ComfyUI_frontend/pull/20244",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "artsy/metaphysics#8002",
+   "url": "https://github.com/artsy/metaphysics/pull/8002",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "electron/clerk#209",
+   "url": "https://github.com/electron/clerk/pull/209",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "swampratnz/community-agent#1327",
+   "url": "https://github.com/swampratnz/community-agent/pull/1327",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "camunda/camunda#67833",
+   "url": "https://github.com/camunda/camunda/pull/67833",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "AICMO/Autonomous-Agent-X-Bluesky#5350",
+   "url": "https://github.com/AICMO/Autonomous-Agent-X-Bluesky/pull/5350",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "linuxarena/control-tower#2195",
+   "url": "https://github.com/linuxarena/control-tower/pull/2195",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "electron-userland/electron-builder#10460",
+   "url": "https://github.com/electron-userland/electron-builder/pull/10460",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "developer0hye/office2pdf#1732",
+   "url": "https://github.com/developer0hye/office2pdf/pull/1732",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "ai-sdlc-framework/ai-sdlc#1447",
+   "url": "https://github.com/ai-sdlc-framework/ai-sdlc/pull/1447",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "cprussin/domicile#220",
+   "url": "https://github.com/cprussin/domicile/pull/220",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "LionSR/TeXRA#13485",
+   "url": "https://github.com/LionSR/TeXRA/pull/13485",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "future-agi/traceAI#466",
+   "url": "https://github.com/future-agi/traceAI/pull/466",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "sgl-project/sglang#40648",
+   "url": "https://github.com/sgl-project/sglang/pull/40648",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "profullstack/coinpayportal#322",
+   "url": "https://github.com/profullstack/coinpayportal/pull/322",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "LIT-Protocol/chipotle#652",
+   "url": "https://github.com/LIT-Protocol/chipotle/pull/652",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "vllm-project/vllm#63864",
+   "url": "https://github.com/vllm-project/vllm/pull/63864",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "we-promise/sure#4630",
+   "url": "https://github.com/we-promise/sure/pull/4630",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "langflow-ai/openrag#2404",
+   "url": "https://github.com/langflow-ai/openrag/pull/2404",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "exoego/uika#253",
+   "url": "https://github.com/exoego/uika/pull/253",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "Yeraze/meshmonitor#5906",
+   "url": "https://github.com/Yeraze/meshmonitor/pull/5906",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "fonoster/fonoster#1027",
+   "url": "https://github.com/fonoster/fonoster/pull/1027",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "Silo-Server/silo-android#482",
+   "url": "https://github.com/Silo-Server/silo-android/pull/482",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "yotamleo-org/Himmel#4428",
+   "url": "https://github.com/yotamleo-org/Himmel/pull/4428",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "the-omega-institute/trureturing#9412",
+   "url": "https://github.com/the-omega-institute/trureturing/pull/9412",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "mvschwarz/openrig#1197",
+   "url": "https://github.com/mvschwarz/openrig/pull/1197",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "MiguelMedeiros/ghostly#3515",
+   "url": "https://github.com/MiguelMedeiros/ghostly/pull/3515",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "tobi/disktree#85",
+   "url": "https://github.com/tobi/disktree/pull/85",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "stimma-ai/stimma#32",
+   "url": "https://github.com/stimma-ai/stimma/pull/32",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "orneryd/NornicDB#1129",
+   "url": "https://github.com/orneryd/NornicDB/pull/1129",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "managoat/managoat#2620",
+   "url": "https://github.com/managoat/managoat/pull/2620",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "TykTechnologies/ai-studio#739",
+   "url": "https://github.com/TykTechnologies/ai-studio/pull/739",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "benord-labs/frink#535",
+   "url": "https://github.com/benord-labs/frink/pull/535",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "mainsdotdev/mains#159",
+   "url": "https://github.com/mainsdotdev/mains/pull/159",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "abrignoni/GLEAPP#123",
+   "url": "https://github.com/abrignoni/GLEAPP/pull/123",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "SciML/SciMLBenchmarks.jl#1939",
+   "url": "https://github.com/SciML/SciMLBenchmarks.jl/pull/1939",
+   "source": "public",
+   "agent": "codex",
+   "created": "2026-10-17"
+  },
+  {
+   "id": "SciML/SciMLBenchmarks.jl#1961",
+   "url": "https://github.com/SciML/SciMLBenchmarks.jl/pull/1961",
+   "source": "public",
+   "agent": "codex",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "SciML/SciMLBenchmarks.jl#1877",
+   "url": "https://github.com/SciML/SciMLBenchmarks.jl/pull/1877",
+   "source": "public",
+   "agent": "codex",
+   "created": "2026-09-12"
+  },
+  {
+   "id": "SciML/SciMLBenchmarksOutput#70",
+   "url": "https://github.com/SciML/SciMLBenchmarksOutput/pull/70",
+   "source": "public",
+   "agent": "codex",
+   "created": "2026-09-08"
+  },
+  {
+   "id": "SciML/SciMLBenchmarksOutput#71",
+   "url": "https://github.com/SciML/SciMLBenchmarksOutput/pull/71",
+   "source": "public",
+   "agent": "codex",
+   "created": "2026-09-08"
+  },
+  {
+   "id": "open-telemetry/opentelemetry-java-instrumentation#21118",
+   "url": "https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/21118",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "BerriAI/litellm-docs#1908",
+   "url": "https://github.com/BerriAI/litellm-docs/pull/1908",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "AICMO/Autonomous-Agent-X-Bluesky#5380",
+   "url": "https://github.com/AICMO/Autonomous-Agent-X-Bluesky/pull/5380",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "yorkie-team/yorkie-js-sdk#1369",
+   "url": "https://github.com/yorkie-team/yorkie-js-sdk/pull/1369",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "github/gh-aw#62488",
+   "url": "https://github.com/github/gh-aw/pull/62488",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "BerriAI/litellm-docs#2091",
+   "url": "https://github.com/BerriAI/litellm-docs/pull/2091",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "electron/clerk#210",
+   "url": "https://github.com/electron/clerk/pull/210",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "atelier-fashion/adlc-toolkit#187",
+   "url": "https://github.com/atelier-fashion/adlc-toolkit/pull/187",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "Azure/azure-sdk-tools#17017",
+   "url": "https://github.com/Azure/azure-sdk-tools/pull/17017",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "onyx-dot-app/onyx#16285",
+   "url": "https://github.com/onyx-dot-app/onyx/pull/16285",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "vectaport/ivtools#577",
+   "url": "https://github.com/vectaport/ivtools/pull/577",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "MillionSend/millionsend#115",
+   "url": "https://github.com/MillionSend/millionsend/pull/115",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "tenstorrent/tt-metal#62593",
+   "url": "https://github.com/tenstorrent/tt-metal/pull/62593",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "LayerNorm/overlay-web#363",
+   "url": "https://github.com/LayerNorm/overlay-web/pull/363",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "Infisical/infisical#8033",
+   "url": "https://github.com/Infisical/infisical/pull/8033",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "burr-tools/burr-tools#105",
+   "url": "https://github.com/burr-tools/burr-tools/pull/105",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "github/gh-aw#62492",
+   "url": "https://github.com/github/gh-aw/pull/62492",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "ai-dynamo/dynamo#16847",
+   "url": "https://github.com/ai-dynamo/dynamo/pull/16847",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "nodetool-ai/nodetool#6118",
+   "url": "https://github.com/nodetool-ai/nodetool/pull/6118",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "LanternOps/breeze#8558",
+   "url": "https://github.com/LanternOps/breeze/pull/8558",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "proximafusion/vmecpp#826",
+   "url": "https://github.com/proximafusion/vmecpp/pull/826",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "fern-api/fern#17815",
+   "url": "https://github.com/fern-api/fern/pull/17815",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "dosu-ai/dosu-cli#294",
+   "url": "https://github.com/dosu-ai/dosu-cli/pull/294",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "224-Industries/webflow-skills#4",
+   "url": "https://github.com/224-Industries/webflow-skills/pull/4",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "SpaceGass/space-gass-api#145",
+   "url": "https://github.com/SpaceGass/space-gass-api/pull/145",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "alphaXiv/OpenResearch#715",
+   "url": "https://github.com/alphaXiv/OpenResearch/pull/715",
+   "source": "public",
+   "agent": "devin",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "theypsilon/MultiDatabases_MiSTer#11",
+   "url": "https://github.com/theypsilon/MultiDatabases_MiSTer/pull/11",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "geoff-maddock/events-tracker#2268",
+   "url": "https://github.com/geoff-maddock/events-tracker/pull/2268",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "github/gh-aw-firewall#9159",
+   "url": "https://github.com/github/gh-aw-firewall/pull/9159",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "Uniswap/sdks#729",
+   "url": "https://github.com/Uniswap/sdks/pull/729",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "VEST-Tokamak/vaft#776",
+   "url": "https://github.com/VEST-Tokamak/vaft/pull/776",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "Viritura/Viritura#57",
+   "url": "https://github.com/Viritura/Viritura/pull/57",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "arthur-ai/arthur-engine#2472",
+   "url": "https://github.com/arthur-ai/arthur-engine/pull/2472",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "The-AIOS/aios-app#83",
+   "url": "https://github.com/The-AIOS/aios-app/pull/83",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "microsoft/brewlet#129",
+   "url": "https://github.com/microsoft/brewlet/pull/129",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "electron/forge#4424",
+   "url": "https://github.com/electron/forge/pull/4424",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "kungfuflex/alkanes-rs#321",
+   "url": "https://github.com/kungfuflex/alkanes-rs/pull/321",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "pnp/sp-dev-fx-controls-react#2190",
+   "url": "https://github.com/pnp/sp-dev-fx-controls-react/pull/2190",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "Infisical/infisical#8453",
+   "url": "https://github.com/Infisical/infisical/pull/8453",
+   "source": "public",
+   "agent": "claude-app",
+   "created": "2026-10-05"
+  },
+  {
+   "id": "ASC-Community/AngouriMath#1955",
+   "url": "https://github.com/ASC-Community/AngouriMath/pull/1955",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-19"
+  },
+  {
+   "id": "tenstorrent/tt-metal#56573",
+   "url": "https://github.com/tenstorrent/tt-metal/pull/56573",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "quanticstudios/pitwall#264",
+   "url": "https://github.com/quanticstudios/pitwall/pull/264",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "az-digital/arizona-bootstrap#2403",
+   "url": "https://github.com/az-digital/arizona-bootstrap/pull/2403",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "ultralytics/ultralytics#26090",
+   "url": "https://github.com/ultralytics/ultralytics/pull/26090",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-07"
+  },
+  {
+   "id": "Azure/azure-sdk-for-js#40134",
+   "url": "https://github.com/Azure/azure-sdk-for-js/pull/40134",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-28"
+  },
+  {
+   "id": "eyalamirmusic/eacp#57",
+   "url": "https://github.com/eyalamirmusic/eacp/pull/57",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-14"
+  },
+  {
+   "id": "pnp/sp-dev-fx-controls-react#2191",
+   "url": "https://github.com/pnp/sp-dev-fx-controls-react/pull/2191",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "WiscWebGroup/photoly#33",
+   "url": "https://github.com/WiscWebGroup/photoly/pull/33",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-10-12"
+  },
+  {
+   "id": "CherryHQ/cherry-studio#23280",
+   "url": "https://github.com/CherryHQ/cherry-studio/pull/23280",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-31"
+  },
+  {
+   "id": "internetarchive/elements#114",
+   "url": "https://github.com/internetarchive/elements/pull/114",
+   "source": "public",
+   "agent": "claude-code",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "longhorn/longhorn-instance-manager#1801",
+   "url": "https://github.com/longhorn/longhorn-instance-manager/pull/1801",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  },
+  {
+   "id": "Brainydaps/Brainydaps#8",
+   "url": "https://github.com/Brainydaps/Brainydaps/pull/8",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-09-21"
+  },
+  {
+   "id": "az-digital/arizona-bootstrap#2405",
+   "url": "https://github.com/az-digital/arizona-bootstrap/pull/2405",
+   "source": "public",
+   "agent": "copilot",
+   "created": "2026-10-26"
+  }
+ ]
+}

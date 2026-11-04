@@ -36,6 +36,14 @@ interface Item {
   readonly created_at: string;
 }
 
+interface Scan {
+  readonly agent: string;
+  readonly query: string;
+  readonly queue: Item[];
+  readonly pool: number;
+  got: number;
+}
+
 interface Pick {
   readonly id: string;
   readonly url: string;
@@ -131,31 +139,53 @@ async function main() {
     if (eligibleText(item) && (await meta(repoOf(item))).public) own.push(pick(item, "own", "own"));
   }
 
-  const quota = TOTAL - own.length;
   const picks: Pick[] = [...own];
   const perRepo = new Map<string, number>();
+  const scans: Scan[] = [];
   for (const [i, a] of AGENTS.entries()) {
-    const want = Math.floor(quota / AGENTS.length) + (i < quota % AGENTS.length ? 1 : 0);
     const pool: Item[] = [];
     for (const [from, to] of weeks()) {
       const res = await search(`is:pr ${a.query} created:${from}..${to}`, 50);
       pool.push(...res.items.filter((it) => eligibleText(it) && ("marker" in a ? (it.body ?? "").includes(a.marker) : true)));
     }
-    let got = 0;
-    for (const item of shuffled(pool, SEED + i)) {
-      if (got === want) break;
+    scans.push({ ...a, queue: shuffled(pool, SEED + i), pool: pool.length, got: 0 });
+  }
+
+  /** The next eligible pull request in this agent's shuffled pool, or null when the pool runs out. */
+  async function next(scan: Scan): Promise<Pick | null> {
+    for (let item = scan.queue.shift(); item !== undefined; item = scan.queue.shift()) {
       const repo = repoOf(item);
       if (OWN_ORGS.includes(repo.split("/")[0] ?? "") || (perRepo.get(repo) ?? 0) >= PER_REPO) continue;
       if (picks.some((p) => p.id === `${repo}#${item.number}`)) continue;
       const m = await meta(repo);
       if (!m.public || m.archived || m.stars < MIN_STARS) continue;
-      if ((await agentPrs(repo, a.query)) < MIN_AGENT_PRS) continue;
-      picks.push(pick(item, "public", a.agent));
+      if ((await agentPrs(repo, scan.query)) < MIN_AGENT_PRS) continue;
       perRepo.set(repo, (perRepo.get(repo) ?? 0) + 1);
-      got += 1;
+      return pick(item, "public", scan.agent);
     }
-    console.error(`${a.agent}: pool ${pool.length}, picked ${got} of ${want}`);
+    return null;
   }
+
+  // Equal quotas first; an agent whose pool runs out hands its share round-robin to the others.
+  const quota = Math.floor((TOTAL - own.length) / AGENTS.length);
+  for (const scan of scans) {
+    while (scan.got < quota) {
+      const p = await next(scan);
+      if (p === null) break;
+      picks.push(p);
+      scan.got += 1;
+    }
+  }
+  for (let open = scans.filter((s) => s.queue.length > 0); picks.length < TOTAL && open.length > 0; open = open.filter((s) => s.queue.length > 0)) {
+    for (const scan of open) {
+      if (picks.length === TOTAL) break;
+      const p = await next(scan);
+      if (p === null) continue;
+      picks.push(p);
+      scan.got += 1;
+    }
+  }
+  for (const s of scans) console.error(`${s.agent}: pool ${s.pool}, picked ${s.got}`);
 
   const file = {
     frozen: new Date().toISOString().slice(0, 10),
@@ -164,7 +194,7 @@ async function main() {
     rules: {
       total: TOTAL,
       own: "author:abhaymettu, public repos, description of 40+ characters outside HTML comments",
-      public: `per agent query, 50 newest per week in the window, seeded shuffle; repo public, not archived, ${MIN_STARS}+ stars, ${MIN_AGENT_PRS}+ PRs from that agent in the window; at most ${PER_REPO} per repo; Dependabot and Renovate excluded`,
+      public: `per agent query, 50 newest per week in the window, seeded shuffle; repo public, not archived, ${MIN_STARS}+ stars, ${MIN_AGENT_PRS}+ PRs from that agent in the window; at most ${PER_REPO} per repo; Dependabot and Renovate excluded; equal quotas, an agent short of its quota hands the rest round-robin to the others`,
       agents: AGENTS.map((a) => ({ agent: a.agent, query: a.query })),
     },
     counts: Object.fromEntries([...new Set(picks.map((p) => p.agent))].map((g) => [g, picks.filter((p) => p.agent === g).length])),

@@ -72,13 +72,15 @@ Preregistered 2026-11-04. The protocol and the frozen ids below are fixed before
 [`scripts/freeze-corpus.ts`](scripts/freeze-corpus.ts) and recorded with its rules. They come from two sources. The
 first is Abhay's own pull requests in public repositories, most of them written by his coding agents. The second is
 public pull requests from seven agent sources (Copilot coding agent, Devin, Jules, Cursor, the Claude GitHub app,
-Claude Code, OpenAI Codex), drawn in equal quotas from repositories with 10 or more stars and 3 or more pull requests
+Claude Code, OpenAI Codex), drawn in equal quotas (an agent short of its quota hands the rest round-robin to the others) from repositories with 10 or more stars and 3 or more pull requests
 from that agent in the window, at most 3 per repository, Dependabot and Renovate excluded. The window runs from
 2026-09-01 to 2026-10-31. Laneproof's lanes have opened no pull requests on GitHub
 (`gh pr list -R abhaymettu/laneproof --state all` returns none on 2026-11-03), so that source is empty and its
 share went to the public sources.
 
-sha256 of `data/prs.json`: `SHA256_PENDING`
+sha256 of `data/prs.json`: `59889f2f1a19b7977ab8fe25b1e0dc428d5e86e7fe394c6257de6749ba1c0b5e`
+
+Counts: 8 of his own, then Copilot 46, Claude Code 43, Claude app 38, Devin 34, Cursor 16, Jules 10, Codex 5.
 
 **Split.** The set divides into dev and test halves by a hash of the repository name, so no repository spans both.
 Rules are tuned on dev only. Test is scored once, after the rules are frozen and tagged.
