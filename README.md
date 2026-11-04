@@ -33,11 +33,12 @@ https://github.com/Open-MBEE/OpenSysML/pull/1908 @ eb8e5c7: 1 unbacked, 2 unveri
 [can1357/oh-my-pi#15391](https://github.com/can1357/oh-my-pi/pull/15391), says three test suites pass, and no check
 ran on any of its 12 commits. That one comes back `unbacked: no check ran on this pull request`.
 
-This repository runs the action on its own pull requests. On [#1](https://github.com/abhaymettu/receipts-github/pull/1)
-it checked the description I wrote ([the check run](https://github.com/abhaymettu/receipts-github/runs/126409817430),
-pictured above). Five claims were verified against the `test` job, the diff and the commits. One was unverifiable,
-and rightly. I ran the prefilter benchmark on my laptop against private labels, and no pull
-request can carry that receipt.
+This repository runs the App on its own pull requests. On [#2](https://github.com/abhaymettu/receipts-github/pull/2),
+the pull request that added the App, its verdict on the first push caught me: the description said `npm test` passes, and CI
+had failed on a test that still read the workflow file the same pull request removed. After the fix,
+[the App's check run](https://github.com/abhaymettu/receipts-github/runs/126427124575) verified five claims against
+the `test` job, the diff and the commits. The sixth, "I deployed the Worker", is unverifiable, and rightly: no pull
+request can carry that receipt. The picture above is the action's run on [#1](https://github.com/abhaymettu/receipts-github/pull/1).
 
 ## Install
 
