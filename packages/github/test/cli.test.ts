@@ -95,10 +95,11 @@ describe("writeWorkflow", () => {
     expect(await readFile(join(root, WORKFLOW_PATH), "utf8")).toBe(expected);
   });
 
-  it("asks for the same permissions as this repository's own receipts workflow", async () => {
-    const dogfood = await readFile(join(import.meta.dirname, "../../../.github/workflows/receipts.yml"), "utf8");
-    const permissions = (yaml: string) => /^permissions:\n(?: {2}.+\n)+/m.exec(yaml)?.[0];
-    expect(permissions(WORKFLOW)).toBe("permissions:\n  checks: write\n  contents: read\n  pull-requests: read\n  actions: read\n  statuses: read\n");
-    expect(permissions(dogfood)).toBe(permissions(WORKFLOW));
+  it("asks for the same permissions as the GitHub App", async () => {
+    const manifest = JSON.parse(await readFile(join(import.meta.dirname, "../../../app-manifest.json"), "utf8"));
+    const permissions = /^permissions:\n((?: {2}.+\n)+)/m.exec(WORKFLOW)?.[1] ?? "";
+    expect(permissions).toBe("  checks: write\n  contents: read\n  pull-requests: read\n  actions: read\n  statuses: read\n");
+    const fromWorkflow = Object.fromEntries(permissions.trim().split("\n").map((line) => line.trim().replace("-", "_").split(": ")));
+    expect({ ...fromWorkflow, metadata: "read" }).toEqual(manifest.default_permissions);
   });
 });

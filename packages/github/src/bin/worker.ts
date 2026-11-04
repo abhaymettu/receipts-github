@@ -15,8 +15,11 @@ export interface Context {
 }
 
 const HOME = "https://github.com/abhaymettu/receipts-github";
+/** A pull request's own CI starts with it; waiting this long lets its runs appear before the first verdict. */
+export const SETTLE_MS = 20_000;
 
-async function handle(target: Target, env: Env): Promise<void> {
+async function handle(target: Target, env: Env, settleMs: number): Promise<void> {
+  if (settleMs > 0) await new Promise((resolve) => setTimeout(resolve, settleMs));
   const where = `${target.pull.owner}/${target.pull.repo}#${target.pull.number}@${target.sha.slice(0, 7)}`;
   try {
     const jwt = await appJwt({ appId: env.APP_ID, privateKey: env.PRIVATE_KEY, now: Date.now() });
@@ -41,7 +44,8 @@ export default {
     }
     const event = request.headers.get("x-github-event") ?? "";
     const queued = targets(event, JSON.parse(new TextDecoder().decode(body)), Number(env.APP_ID));
-    ctx.waitUntil(Promise.all(queued.map((target) => handle(target, env))));
+    const settleMs = event === "pull_request" ? SETTLE_MS : 0;
+    ctx.waitUntil(Promise.all(queued.map((target) => handle(target, env, settleMs))));
     return new Response(`${event}: ${queued.length} pull request(s) to check\n`, { status: 202 });
   },
 };
