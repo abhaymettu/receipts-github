@@ -1,4 +1,4 @@
-// Bundles the Action and the CLI into dist/ with zod inlined, so neither needs an install step.
+// Bundles the Action, the CLI and the App's Worker into dist/ with zod inlined, so none needs an install step.
 import { chmod } from "node:fs/promises";
 import { build } from "esbuild";
 
@@ -15,5 +15,6 @@ const shared = {
 await Promise.all([
   build({ ...shared, entryPoints: ["packages/github/src/bin/action.ts"], outfile: "dist/action.js" }),
   build({ ...shared, entryPoints: ["packages/github/src/bin/cli.ts"], outfile: "dist/cli.js" }),
+  build({ ...shared, platform: "neutral", target: "es2023", minify: true, entryPoints: ["packages/github/src/bin/worker.ts"], outfile: "dist/worker.js" }),
 ]);
 await chmod("dist/cli.js", 0o755);

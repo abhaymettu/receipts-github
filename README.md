@@ -8,6 +8,10 @@ It reads the claims in a pull request's title, description and commit messages (
 diff, the check runs and statuses, the commands its Actions jobs ran, and its commits. Each claim comes back
 **verified**, **unbacked** or **unverifiable**, in one check run, with a link to the receipt that decided it.
 
+It caught a Devin pull request ticking "`make test` and `make lint` pass locally" while CI ran only on the commit
+before the head, and a Codex pull request saying three test suites pass with no check on any of its 12 commits. Its
+claim reader gives the same output as receipts' on all 2,082 hand-labelled claims.
+
 ![The receipts check run on this repository's first pull request: 0 unbacked, 1 unverifiable, 5 verified of 6 claims](docs/check-run.png)
 
 It is the pull request side of [receipts](https://github.com/abhaymettu/receipts), which checks the same claims
@@ -33,15 +37,27 @@ https://github.com/Open-MBEE/OpenSysML/pull/1908 @ eb8e5c7: 1 unbacked, 2 unveri
 [can1357/oh-my-pi#15391](https://github.com/can1357/oh-my-pi/pull/15391), says three test suites pass, and no check
 ran on any of its 12 commits. That one comes back `unbacked: no check ran on this pull request`.
 
-This repository runs the action on its own pull requests. On [#1](https://github.com/abhaymettu/receipts-github/pull/1)
-it checked the description I wrote ([the check run](https://github.com/abhaymettu/receipts-github/runs/126409817430),
-pictured above). Five claims were verified against the `test` job, the diff and the commits. One was unverifiable,
-and rightly. I ran the prefilter benchmark on my laptop against private labels, and no pull
-request can carry that receipt.
+This repository runs the App on its own pull requests. On [#2](https://github.com/abhaymettu/receipts-github/pull/2),
+the pull request that added the App, its verdict on the first push caught me: the description said `npm test` passes, and CI
+had failed on a test that still read the workflow file the same pull request removed. After the fix,
+[the App's check run](https://github.com/abhaymettu/receipts-github/runs/126427124575) verified five claims against
+the `test` job, the diff and the commits. The sixth, "I deployed the Worker", is unverifiable, and rightly: no pull
+request can carry that receipt. The picture above is the action's run on [#1](https://github.com/abhaymettu/receipts-github/pull/1).
 
 ## Install
 
-Run this in your repository:
+[![Install the GitHub App](https://img.shields.io/badge/Install-GitHub%20App-2ea44f?logo=github&style=for-the-badge)](https://github.com/apps/receipts-github/installations/new)
+
+Pick the repositories, and the `receipts` check appears on their next pull request. There is no workflow file and no
+token to set. The App reads code, pull requests, Actions logs and commit statuses, and writes only check runs.
+
+It checks a pull request when it opens, when its description is edited and on every push. While the pull request's
+other checks are still running, the check stays in progress. When they finish, it posts the verdicts. Re-running the
+check from the Checks tab reads everything again.
+
+### Or run it as an Action
+
+If you would rather keep it inside your own Actions minutes, run this in your repository:
 
 ```bash
 npx github:abhaymettu/receipts-github init
@@ -95,8 +111,8 @@ exits 1 when a claim is unbacked, unless you pass `--fail-on never`.
 | deployed, installed, I ran the migration, I tested it by hand | A check on the head commit that ran it. | Never. Without that check these are **unverifiable**: nothing a pull request carries could show them. |
 
 A check that names no kind of work and logs nothing readable (an external CI status, say) makes a claim
-unverifiable, not unbacked. Runs cancelled by a newer push count as skipped, not failed. The action never judges
-its own check. [`CONTRACT.md`](CONTRACT.md) has every rule, every API field it reads, and the protocol for measuring
+unverifiable, not unbacked. Runs cancelled by a newer push count as skipped, not failed. Neither the App nor the
+action judges its own check. [`CONTRACT.md`](CONTRACT.md) has every rule, every API field it reads, and the protocol for measuring
 it.
 
 ## How well it reads claims
@@ -120,9 +136,13 @@ npm run bench:prefilter    # needs receipts' private labelled set; writes bench/
 - `packages/checker` is pure. `parseReceipts` turns GitHub's REST responses into one `PullRequest` at the boundary,
   and check runs and commit statuses become one `Check` type. `judge(claim, pr)` is a total function over the claim
   kinds, with an exhaustive switch.
-- `packages/github` holds the I/O: a small REST client over `fetch`, the action, and the CLI. The wait-for-CI
+- `packages/github` holds the I/O: a small REST client over `fetch`, the action, the CLI and the App. The wait-for-CI
   decision is a pure function with its own tests.
-- One esbuild bundle in `dist/` serves the action and `npx`. CI rebuilds it and fails if the committed copy drifts.
+- The App is a Cloudflare Worker (`src/bin/worker.ts`). It checks each webhook's signature, signs the App's JWT with
+  WebCrypto, and writes one check run per head commit, updated in place. Reading five commits and ten job logs keeps a
+  check near 30 requests, inside a free Worker's 50.
+- One esbuild bundle per entry point in `dist/` serves the action, `npx` and the Worker. CI rebuilds them and fails if
+  a committed copy drifts.
 - The only runtime dependency is zod, and it is bundled. Permissions are read-only plus `checks: write`. On a fork
   pull request, where the token cannot write checks, the verdicts go to the job summary instead.
 - The tests include ten real agent pull requests (Copilot, Devin, Jules, Cursor, Claude Code, Codex) recorded as
@@ -134,6 +154,17 @@ npm ci
 npm test               # vitest
 npx tsc --noEmit       # strict, no any
 npm run build          # checker package, then dist/
+```
+
+To run your own copy of the App: register a GitHub App with the permissions above and the `pull_request`,
+`check_suite` and `check_run` events, point its webhook at `https://<your worker>/webhook`, set `APP_ID` in
+`wrangler.toml`, and store the key and webhook secret as Worker secrets. GitHub hands out a PKCS#1 key, and WebCrypto
+wants PKCS#8:
+
+```bash
+openssl pkcs8 -topk8 -nocrypt -in app.private-key.pem | npx wrangler@4.157.0 secret put PRIVATE_KEY
+npx wrangler@4.157.0 secret put WEBHOOK_SECRET
+npm run build && npx wrangler@4.157.0 deploy
 ```
 
 ## License

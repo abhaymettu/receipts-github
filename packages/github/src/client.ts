@@ -45,6 +45,7 @@ export interface GitHub {
   pages(path: string, items: (page: unknown) => readonly unknown[]): Promise<unknown[]>;
   text(path: string): Promise<string>;
   post(path: string, body: unknown): Promise<unknown>;
+  patch(path: string, body: unknown): Promise<unknown>;
 }
 
 export interface GitHubOptions {
@@ -81,6 +82,7 @@ export function gitHub({ token, baseUrl = "https://api.github.com", fetch: send 
     json: async (path) => (await request("GET", path)).json(),
     text: async (path) => (await request("GET", path)).text(),
     post: async (path, body) => (await request("POST", path, body)).json(),
+    patch: async (path, body) => (await request("PATCH", path, body)).json(),
     async pages(path, items) {
       const all: unknown[] = [];
       let next: string | null = path + (path.includes("?") ? "&" : "?") + "per_page=100";
@@ -134,7 +136,21 @@ export function runGroups(log: string): string {
 /** Statuses GitHub returns for a log it will not hand over: expired, deleted, or needs a token. */
 const MISSING_LOG = new Set([401, 403, 404, 410]);
 
-export async function fetchReceipts({ github, pull }: { github: GitHub; pull: PullRef }): Promise<RawReceipts> {
+/** How much history to read; the App lowers both to stay inside a Worker's subrequest budget. */
+export interface Limits {
+  readonly commits: number;
+  readonly logs: number;
+}
+
+export async function fetchReceipts({
+  github,
+  pull,
+  limits = { commits: MAX_COMMITS, logs: MAX_LOGS },
+}: {
+  github: GitHub;
+  pull: PullRef;
+  limits?: Limits;
+}): Promise<RawReceipts> {
   const repo = `/repos/${pull.owner}/${pull.repo}`;
   const [pullJson, files, commits] = await Promise.all([
     github.json(`${repo}/pulls/${pull.number}`),
@@ -142,7 +158,7 @@ export async function fetchReceipts({ github, pull }: { github: GitHub; pull: Pu
     github.pages(`${repo}/pulls/${pull.number}/commits`, (page) => AnyArray.parse(page)),
   ]);
 
-  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-MAX_COMMITS).reverse();
+  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-limits.commits).reverse();
   const shas = [...new Set([PullHead.parse(pullJson).head.sha, ...recent])];
 
   const perSha = await mapLimit(shas, async (sha) => {
@@ -157,7 +173,7 @@ export async function fetchReceipts({ github, pull }: { github: GitHub; pull: Pu
     .flatMap(({ runs }) => z.array(ActionsRun).parse(runs))
     .filter((run) => run.app?.slug === "github-actions")
     .map((run) => run.id)
-    .slice(0, MAX_LOGS);
+    .slice(0, limits.logs);
 
   const logs = await mapLimit(actionsJobIds, async (id) => {
     try {

@@ -20476,6 +20476,7 @@ function gitHub({ token, baseUrl = "https://api.github.com", fetch: send = fetch
     json: async (path) => (await request("GET", path)).json(),
     text: async (path) => (await request("GET", path)).text(),
     post: async (path, body) => (await request("POST", path, body)).json(),
+    patch: async (path, body) => (await request("PATCH", path, body)).json(),
     async pages(path, items) {
       const all = [];
       let next = path + (path.includes("?") ? "&" : "?") + "per_page=100";
@@ -20518,14 +20519,18 @@ function runGroups(log) {
   return kept.join("\n");
 }
 var MISSING_LOG = /* @__PURE__ */ new Set([401, 403, 404, 410]);
-async function fetchReceipts({ github, pull }) {
+async function fetchReceipts({
+  github,
+  pull,
+  limits = { commits: MAX_COMMITS, logs: MAX_LOGS }
+}) {
   const repo = `/repos/${pull.owner}/${pull.repo}`;
   const [pullJson, files2, commits] = await Promise.all([
     github.json(`${repo}/pulls/${pull.number}`),
     github.pages(`${repo}/pulls/${pull.number}/files`, (page) => AnyArray.parse(page)),
     github.pages(`${repo}/pulls/${pull.number}/commits`, (page) => AnyArray.parse(page))
   ]);
-  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-MAX_COMMITS).reverse();
+  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-limits.commits).reverse();
   const shas = [.../* @__PURE__ */ new Set([PullHead.parse(pullJson).head.sha, ...recent])];
   const perSha = await mapLimit(shas, async (sha) => {
     const [runs2, statuses] = await Promise.all([
@@ -20534,7 +20539,7 @@ async function fetchReceipts({ github, pull }) {
     ]);
     return { sha, runs: runs2, statuses };
   });
-  const actionsJobIds = perSha.flatMap(({ runs: runs2 }) => external_exports.array(ActionsRun).parse(runs2)).filter((run2) => run2.app?.slug === "github-actions").map((run2) => run2.id).slice(0, MAX_LOGS);
+  const actionsJobIds = perSha.flatMap(({ runs: runs2 }) => external_exports.array(ActionsRun).parse(runs2)).filter((run2) => run2.app?.slug === "github-actions").map((run2) => run2.id).slice(0, limits.logs);
   const logs = await mapLimit(actionsJobIds, async (id) => {
     try {
       return [String(id), runGroups(await github.text(`${repo}/actions/jobs/${id}/logs`))];
@@ -20562,9 +20567,18 @@ async function mapLimit(items, work, limit = 8) {
   return results;
 }
 
+// packages/github/src/summary.ts
+var SUMMARY_LIMIT = 65e3;
+function capSummary(markdown) {
+  const bytes = new TextEncoder().encode(markdown);
+  if (bytes.length <= SUMMARY_LIMIT) return markdown;
+  const note = "\n\n(Cut to fit the check run; the job's step summary has the full table.)";
+  const kept = new TextDecoder().decode(bytes.subarray(0, SUMMARY_LIMIT - new TextEncoder().encode(note).length));
+  return kept.replace(/�$/, "") + note;
+}
+
 // packages/github/src/action.ts
 var POLL_MS = 15e3;
-var SUMMARY_LIMIT = 65e3;
 function isOwnCheck(check2, self) {
   const ownRun = `/actions/runs/${self.runId}/`;
   return check2.name === self.checkName || check2.name === self.jobName || check2.urls.some((url2) => url2?.includes(ownRun) === true);
@@ -20633,13 +20647,6 @@ async function waitForChecks({ github, repo, sha, self, limitMs }) {
       }
     }
   }
-}
-function capSummary(markdown) {
-  const bytes = Buffer.from(markdown);
-  if (bytes.length <= SUMMARY_LIMIT) return markdown;
-  const note = "\n\n(Cut to fit the check run; the job's step summary has the full table.)";
-  const kept = new TextDecoder().decode(bytes.subarray(0, SUMMARY_LIMIT - Buffer.byteLength(note)));
-  return kept.replace(/\uFFFD$/, "") + note;
 }
 async function run() {
   try {

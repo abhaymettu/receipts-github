@@ -1,0 +1,18 @@
+{
+  "name": "receipts-github",
+  "url": "https://github.com/abhaymettu/receipts-github",
+  "description": "Checks what a pull request says it did against what its diff and checks show, and posts one check run: each claim verified, unbacked or unverifiable, with a link to the receipt that decided it.",
+  "hook_attributes": { "url": "https://receipts-github.abhays-account.workers.dev/webhook", "active": true },
+  "redirect_url": "https://github.com/abhaymettu/receipts-github",
+  "setup_url": "https://github.com/abhaymettu/receipts-github#install",
+  "public": true,
+  "default_permissions": {
+    "pull_requests": "read",
+    "checks": "write",
+    "contents": "read",
+    "metadata": "read",
+    "actions": "read",
+    "statuses": "read"
+  },
+  "default_events": ["pull_request", "check_suite", "check_run"]
+}

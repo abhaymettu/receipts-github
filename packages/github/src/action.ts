@@ -3,10 +3,10 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { z } from "zod";
 import { checkPullRequest, parseReceipts, summarize } from "@receipts-github/checker";
 import { fetchReceipts, gitHub, GitHubError, type GitHub, type PullRef } from "./client.ts";
+import { capSummary } from "./summary.ts";
 
 export const POLL_MS = 15_000;
-/** GitHub rejects a check run whose output.summary exceeds 65,535 characters. */
-export const SUMMARY_LIMIT = 65_000;
+export { capSummary, SUMMARY_LIMIT } from "./summary.ts";
 
 /**
  * What identifies the checks this action must not wait for or judge: its own workflow run, its own check run, and
@@ -119,15 +119,6 @@ async function waitForChecks({ github, repo, sha, self, limitMs }: { github: Git
       }
     }
   }
-}
-
-/** Cuts by UTF-8 bytes, which stays under the limit however GitHub counts characters. */
-export function capSummary(markdown: string): string {
-  const bytes = Buffer.from(markdown);
-  if (bytes.length <= SUMMARY_LIMIT) return markdown;
-  const note = "\n\n(Cut to fit the check run; the job's step summary has the full table.)";
-  const kept = new TextDecoder().decode(bytes.subarray(0, SUMMARY_LIMIT - Buffer.byteLength(note)));
-  return kept.replace(/\uFFFD$/, "") + note;
 }
 
 /** Exit code: 1 on an error, or when no check run could be written and fail-on says a verdict fails the step. */
