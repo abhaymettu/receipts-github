@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
     "target": "es2023",
-    "lib": ["es2023"],
+    "lib": [
+      "es2023"
+    ],
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "customConditions": ["source"],
-    "types": ["node"],
+    "customConditions": [
+      "source"
+    ],
+    "types": [
+      "node"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -14,7 +20,15 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true
   },
-  "include": ["packages/*/src", "packages/*/test", "scripts", "bench", "vitest.config.ts"]
+  "include": [
+    "packages/*/src",
+    "packages/*/test",
+    "scripts",
+    "bench",
+    "vitest.config.ts"
+  ]
 }
