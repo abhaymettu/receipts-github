@@ -3,14 +3,14 @@
  *
  * A check counts when its name says so or when its Actions log shows it ran such a command. The command
  * patterns are receipts' rules.py (TEST, BUILD, LINT, TYPECHECK, DEPLOY), with package-manager flags
- * allowed before the script name (`pnpm -r test`).
+ * allowed before the script name (`pnpm -r test`) and turbo and nx as task runners.
  */
 
 export const GATES = ["tests", "build", "typecheck", "lint", "deploy"] as const;
 
 export type Gate = (typeof GATES)[number];
 
-const PM = String.raw`(?:npm|pnpm|yarn|bun|deno)\s+(?:-\S+\s+)*(?:run\s+)?`;
+const PM = String.raw`(?:npm|pnpm|yarn|bun|deno|turbo|nx)\s+(?:-\S+\s+)*(?:run\s+)?`;
 
 export const COMMAND: Readonly<Record<Gate, RegExp>> = {
   tests: new RegExp(

@@ -17,7 +17,7 @@ export interface Check {
   readonly sha: Sha;
   readonly state: CheckState;
   readonly url: string | null;
-  /** Shell commands the job ran, read from its Actions log (`##[group]Run <cmd>`). Empty when no log was read. */
+  /** Shell commands the job ran, read from its Actions log. Empty when no log was read. */
   readonly commands: readonly string[];
 }
 
@@ -117,11 +117,29 @@ function checkRunState(status: string, conclusion: string | null): CheckState {
   }
 }
 
-const RUN_LINE = /##\[group\]Run (.+)$/gm;
+const STAMP = /^\d{4}-\d\d-\d\dT[\d:.]+Z ?/;
+const ANSI = /\u001b\[[\d;]*m/g;
+const STEP_META = /^(?:shell|with|env):/;
 
-/** The first line of each `Run <cmd>` step in an Actions job log. */
+/**
+ * The commands each Actions step ran: the `##[group]Run <cmd>` line and, for a multi-line `run:` block, the script
+ * lines echoed after it, up to the step's `shell:`, `with:` or `env:` line.
+ */
 export function commandsFromLog(log: string): string[] {
-  return [...log.matchAll(RUN_LINE)].map((m) => (m[1] ?? "").trim()).filter((c) => c.length > 0);
+  const out: string[] = [];
+  let inStep = false;
+  for (const raw of log.split(/\r?\n/)) {
+    const line = raw.replace(STAMP, "").replace(ANSI, "");
+    if (line.startsWith("##[group]Run ")) {
+      inStep = true;
+      out.push(line.slice("##[group]Run ".length).trim());
+    } else if (line.startsWith("##[endgroup]") || STEP_META.test(line)) {
+      inStep = false;
+    } else if (inStep && line.trim().length > 0) {
+      out.push(line.trim());
+    }
+  }
+  return [...new Set(out.filter((c) => c.length > 0))];
 }
 
 export function parseReceipts(raw: RawReceipts): PullRequest {
