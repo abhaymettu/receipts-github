@@ -1,0 +1,12 @@
+{
+  "name": "@receipts-github/github",
+  "version": "0.1.0",
+  "description": "Fetches a pull request's receipts from GitHub and reports verdicts as a check run",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@receipts-github/checker": "0.1.0"
+  }
+}
