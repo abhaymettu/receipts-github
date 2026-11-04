@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { capSummary, decideWait, isOwnCheck, parseInputs, SUMMARY_LIMIT, type CheckRunStatus } from "../src/action.ts";
 
-const self = { runId: "777", checkName: "receipts" };
+const self = { runId: "777", checkName: "receipts", jobName: "read-claims" };
 
 const run = (name: string, status: string, url: string | null = null): CheckRunStatus => ({
   name,
@@ -11,6 +11,10 @@ const run = (name: string, status: string, url: string | null = null): CheckRunS
 });
 
 describe("isOwnCheck", () => {
+  it("matches another run of its own job, so an edit and a push do not wait on each other", () => {
+    expect(isOwnCheck({ name: "read-claims", urls: ["https://github.com/o/r/actions/runs/778/job/1"] }, self)).toBe(true);
+  });
+
   it("matches a job of this workflow run by its URL", () => {
     expect(isOwnCheck({ name: "receipts", urls: ["https://github.com/o/r/actions/runs/777/job/9"] }, { ...self, checkName: "x" })).toBe(true);
   });

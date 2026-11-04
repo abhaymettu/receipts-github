@@ -20567,7 +20567,7 @@ var POLL_MS = 15e3;
 var SUMMARY_LIMIT = 65e3;
 function isOwnCheck(check2, self) {
   const ownRun = `/actions/runs/${self.runId}/`;
-  return check2.name === self.checkName || check2.urls.some((url2) => url2?.includes(ownRun) === true);
+  return check2.name === self.checkName || check2.name === self.jobName || check2.urls.some((url2) => url2?.includes(ownRun) === true);
 }
 var CheckRunStatus = external_exports.object({
   name: external_exports.string(),
@@ -20604,6 +20604,7 @@ var Env = external_exports.object({
   GITHUB_EVENT_PATH: external_exports.string(),
   GITHUB_REPOSITORY: external_exports.string().regex(/^[^/]+\/[^/]+$/),
   GITHUB_RUN_ID: external_exports.string(),
+  GITHUB_JOB: external_exports.string(),
   GITHUB_SERVER_URL: external_exports.string().default("https://github.com"),
   GITHUB_API_URL: external_exports.string().default("https://api.github.com"),
   GITHUB_STEP_SUMMARY: external_exports.string().optional()
@@ -20661,7 +20662,7 @@ async function checkThisPullRequest() {
   const [owner = "", repo = ""] = env.GITHUB_REPOSITORY.split("/");
   const pull = { owner, repo, number: event.pull_request.number };
   const sha = event.pull_request.head.sha;
-  const self = { runId: env.GITHUB_RUN_ID, checkName: inputs.checkName };
+  const self = { runId: env.GITHUB_RUN_ID, checkName: inputs.checkName, jobName: env.GITHUB_JOB };
   const github = gitHub({ token: inputs.token, baseUrl: env.GITHUB_API_URL });
   await waitForChecks({ github, repo: env.GITHUB_REPOSITORY, sha, self, limitMs: inputs.waitMs });
   const pr = parseReceipts(await fetchReceipts({ github, pull }));

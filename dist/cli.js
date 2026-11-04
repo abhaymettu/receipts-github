@@ -20606,6 +20606,10 @@ permissions:
   actions: read
   statuses: read
 
+concurrency:
+  group: receipts-\${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   read-claims:
     runs-on: ubuntu-latest

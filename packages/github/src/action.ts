@@ -8,15 +8,23 @@ export const POLL_MS = 15_000;
 /** GitHub rejects a check run whose output.summary exceeds 65,535 characters. */
 export const SUMMARY_LIMIT = 65_000;
 
-/** What identifies the checks this action must not wait for or judge: its own workflow run and its own check run. */
+/**
+ * What identifies the checks this action must not wait for or judge: its own workflow run, its own check run, and
+ * other runs of its own job (an edit and a push fire two runs, and each would wait for the other).
+ */
 export interface Self {
   readonly runId: string;
   readonly checkName: string;
+  readonly jobName: string;
 }
 
 export function isOwnCheck(check: { name: string; urls: readonly (string | null)[] }, self: Self): boolean {
   const ownRun = `/actions/runs/${self.runId}/`;
-  return check.name === self.checkName || check.urls.some((url) => url?.includes(ownRun) === true);
+  return (
+    check.name === self.checkName ||
+    check.name === self.jobName ||
+    check.urls.some((url) => url?.includes(ownRun) === true)
+  );
 }
 
 const CheckRunStatus = z.object({
@@ -82,6 +90,7 @@ const Env = z.object({
   GITHUB_EVENT_PATH: z.string(),
   GITHUB_REPOSITORY: z.string().regex(/^[^/]+\/[^/]+$/),
   GITHUB_RUN_ID: z.string(),
+  GITHUB_JOB: z.string(),
   GITHUB_SERVER_URL: z.string().default("https://github.com"),
   GITHUB_API_URL: z.string().default("https://api.github.com"),
   GITHUB_STEP_SUMMARY: z.string().optional(),
@@ -142,7 +151,7 @@ async function checkThisPullRequest(): Promise<number> {
   const [owner = "", repo = ""] = env.GITHUB_REPOSITORY.split("/");
   const pull: PullRef = { owner, repo, number: event.pull_request.number };
   const sha = event.pull_request.head.sha;
-  const self: Self = { runId: env.GITHUB_RUN_ID, checkName: inputs.checkName };
+  const self: Self = { runId: env.GITHUB_RUN_ID, checkName: inputs.checkName, jobName: env.GITHUB_JOB };
   const github = gitHub({ token: inputs.token, baseUrl: env.GITHUB_API_URL });
 
   await waitForChecks({ github, repo: env.GITHUB_REPOSITORY, sha, self, limitMs: inputs.waitMs });
