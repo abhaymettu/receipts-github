@@ -68,7 +68,7 @@ describe("writeWorkflow", () => {
     "  statuses: read",
     "",
     "jobs:",
-    "  receipts:",
+    "  read-claims:",
     "    runs-on: ubuntu-latest",
     "    steps:",
     "      - uses: abhaymettu/receipts-github@v0.1.0",
