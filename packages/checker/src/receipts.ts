@@ -29,6 +29,8 @@ export interface ChangedFile {
   readonly status: FileStatus;
   readonly additions: number;
   readonly deletions: number;
+  /** The lines the diff adds to this file, without the leading `+`. Empty when GitHub omits the patch. */
+  readonly added: readonly string[];
 }
 
 export interface Commit {
@@ -64,6 +66,7 @@ const FileSchema = z.object({
   status: z.enum(["added", "removed", "modified", "renamed", "copied", "changed", "unchanged"]),
   additions: z.number().int(),
   deletions: z.number().int(),
+  patch: z.string().optional(),
 });
 
 const CommitSchema = z.object({
@@ -90,7 +93,7 @@ const StatusSchema = z.object({
 export interface RawReceipts {
   /** `GET /repos/{owner}/{repo}/pulls/{n}` */
   readonly pull: unknown;
-  /** `GET /repos/{owner}/{repo}/pulls/{n}/files`, all pages concatenated */
+  /** `GET /repos/{owner}/{repo}/pulls/{n}/files`, all pages concatenated; a patch may keep only its added lines */
   readonly files: unknown;
   /** `GET /repos/{owner}/{repo}/pulls/{n}/commits`, all pages concatenated */
   readonly commits: unknown;
@@ -193,6 +196,10 @@ export function parseReceipts(raw: RawReceipts): PullRequest {
       status: f.status === "added" || f.status === "removed" || f.status === "renamed" ? f.status : "modified",
       additions: f.additions,
       deletions: f.deletions,
+      added: (f.patch ?? "")
+        .split("\n")
+        .filter((l) => l.startsWith("+") && !l.startsWith("+++"))
+        .map((l) => l.slice(1)),
     })),
     checks,
   };

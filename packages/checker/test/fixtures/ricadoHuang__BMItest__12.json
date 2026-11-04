@@ -134,7 +134,8 @@
    "changes": 2,
    "blob_url": "https://github.com/ricadoHuang/BMItest/blob/d9756b7d6fe5c6041004db273001b20b97154973/.github%2Fworkflows%2Fdeploy-azure-test.yml",
    "raw_url": "https://github.com/ricadoHuang/BMItest/raw/d9756b7d6fe5c6041004db273001b20b97154973/.github%2Fworkflows%2Fdeploy-azure-test.yml",
-   "contents_url": "https://api.github.com/repos/ricadoHuang/BMItest/contents/.github%2Fworkflows%2Fdeploy-azure-test.yml?ref=d9756b7d6fe5c6041004db273001b20b97154973"
+   "contents_url": "https://api.github.com/repos/ricadoHuang/BMItest/contents/.github%2Fworkflows%2Fdeploy-azure-test.yml?ref=d9756b7d6fe5c6041004db273001b20b97154973",
+   "patch": "+          Copy-Item app.py, bmi_logic.py, serve.py, web.config dist\\"
   }
  ],
  "commits": [

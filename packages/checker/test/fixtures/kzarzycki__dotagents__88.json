@@ -89,7 +89,8 @@
    "changes": 4,
    "blob_url": "https://github.com/kzarzycki/dotagents/blob/518c825f00837f3d84ee94be6741e8401d608e32/home%2F.claude%2Fsettings.shared.json",
    "raw_url": "https://github.com/kzarzycki/dotagents/raw/518c825f00837f3d84ee94be6741e8401d608e32/home%2F.claude%2Fsettings.shared.json",
-   "contents_url": "https://api.github.com/repos/kzarzycki/dotagents/contents/home%2F.claude%2Fsettings.shared.json?ref=518c825f00837f3d84ee94be6741e8401d608e32"
+   "contents_url": "https://api.github.com/repos/kzarzycki/dotagents/contents/home%2F.claude%2Fsettings.shared.json?ref=518c825f00837f3d84ee94be6741e8401d608e32",
+   "patch": "+  \"attribution\": {\n+    \"pr\": \"\",\n+    \"sessionUrl\": false\n+  },"
   }
  ],
  "commits": [

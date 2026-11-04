@@ -69,7 +69,8 @@
    "changes": 2,
    "blob_url": "https://github.com/YOKEN21/grok-bot-cursor/blob/bea02f0299b2b2760613a1ca0846b4b657773212/services%2Fmatter%2Fmatter-search%2Fconfig.json",
    "raw_url": "https://github.com/YOKEN21/grok-bot-cursor/raw/bea02f0299b2b2760613a1ca0846b4b657773212/services%2Fmatter%2Fmatter-search%2Fconfig.json",
-   "contents_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/contents/services%2Fmatter%2Fmatter-search%2Fconfig.json?ref=bea02f0299b2b2760613a1ca0846b4b657773212"
+   "contents_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/contents/services%2Fmatter%2Fmatter-search%2Fconfig.json?ref=bea02f0299b2b2760613a1ca0846b4b657773212",
+   "patch": "+  \"desiredCount\": 4,"
   }
  ],
  "commits": [

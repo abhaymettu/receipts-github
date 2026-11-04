@@ -69,7 +69,8 @@
    "changes": 3,
    "blob_url": "https://github.com/databricks/unity-gateway/blob/d2fc899d12e5c3498099292339bd5cbf0e10474a/src%2Fucode%2Fmcp.py",
    "raw_url": "https://github.com/databricks/unity-gateway/raw/d2fc899d12e5c3498099292339bd5cbf0e10474a/src%2Fucode%2Fmcp.py",
-   "contents_url": "https://api.github.com/repos/databricks/unity-gateway/contents/src%2Fucode%2Fmcp.py?ref=d2fc899d12e5c3498099292339bd5cbf0e10474a"
+   "contents_url": "https://api.github.com/repos/databricks/unity-gateway/contents/src%2Fucode%2Fmcp.py?ref=d2fc899d12e5c3498099292339bd5cbf0e10474a",
+   "patch": "+    # Codex's client signs in on workspaces that don't advertise CIMD support yet.\n+    if client == \"codex\" or workspace_supports_cimd(workspace):"
   },
   {
    "sha": "917626a81837a1381e9aa65f6e5295c1381919da",
@@ -80,7 +81,8 @@
    "changes": 10,
    "blob_url": "https://github.com/databricks/unity-gateway/blob/d2fc899d12e5c3498099292339bd5cbf0e10474a/tests%2Ftest_mcp.py",
    "raw_url": "https://github.com/databricks/unity-gateway/raw/d2fc899d12e5c3498099292339bd5cbf0e10474a/tests%2Ftest_mcp.py",
-   "contents_url": "https://api.github.com/repos/databricks/unity-gateway/contents/tests%2Ftest_mcp.py?ref=d2fc899d12e5c3498099292339bd5cbf0e10474a"
+   "contents_url": "https://api.github.com/repos/databricks/unity-gateway/contents/tests%2Ftest_mcp.py?ref=d2fc899d12e5c3498099292339bd5cbf0e10474a",
+   "patch": "+    def test_cursor_native_cimd_requires_workspace_support(self, monkeypatch):\n+        assert mcp._oauth_http_client(\"cursor\", WS, use_pat=False) is None\n+\n+    def test_codex_native_cimd_skips_workspace_support(self, monkeypatch):\n+        monkeypatch.setattr(mcp, \"workspace_supports_cimd\", lambda ws: False)\n+        monkeypatch.setattr(mcp, \"oauth_client_available\", lambda ws, client_id: True)\n+        assert mcp._oauth_http_client(\"codex\", WS, use_pat=False) == mcp.CODEX_CIMD_CLIENT_ID"
   }
  ],
  "commits": [

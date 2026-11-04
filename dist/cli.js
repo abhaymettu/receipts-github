@@ -12,8 +12,277 @@ import { join } from "node:path";
 import { parseArgs, promisify as promisify2 } from "node:util";
 
 // packages/checker/src/claims.ts
-function extract(_report) {
-  return [];
+var WORD = String.raw`\p{L}\p{N}_`;
+var DIGIT = String.raw`\p{Nd}`;
+var SPACE = String.raw`\t-\r\x1c-\x20\x85\xa0  -     　`;
+var BOUNDARY = `(?:(?<=[${WORD}])(?![${WORD}])|(?<![${WORD}])(?=[${WORD}]))`;
+var FOLDS = { i: "\u0130\u0131", k: "\u212A", s: "\u017F" };
+var SYNTAX = "^$\\.*+?()[]{}|/";
+function caseless(letter) {
+  const lower = letter.toLowerCase();
+  return lower + lower.toUpperCase() + (FOLDS[lower] ?? "");
+}
+function isLetter(c) {
+  return /^[A-Za-z]$/.test(c);
+}
+function escaped(e, inClass) {
+  switch (e) {
+    case "b":
+      return inClass ? "\\x08" : BOUNDARY;
+    case "w":
+      return inClass ? WORD : `[${WORD}]`;
+    case "d":
+      return inClass ? DIGIT : `[${DIGIT}]`;
+    case "s":
+      return inClass ? SPACE : `[${SPACE}]`;
+    case "Z":
+      if (inClass) break;
+      return "$";
+    case "n":
+    case "t":
+    case "r":
+      return "\\" + e;
+    default:
+      if (SYNTAX.includes(e) || inClass && e === "-") return "\\" + e;
+      if (!/[A-Za-z0-9]/.test(e)) return e;
+  }
+  throw new Error(`unsupported escape \\${e}`);
+}
+function py(source, ...flags) {
+  const ignoreCase = flags.includes("I");
+  let out = "";
+  let inClass = false;
+  for (let i = 0; i < source.length; i++) {
+    const c = source.charAt(i);
+    if (c === "\\") {
+      out += escaped(source.charAt(++i), inClass);
+    } else if (inClass) {
+      if (c === "]") {
+        inClass = false;
+        out += c;
+      } else if (ignoreCase && isLetter(c) && source.charAt(i + 1) === "-" && isLetter(source.charAt(i + 2))) {
+        const end = source.charAt(i + 2);
+        let folds = "";
+        for (let code = c.toLowerCase().charCodeAt(0); code <= end.toLowerCase().charCodeAt(0); code++) {
+          folds += FOLDS[String.fromCharCode(code)] ?? "";
+        }
+        out += `${c.toLowerCase()}-${end.toLowerCase()}${c.toUpperCase()}-${end.toUpperCase()}${folds}`;
+        i += 2;
+      } else {
+        out += ignoreCase && isLetter(c) ? caseless(c) : c;
+      }
+    } else if (c === "[") {
+      inClass = true;
+      out += c;
+      if (source.charAt(i + 1) === "^") out += source.charAt(++i);
+      if (source.charAt(i + 1) === "]") throw new Error("unsupported leading ] in a class");
+    } else if (c === "(" && source.charAt(i + 1) === "?") {
+      const group = /^\(\?(?::|=|!|<=|<!)/.exec(source.slice(i));
+      if (!group) throw new Error(`unsupported group ${source.slice(i, i + 4)}`);
+      out += group[0];
+      i += group[0].length - 1;
+    } else if (c === ".") {
+      out += flags.includes("S") ? "[\\s\\S]" : "[^\\n]";
+    } else if (c === "^") {
+      out += flags.includes("M") ? "(?:^|(?<=\\n))" : "^";
+    } else if (c === "$") {
+      out += flags.includes("M") ? "(?=\\n|$)" : "(?=\\n?$)";
+    } else {
+      out += ignoreCase && isLetter(c) ? `[${caseless(c)}]` : c;
+    }
+  }
+  return new RegExp(out, "u");
+}
+function every(rx) {
+  return new RegExp(rx.source, "gu");
+}
+var FENCE = every(py(String.raw`\`\`\`.*?(?:\`\`\`|\Z)`, "S"));
+var QUOTE = every(py(String.raw`^\s*>.*$`, "M"));
+var SPLIT = every(py(String.raw`(?<=[.!?])\s+(?=[A-Z\`*\"(\[])|\n+`));
+var MARKUP = every(py(String.raw`^\s*(?:[-*+]|\d+[.)]|#+)\s+|\*\*|__`));
+var EDGES = /^[ |\t]+|[ |\t]+$/gu;
+var QUESTION = py(String.raw`\?\s*\Z`);
+var UNTICKED = py(String.raw`^\[ \]`);
+var FIRST_PERSON = py(String.raw`^\s*I\b`);
+var HEDGE = py(
+  String.raw`\b(?:will|I'll|you'll|going to|should|would|could|might|may|probably|likely|perhaps|` + String.raw`maybe|plan(?:ned)? to|need(?:s|ed)? to|want(?:s|ed)? to|next step|todo|to do|` + String.raw`if|unless|once|when you|let me|can you|you can|try|hopefully|expect(?:ed)?|` + String.raw`in case|whether|needs?|pending|remaining|left to|propose[sd]?|suggest(?:s|ed)?|recommend(?:s|ed)?|consider|option)\b`,
+  "I"
+);
+var NEGATION = py(
+  String.raw`\b(?:not|never|no longer|unverified|untested|unable|cannot|nothing (?:was|has been))\b|n't\b|` + String.raw`\bwithout (?:running|testing|verifying|checking)\b`,
+  "I"
+);
+var REPORTED = py(
+  String.raw`\b(?:the (?:lane|subagent|agent|worker|report|readme|docs?|issue|user|ticket|log)|you|they|he|she)` + String.raw`\s+(?:says?|said|claims?|claimed|reports?|reported|mentioned|noted|wrote)\b`,
+  "I"
+);
+var OK_WORDS = String.raw`pass(?:es|ed|ing)?|green|succeed(?:s|ed)?|clean(?:ly)?|OK|all good`;
+var OK = `(?:${OK_WORDS})`;
+var RULES = [
+  {
+    group: "test",
+    kind: "test_pass",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:tests?|test suite|suites?|specs?|pytest|vitest|jest|unittest|cargo test|go test|` + String.raw`tests\.R|e2e|smoke tests?)\b[^.;]{0,60}?\b` + OK + String.raw`\b|` + String.raw`\b\d+\s*/\s*\d+\s+(?:\w+\s+)?(?:tests?\s+|checks?\s+)?pass|\b\d+\s+(?:\w+\s+)?(?:tests?\s+)?passed\b|` + String.raw`\ball\s+(?:\d+\s+)?(?:\w+\s+)?(?:tests?|checks|assertions)\s+(?:now\s+)?pass`,
+      "I"
+    )
+  },
+  {
+    group: "typecheck",
+    kind: "typecheck_pass",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:typechecks?|typechecking|type-?check(?:s|ing)?|tsc|mypy|pyright|types)\b[^.;]{0,30}?` + String.raw`\b(?:` + OK_WORDS + String.raw`|no (?:type )?errors|0 errors)\b|\bno type errors\b`,
+      "I"
+    )
+  },
+  {
+    group: "lint",
+    kind: "lint_pass",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:lint(?:s|er|ing)?|eslint|ruff|clippy|flake8|shellcheck|swiftlint)\b[^.;]{0,30}?` + String.raw`\b(?:` + OK_WORDS + String.raw`|no (?:errors|warnings|issues)|0 (?:errors|warnings))\b`,
+      "I"
+    )
+  },
+  {
+    group: "build",
+    kind: "build_pass",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:build|builds|built|compiles?|compiled|compilation)\b[^.;]{0,40}?` + String.raw`\b(?:` + OK_WORDS + String.raw`|success(?:fully)?|without (?:errors|warnings)|fine)\b|` + String.raw`\b(?:it|everything|the (?:app|project|site|package|binary|paper|pdf)) (?:now )?(?:builds|compiles)\b`,
+      "I"
+    )
+  },
+  {
+    group: "git",
+    kind: "pr",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:opened|created|filed|raised|merged)\s+(?:a\s+|the\s+|draft\s+)*(?:PR|pull request)\b|` + String.raw`\bPR\s+#?\d+\s+(?:is\s+)?(?:open|up|opened|created|merged)\b`,
+      "I"
+    )
+  },
+  {
+    group: "git",
+    kind: "push",
+    requires: "nothing",
+    pattern: py(String.raw`\bpushed\b|\bpush(?:ed)? to (?:origin|main|master|remote)\b`, "I")
+  },
+  {
+    group: "git",
+    kind: "commit",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\bcommitted\b|\bcommit(?:ted)? (?:as|in)\b|\bin commit\b|\bnew commit\b|` + String.raw`\bcommit\s+\`?[0-9a-f]{7,40}\b|\b(?:landed|lands) (?:in|as)\b`,
+      "I"
+    )
+  },
+  {
+    group: "ship",
+    kind: "deployed",
+    requires: "nothing",
+    pattern: py(String.raw`\b(?:deployed|is (?:now )?live|went live|published)\b`, "I")
+  },
+  {
+    group: "ship",
+    kind: "installed",
+    requires: "nothing",
+    pattern: py(
+      String.raw`(?<!the )(?<!an )(?<!a )\b(?:installed|reinstalled)\b(?!\s+(?:version|copy|engine|base|build|binary|app|cli|command)\b)`,
+      "I"
+    )
+  },
+  {
+    group: "work",
+    kind: "works",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:now works|works now|works (?:correctly|as expected|end[- ]to[- ]end)|is working|are working|` + String.raw`(?:it|this|that|everything|all of (?:it|them)) works|` + String.raw`(?:is|are|was|were|now|has been|have been|got) (?:fixed|resolved)|` + String.raw`\bI (?:fixed|resolved)\b|^(?:Fixed|Resolved)\b|\((?:fixed|resolved)\)|(?:fixed|resolved):)`,
+      "I"
+    )
+  },
+  {
+    group: "work",
+    kind: "verified",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\b(?:verified|confirmed|double-checked|validated|smoke-tested|sanity-checked|tested)\b`,
+      "I"
+    )
+  },
+  {
+    group: "work",
+    kind: "ran",
+    requires: "nothing",
+    pattern: py(
+      String.raw`\bI\s+(?:just\s+|also\s+|then\s+|first\s+)?(?:ran|re-?ran|executed|invoked)\b|` + String.raw`^(?:Ran|Re-?ran|Executed)\b`,
+      "I"
+    )
+  },
+  {
+    group: "work",
+    kind: "file_change",
+    requires: "a named file or I",
+    pattern: py(
+      String.raw`\b(?:updated|edited|modified|changed|created|added|wrote|rewrote|removed|deleted|renamed|` + String.raw`moved|refactored|replaced|patched)\b`,
+      "I"
+    )
+  }
+];
+var FILE_EXT = String.raw`(?:py|pyi|ts|tsx|js|jsx|mjs|cjs|rs|go|swift|java|kt|rb|php|c|h|cc|cpp|hpp|m|cs|r|R|sql|sh|` + String.raw`css|scss|html|vue|svelte|astro|json|toml|yaml|yml|md|mdx|txt|tex|bib|ipynb|lock|cfg|ini|env|xml|plist)`;
+var FILE = every(
+  py(
+    String.raw`\`([^\`\s]+?\.` + FILE_EXT + String.raw`)\`|(?<![\w/.])((?:[\w.~-]+/)*[\w-]+\.` + FILE_EXT + String.raw`)\b`
+  )
+);
+var PATH = every(py(String.raw`\`((?:[\w.~-]+/)+[\w.-]*)\``));
+var SHA = py(String.raw`(?<![\w-])([0-9a-f]{7,40})(?![\w-])`);
+function codePoints(s) {
+  return Array.from(s);
+}
+function sentences(report) {
+  const text = report.replace(FENCE, " ").replace(QUOTE, " ");
+  const pieces = [];
+  let start = 0;
+  for (const m of text.matchAll(SPLIT)) {
+    pieces.push(text.slice(start, m.index));
+    start = m.index + m[0].length;
+  }
+  pieces.push(text.slice(start));
+  return pieces.map((raw) => raw.replace(MARKUP, "").replace(EDGES, "")).filter((s) => codePoints(s).length >= 8);
+}
+function isAssertion(s) {
+  return ![QUESTION, UNTICKED, HEDGE, NEGATION, REPORTED].some((rx) => rx.test(s));
+}
+function namedFiles(s) {
+  const files2 = Array.from(s.matchAll(FILE), (m) => m[1] ?? m[2] ?? "");
+  return files2.concat(Array.from(s.matchAll(PATH), (m) => m[1] ?? ""));
+}
+function namedSha(s) {
+  const sha = SHA.exec(s)?.[1];
+  return sha !== void 0 && /[0-9]/.test(sha) ? sha : null;
+}
+function extract(report) {
+  const claims = [];
+  for (const s of sentences(report)) {
+    if (!isAssertion(s)) continue;
+    const files2 = namedFiles(s);
+    const seen = /* @__PURE__ */ new Set();
+    for (const rule of RULES) {
+      if (seen.has(rule.group) || !rule.pattern.test(s)) continue;
+      if (rule.requires === "a named file or I" && files2.length === 0 && !FIRST_PERSON.test(s)) continue;
+      seen.add(rule.group);
+      claims.push({
+        kind: rule.kind,
+        text: codePoints(s).slice(0, 400).join(""),
+        files: files2,
+        sha: rule.group === "git" ? namedSha(s) : null
+      });
+    }
+  }
+  return claims;
 }
 
 // packages/checker/src/commands.ts
@@ -58,7 +327,10 @@ var WHAT = {
   deploy: "a deploy"
 };
 var short = (sha) => sha.slice(0, 7);
-var named = (checks) => [...new Set(checks.map((c) => `\`${c.name}\``))].join(", ");
+function named(checks) {
+  const names = [...new Set(checks.map((c) => `\`${c.name}\``))];
+  return names.length <= 3 ? names.join(", ") : `${names.slice(0, 3).join(", ")} and ${names.length - 3} more`;
+}
 var byCheck = (checks) => checks.map((check3) => ({ kind: "check", check: check3 }));
 var verified = (reason, evidence = []) => ({ status: "verified", reason, evidence });
 var unbacked = (basis, reason, evidence = []) => ({
@@ -68,9 +340,16 @@ var unbacked = (basis, reason, evidence = []) => ({
   evidence
 });
 var unverifiable = (reason) => ({ status: "unverifiable", reason });
-function runs(pr, gate2) {
+var TICKED = /`([^`\n]{2,})`/g;
+var ticked = (claim2) => [...claim2.text.matchAll(TICKED)].map((m) => m[1] ?? "");
+function claimedCommands(claim2, gate2) {
+  if (claim2 === void 0) return [];
+  return ticked(claim2).filter((t) => /\S\s+\S/.test(t)).filter((t) => COMMAND[gate2].test(t) || !GATES.some((g) => COMMAND[g].test(t))).map((t) => t.trim().toLowerCase());
+}
+function runs(pr, gate2, claim2) {
+  const claimed = claimedCommands(claim2, gate2);
   return pr.checks.filter(
-    (c) => c.state !== "skipped" && (NAME[gate2].test(c.name) || c.commands.some((cmd) => COMMAND[gate2].test(cmd)))
+    (c) => c.state !== "skipped" && (NAME[gate2].test(c.name) || c.commands.some((cmd) => COMMAND[gate2].test(cmd) || claimed.some((t) => cmd.toLowerCase().includes(t))))
   );
 }
 var onHead = (pr, checks) => checks.filter((c) => c.sha === pr.headSha);
@@ -90,8 +369,8 @@ function stale(pr, checks, gate2) {
   const behind = at === void 0 ? "an earlier commit" : `${pr.commits.length - 1 - at} commit(s) before the head`;
   return unbacked("stale", `${WHAT[gate2]} last ran on ${short(latest.sha)}, ${behind}`, byCheck([latest]));
 }
-function gate(pr, g, fallback) {
-  const matching = runs(pr, g);
+function gate(pr, g, claim2, fallback) {
+  const matching = runs(pr, g, claim2);
   if (matching.length === 0 && fallback !== void 0) {
     const passed = onHead(pr, runs(pr, fallback));
     if (passed.length > 0 && passed.every((c) => c.state === "success")) {
@@ -100,7 +379,10 @@ function gate(pr, g, fallback) {
   }
   if (matching.length === 0) return missing(pr, g);
   const head = onHead(pr, matching);
-  if (head.length === 0) return stale(pr, matching, g);
+  if (head.length === 0) {
+    const opaque = onHead(pr, pr.checks).filter(isOpaque);
+    return opaque.length > 0 ? unverifiable(`no check on the head commit says it runs ${WHAT[g]}, and ${named(opaque)} does not say what it ran`) : stale(pr, matching, g);
+  }
   const failed = head.filter((c) => c.state === "failure");
   if (failed.length > 0) return unbacked("contradicted", `${named(failed)} failed on the head commit`, byCheck(failed));
   const pending = head.filter((c) => c.state === "pending");
@@ -117,11 +399,9 @@ function works(pr) {
     [...v.evidence, ...tests.map((file2) => ({ kind: "file", file: file2 }))]
   );
 }
-var TICKED = /`([^`\n]{2,})`/g;
 function objects(claim2) {
   const names = claim2.files.map((f) => f.replace(/\/+$/, "").split("/").pop() ?? f);
-  const ticked = [...claim2.text.matchAll(TICKED)].map((m) => m[1] ?? "");
-  return [...names, ...ticked].filter((n) => n.length >= 3).map((n) => n.toLowerCase());
+  return [...names, ...ticked(claim2)].filter((n) => n.length >= 3).map((n) => n.toLowerCase());
 }
 function observed(claim2, pr) {
   const passed = onHead(pr, pr.checks).filter((c) => c.state === "success");
@@ -151,16 +431,27 @@ function files(claim2, pr) {
   if (claim2.files.length === 0) {
     return pr.files.length > 0 ? verified(`the diff changes ${pr.files.length} file(s)`) : unbacked("missing", "the diff changes no files");
   }
-  const hits = [];
-  for (const name of claim2.files) {
+  const names = [...new Set(claim2.files)];
+  const hits = /* @__PURE__ */ new Set();
+  const mentions = [];
+  for (const name of names) {
     const touched = pr.files.filter((f) => touches(f, name));
-    if (touched.length === 0) return unbacked("missing", `the diff does not touch \`${name}\``);
-    hits.push(...touched);
+    if (touched.length > 0) {
+      for (const f of touched) hits.add(f);
+      continue;
+    }
+    const base = clean(name).replace(/\/+$/, "").split("/").pop() ?? name;
+    const mention = pr.files.find((f) => f.added.some((line) => line.includes(base)));
+    if (mention === void 0) return unbacked("missing", `the diff does not touch \`${name}\``);
+    hits.add(mention);
+    mentions.push(`\`${name}\` (named in \`${mention.path}\`)`);
   }
-  return verified(
-    `the diff touches ${claim2.files.map((f) => `\`${f}\``).join(", ")}`,
-    [...new Set(hits)].map((file2) => ({ kind: "file", file: file2 }))
-  );
+  const touchedNames = names.filter((n) => !mentions.some((m) => m.startsWith(`\`${n}\``))).map((n) => `\`${n}\``);
+  const parts = [
+    ...touchedNames.length > 0 ? [`the diff touches ${touchedNames.join(", ")}`] : [],
+    ...mentions.length > 0 ? [`the diff adds a line naming ${mentions.join(", ")}`] : []
+  ];
+  return verified(parts.join("; "), [...hits].map((file2) => ({ kind: "file", file: file2 })));
 }
 var PR_NUMBER = /#(\d+)\b/;
 function git(claim2, pr) {
@@ -185,13 +476,13 @@ function git(claim2, pr) {
 function judge(claim2, pr) {
   switch (claim2.kind) {
     case "test_pass":
-      return gate(pr, "tests");
+      return gate(pr, "tests", claim2);
     case "build_pass":
-      return gate(pr, "build", "tests");
+      return gate(pr, "build", claim2, "tests");
     case "typecheck_pass":
-      return gate(pr, "typecheck", "build");
+      return gate(pr, "typecheck", claim2, "build");
     case "lint_pass":
-      return gate(pr, "lint");
+      return gate(pr, "lint", claim2);
     case "works":
       return works(pr);
     case "verified":
@@ -204,7 +495,7 @@ function judge(claim2, pr) {
     case "pr":
       return git(claim2, pr);
     case "deployed": {
-      const v = gate(pr, "deploy");
+      const v = gate(pr, "deploy", claim2);
       return v.status === "unbacked" && v.basis === "missing" ? unverifiable("no deploy check ran on this pull request") : v;
     }
     case "installed":
@@ -20036,7 +20327,8 @@ var FileSchema = external_exports.object({
   previous_filename: external_exports.string().optional(),
   status: external_exports.enum(["added", "removed", "modified", "renamed", "copied", "changed", "unchanged"]),
   additions: external_exports.number().int(),
-  deletions: external_exports.number().int()
+  deletions: external_exports.number().int(),
+  patch: external_exports.string().optional()
 });
 var CommitSchema = external_exports.object({
   sha: external_exports.string(),
@@ -20134,7 +20426,8 @@ function parseReceipts(raw) {
       previousPath: f.previous_filename ?? null,
       status: f.status === "added" || f.status === "removed" || f.status === "renamed" ? f.status : "modified",
       additions: f.additions,
-      deletions: f.deletions
+      deletions: f.deletions,
+      added: (f.patch ?? "").split("\n").filter((l) => l.startsWith("+") && !l.startsWith("+++")).map((l) => l.slice(1))
     })),
     checks
   };

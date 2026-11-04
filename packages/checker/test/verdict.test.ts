@@ -74,6 +74,31 @@ describe("test claims", () => {
     );
   });
 
+  it("count a check that ran the command the claim names, whatever kind of command it is", () => {
+    const ci = check("check", "success", HEAD, ["actions/checkout@v4", "mise run check"]);
+    const v = judge(claim("test_pass", "`mise run check`: all 10 checks passed."), pr({ checks: [ci] }));
+    expect(status(v)).toBe("verified: `check` passed on the head commit ccccccc");
+  });
+
+  it("do not count a named command of another kind", () => {
+    const ci = check("ci", "success", HEAD, ["make lint"]);
+    expect(judge(claim("test_pass", "`make test` and `make lint` pass."), pr({ checks: [ci] })).status).toBe("unbacked");
+  });
+
+  it("are unverifiable, not stale, when a head check does not say what it ran", () => {
+    const checks = [check("unit tests", "success", A), check("CircleCI", "success")];
+    expect(status(judge(tests, pr({ checks })))).toBe(
+      "unverifiable: no check on the head commit says it runs tests, and `CircleCI` does not say what it ran",
+    );
+  });
+
+  it("name at most three checks in a reason", () => {
+    const checks = ["test a", "test b", "test c", "test d", "test e"].map((n) => check(n, "success"));
+    expect(status(judge(tests, pr({ checks })))).toBe(
+      "verified: `test a`, `test b`, `test c` and 2 more passed on the head commit ccccccc",
+    );
+  });
+
   it("are unverifiable while the test check is still running", () => {
     expect(status(judge(tests, pr({ checks: [check("test", "pending")] })))).toBe("unverifiable: `test` had not finished");
   });
@@ -93,8 +118,8 @@ describe("build claims", () => {
 describe("works claims", () => {
   it("need a passing test check and list changed test files", () => {
     const files = [
-      { path: "src/parse.ts", previousPath: null, status: "modified" as const, additions: 3, deletions: 1 },
-      { path: "src/parse.test.ts", previousPath: null, status: "modified" as const, additions: 9, deletions: 0 },
+      { path: "src/parse.ts", previousPath: null, status: "modified" as const, additions: 3, deletions: 1, added: [] },
+      { path: "src/parse.test.ts", previousPath: null, status: "modified" as const, additions: 9, deletions: 0, added: [] },
     ];
     const v = judge(claim("works", "Fixed the off-by-one."), pr({ files, checks: [check("test", "success")] }));
     expect(status(v)).toBe("verified: `test` passed on the head commit ccccccc, and the diff changes 1 test file(s)");
@@ -109,8 +134,8 @@ describe("works claims", () => {
 
 describe("file claims", () => {
   const files = [
-    { path: "packages/core/src/config.ts", previousPath: null, status: "modified" as const, additions: 1, deletions: 1 },
-    { path: "docs/new.md", previousPath: "docs/old.md", status: "renamed" as const, additions: 0, deletions: 0 },
+    { path: "packages/core/src/config.ts", previousPath: null, status: "modified" as const, additions: 1, deletions: 1, added: [] },
+    { path: "docs/new.md", previousPath: "docs/old.md", status: "renamed" as const, additions: 0, deletions: 0, added: [] },
   ];
 
   it("are verified when the diff touches every named file, by suffix or basename", () => {
@@ -121,6 +146,14 @@ describe("file claims", () => {
   it("are unbacked when a named file is not in the diff", () => {
     const v = judge(claim("file_change", "Edited `README.md`.", ["README.md"]), pr({ files }));
     expect(status(v)).toBe("unbacked/missing: the diff does not touch `README.md`");
+  });
+
+  it("count a named file the diff adds a line naming, as when a file is added to a list", () => {
+    const workflow = [
+      { path: ".github/workflows/ship.yml", previousPath: null, status: "modified" as const, additions: 1, deletions: 1, added: ["  Copy-Item app.py, bmi_logic.py dist\\"] },
+    ];
+    const v = judge(claim("file_change", "Added `bmi_logic.py` to the copy list.", ["bmi_logic.py", "bmi_logic.py"]), pr({ files: workflow }));
+    expect(status(v)).toBe("verified: the diff adds a line naming `bmi_logic.py` (named in `.github/workflows/ship.yml`)");
   });
 
   it("match a named directory by prefix", () => {

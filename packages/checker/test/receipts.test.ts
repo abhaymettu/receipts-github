@@ -32,7 +32,7 @@ describe("parseReceipts", () => {
       user: { login: "Copilot", type: "Bot" },
       head: { sha: "ABC0000000000000000000000000000000000000" },
     },
-    files: [{ filename: "b.ts", previous_filename: "a.ts", status: "renamed", additions: 1, deletions: 0 }],
+    files: [{ filename: "b.ts", previous_filename: "a.ts", status: "renamed", additions: 1, deletions: 0, patch: "@@ -1 +1 @@\n-old\n+new" }],
     commits: [{ sha: "abc0000000000000000000000000000000000000", commit: { message: "Fix parser" } }],
     checkRuns: {
       abc0000000000000000000000000000000000000: [
@@ -50,7 +50,7 @@ describe("parseReceipts", () => {
     expect(pr.body).toBe("");
     expect(pr.author).toEqual({ login: "Copilot", isBot: true });
     expect(pr.headSha).toBe("abc0000000000000000000000000000000000000");
-    expect(pr.files).toEqual([{ path: "b.ts", previousPath: "a.ts", status: "renamed", additions: 1, deletions: 0 }]);
+    expect(pr.files).toEqual([{ path: "b.ts", previousPath: "a.ts", status: "renamed", additions: 1, deletions: 0, added: ["new"] }]);
     expect(pr.checks.map((c) => [c.source, c.name, c.state, c.commands.length])).toEqual([
       ["check_run", "test", "success", 3],
       ["check_run", "e2e", "pending", 0],

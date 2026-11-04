@@ -131,7 +131,8 @@
    "changes": 22,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/docs%2Fcontributing%2Fblog.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/docs%2Fcontributing%2Fblog.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/docs%2Fcontributing%2Fblog.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/docs%2Fcontributing%2Fblog.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": "+| Key                            | Required | Rule                                                                  |\n+| ------------------------------ | -------- | --------------------------------------------------------------------- |\n+| `title`, `description`         | yes      | Plain text, no quotes (the parser keeps them).                        |\n+| `date`                         | yes      | `YYYY-MM-DD` publish date.                                            |\n+| `order`                        | yes      | Integer tie-break for posts on the same date (lower first).           |\n+| `category`                     | yes      | Exactly one slug from the list below.                                 |\n+| `series`                       | no       | A series slug from `blog-taxonomy.ts`.                                |\n+| `updated`                      | no       | Last meaningful revision, not before `date`. Typo fixes do not count. |\n+| `featured`                     | no       | `true` pins the post as the index hero. At most one post.             |\n+| `image`, `imageAlt`, `ogImage` | no       | `/images/...` asset paths; `imageAlt` is required with `image`.       |"
   },
   {
    "sha": "f5e0e636353d07ed4c4faaa385b8ff12b6adf507",
@@ -142,7 +143,8 @@
    "changes": 9,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.node.test.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.node.test.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.node.test.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.node.test.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": "+\t\t\t\t`title: Reviewed\\n${baseFrontmatter}\\nimage: /images/openclaw-2-needs-a-home.webp\\nimageAlt: Kody stands with his arm around OpenClaw.`,\n+\t\t\t`title: Retired placeholder\\n${baseFrontmatter}\\nplaceholder: false`,\n+\t\t\t/unknown frontmatter \"placeholder\"/,"
   },
   {
    "sha": "ea5b9e0c2533f19039c090c1247e8dcf1396b819",
@@ -153,7 +155,8 @@
    "changes": 3,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fcatalog.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": "+ * Optional `image` / `imageAlt` are"
   },
   {
    "sha": "d6dd80ded40bcbf1cd04a0b8ba51b0fb891d7bc7",
@@ -164,7 +167,8 @@
    "changes": 16,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fparse-frontmatter.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fparse-frontmatter.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fparse-frontmatter.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fparse-frontmatter.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "54f622abe085500d90ce727e14a49d643dd648c9",
@@ -175,7 +179,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fearly-kody-users.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fearly-kody-users.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fearly-kody-users.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fearly-kody-users.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "1c0d8c4212aa5ef7e3676b244e1ad112fc2f6bae",
@@ -186,7 +191,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fhow-to-turn-agent-work-into-software-you-own.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fhow-to-turn-agent-work-into-software-you-own.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fhow-to-turn-agent-work-into-software-you-own.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fhow-to-turn-agent-work-into-software-you-own.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "d0d115ac8e06fc22a0578c2bf88455b0bda7c5eb",
@@ -197,7 +203,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-20.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-20.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-20.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-20.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "5287fbb1a1c5a9a28b50f08063b0e22f6ecbfd06",
@@ -208,7 +215,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-27.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-27.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-27.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-03-27.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "f0fea40cfe5cd8ed9022348a3c480cdc4b73c392",
@@ -219,7 +227,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-03.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-03.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-03.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-03.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "289ca0ebf8269eb6dc100e5191847bde6bd87063",
@@ -230,7 +239,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-10.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-10.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-10.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-10.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "3041784fb9b0dd0972ba484f991e5c00270f1c8a",
@@ -241,7 +251,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-17.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-17.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-17.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-17.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "3bcd4a512ab58dfa96cc085866cf77d65f15a687",
@@ -252,7 +263,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-24.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-24.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-24.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-04-24.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "b62c0f19e7c35dabb26f3fea9fb453797ee69b93",
@@ -263,7 +275,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-01.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-01.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-01.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-01.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "301900fe0eaeacfa864dbc4fbf0ab7a7eb4a3022",
@@ -274,7 +287,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-08.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-08.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-08.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-08.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "e84c00c824cff8e6fb2d4ac33e98f0da6833ba05",
@@ -285,7 +299,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-15.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-15.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-15.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-15.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "11cb690baf7cf32421b9ecee9dd0950656589723",
@@ -296,7 +311,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-22.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-22.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-22.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-22.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "40589dcbf06eae4425c931de32ab30c6d034e5e4",
@@ -307,7 +323,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-29.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-29.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-29.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-05-29.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "26a3b5deec6792cebc3d87935577b5d9078675f1",
@@ -318,7 +335,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-05.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-05.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-05.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-05.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "4c2f9f6b4686e2db172db68095f215151e6b762b",
@@ -329,7 +347,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-12.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-12.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-12.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-12.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "cb78a8b3e5f3fb17d40d53383cb5c45a7123ec5c",
@@ -340,7 +359,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-19.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-19.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-19.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-19.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "ce589c062dddaede9843b33cfe1214400678f5bf",
@@ -351,7 +371,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-26.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-26.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-26.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-06-26.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "290092eb08efd566abae29521835d1c5a8ec1033",
@@ -362,7 +383,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-03.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-03.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-03.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-03.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "6f511b465906898823cb5ab700c18f0d63ea4d37",
@@ -373,7 +395,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-10.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-10.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-10.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-10.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "5dff601b0c6a1ee7a7cfd9f4a0a1a88c3669eb67",
@@ -384,7 +407,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-17.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-17.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-17.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-17.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "205f6ac54d565d59bb6c5b8e7b1dd7418c813afc",
@@ -395,7 +419,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-24.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-24.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-24.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-24.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "1e2347260e3d5c0f2e36aa331d6b369837f26662",
@@ -406,7 +431,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-31.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-31.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-31.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-07-31.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "d93623d2c977f2b3556f8cc3337f4d72c11ddbc2",
@@ -417,7 +443,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-07.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-07.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-07.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-07.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "f17548d549efa98b2b22d31ada5538b88f617f3c",
@@ -428,7 +455,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-14.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-14.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-14.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-14.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "7563b96f5c6f3fbf23a8358f0dab33ba2c1ab69d",
@@ -439,7 +467,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-21.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-21.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-21.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-21.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "b1603eea223442eb4fe02714fb154e62bed18291",
@@ -450,7 +479,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-28.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-28.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-28.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-08-28.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "c743722f96dd113860c73c00b94ac1ab28e175bb",
@@ -461,7 +491,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-04.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-04.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-04.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-04.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "a8e8416e06281e60962caa22a077a4dfa4de59ab",
@@ -472,7 +503,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-11.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-11.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-11.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-11.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "1a6bb885b8a976323c20fac375392a9791faa8aa",
@@ -483,7 +515,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-18.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-18.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-18.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-18.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "c9f17c6812d0cf2b78c800ffd8390060d7975e49",
@@ -494,7 +527,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-25.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-25.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-25.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-09-25.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "67cde5f87c636bb58979a25bdc749192d42ceb26",
@@ -505,7 +539,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-02.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-02.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-02.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-02.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "d423a9794f6cb529833c0585d60ca666fb281d97",
@@ -516,7 +551,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-09.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-09.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-09.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-09.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "211beaf80b1166ed749553aa51dd4e656359538e",
@@ -527,7 +563,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-16.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-16.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-16.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-16.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "92110ca24846bb01e481e9a0fe274884318f5732",
@@ -538,7 +575,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-23.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-23.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-23.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-23.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "ca054331394dbdbc9692f4f99f9890522ab5a7d3",
@@ -549,7 +587,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-30.md",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-30.md",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-30.md?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fsrc%2Fblog%2Fposts%2Fkody-weekly-2026-10-30.md?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "e567d9fc0be63e75fff7a60e8a9ba1e2633f006a",
@@ -560,7 +599,8 @@
    "changes": 28,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fstart%2Fpages%2Fblog-post.tsx",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fstart%2Fpages%2Fblog-post.tsx",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fstart%2Fpages%2Fblog-post.tsx?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fstart%2Fpages%2Fblog-post.tsx?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "69ee65d101c544b46fb96df1be19223384c93a87",
@@ -571,7 +611,8 @@
    "changes": 1,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fstart%2Fserver%2Fblog.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Fstart%2Fserver%2Fblog.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fstart%2Fserver%2Fblog.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Fstart%2Fserver%2Fblog.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "7c421e1fd2fbc150b3527132cfb05f199fcb6aba",
@@ -582,7 +623,8 @@
    "changes": 3,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Funiversal%2Fblog-display.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Funiversal%2Fblog-display.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Funiversal%2Fblog-display.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Funiversal%2Fblog-display.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   },
   {
    "sha": "1618c5e2210e2dc99c3402da391cfcfafc5f0e1d",
@@ -593,7 +635,8 @@
    "changes": 2,
    "blob_url": "https://github.com/kody-hq/kody/blob/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Funiversal%2Floader-data.ts",
    "raw_url": "https://github.com/kody-hq/kody/raw/7a66840562395401481fe4626d5af4476f42569a/packages%2Fworker%2Funiversal%2Floader-data.ts",
-   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Funiversal%2Floader-data.ts?ref=7a66840562395401481fe4626d5af4476f42569a"
+   "contents_url": "https://api.github.com/repos/kody-hq/kody/contents/packages%2Fworker%2Funiversal%2Floader-data.ts?ref=7a66840562395401481fe4626d5af4476f42569a",
+   "patch": ""
   }
  ],
  "commits": [

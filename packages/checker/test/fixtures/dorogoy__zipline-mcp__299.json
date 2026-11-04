@@ -91,7 +91,8 @@
    "changes": 26,
    "blob_url": "https://github.com/dorogoy/zipline-mcp/blob/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2Fdownload.test.ts",
    "raw_url": "https://github.com/dorogoy/zipline-mcp/raw/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2Fdownload.test.ts",
-   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2Fdownload.test.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260"
+   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2Fdownload.test.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "patch": "+  it('strips surrounding brackets from IPv6 host literals for DNS resolution', async () => {\n+    vi.mocked(lookup).mockResolvedValue([\n+      { address: '2606:4700:4700::1111', family: 6 },\n+    ] as never);\n+    let seen: RequestOptions | undefined;\n+    installRequest((options, callback) => {\n+      seen = options;\n+      callback(\n+        fakeResponse(200, { 'content-length': String(content.length) }, [\n+          content,\n+        ])\n+      );\n+    });\n+\n+    const { downloadExternalUrl } = await import('./httpClient.js');\n+    await downloadExternalUrl('http://[2606:4700:4700::1111]/test.txt');\n+\n+    // lookup should be called with unbracketed IPv6 literal\n+    expect(lookup).toHaveBeenCalledWith(\n+      '2606:4700:4700::1111',\n+      expect.objectContaining({ all: true, verbatim: true })\n+    );\n+    expect(seen?.hostname).toBe('2606:4700:4700::1111');\n+    expect(seen?.servername).toBe('[2606:4700:4700::1111]');\n+  });\n+"
   },
   {
    "sha": "effead92f42baf5a98be5ebfe0422add2ce1ef41",
@@ -102,7 +103,8 @@
    "changes": 5,
    "blob_url": "https://github.com/dorogoy/zipline-mcp/blob/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2FhttpClient.ts",
    "raw_url": "https://github.com/dorogoy/zipline-mcp/raw/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2FhttpClient.ts",
-   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2FhttpClient.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260"
+   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2FhttpClient.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "patch": "+  // Strip surrounding brackets from IPv6 host literals (e.g. \"[2001:db8::1]\" -> \"2001:db8::1\")\n+  // so Node dns.lookup doesn't fail with ENOTFOUND on bracketed literals.\n+  const cleanHostname = hostname.replace(/^\\[|\\]$/g, '');\n+    records = await lookup(cleanHostname, { all: true, verbatim: true });"
   }
  ],
  "commits": [

@@ -75,11 +75,14 @@ const FIXTURES: readonly Fixture[] = [
 const User = z.object({ login: z.string(), type: z.string() });
 const GitRef = z.object({ label: z.string(), ref: z.string(), sha: z.string() });
 const Pull = z.looseObject({ user: User, head: GitRef, base: GitRef }).transform(({ _links, ...rest }) => rest);
-const File = z.looseObject({}).transform(({ patch, ...rest }) => rest);
+const File = z.looseObject({ patch: z.string().optional() }).transform(({ patch, ...rest }) => ({
+  ...rest,
+  ...(patch === undefined ? {} : { patch: patch.split("\n").filter((l) => l.startsWith("+") && !l.startsWith("+++")).join("\n") }),
+}));
 const Commit = z.looseObject({ author: User.nullable(), committer: User.nullable() });
 const Run = z.looseObject({ app: z.object({ slug: z.string() }).nullable() });
 
-/** Drops what the checker never reads and that makes up most of the bytes: patches, repository and app objects. */
+/** Drops what the checker never reads and that makes up most of the bytes: removed patch lines, repository and app objects. */
 function trim(raw: RawReceipts): RawReceipts {
   const runs = (value: unknown) => z.array(Run).parse(value);
   return {
@@ -111,7 +114,7 @@ function readme(): string {
     "# Fixtures",
     "",
     "Real public pull requests written by coding agents, recorded once in `RawReceipts` shape (see `packages/checker/src/receipts.ts`).",
-    "Each file holds the pull request, its files and commits (without patches, repository objects or user profiles), the check runs and statuses of the head commit and up to 20 recent commits, and each `##[group]Run` block through its `##[endgroup]` from up to 30 Actions job logs.",
+    "Each file holds the pull request, its files and commits (patches cut to their added lines, without repository objects or user profiles), the check runs and statuses of the head commit and up to 20 recent commits, and each `##[group]Run` block through its `##[endgroup]` from up to 30 Actions job logs.",
     "",
     "Regenerate with `node --conditions=source scripts/fetch-fixtures.ts` (this README is written from the same list). The pull requests keep changing on GitHub, so a fresh fetch can change verdicts.",
     "",
