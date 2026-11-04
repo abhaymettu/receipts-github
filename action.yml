@@ -1,0 +1,22 @@
+name: receipts-github
+description: Checks the claims in a pull request against its diff, checks and commits, and reports one check run.
+author: Abhay Mettu
+branding:
+  icon: check-square
+  color: green
+inputs:
+  token:
+    description: Token that reads the pull request and its checks and creates the check run.
+    default: ${{ github.token }}
+  fail-on:
+    description: "`unbacked` fails the check run when a claim has no receipt; `never` reports without failing."
+    default: unbacked
+  wait-minutes:
+    description: How long to wait for the pull request's other checks to finish before judging.
+    default: "10"
+  check-name:
+    description: Name of the check run this action creates.
+    default: receipts
+runs:
+  using: node24
+  main: dist/action.js
