@@ -104,6 +104,7 @@ export interface RawReceipts {
 
 const asSha = (s: string): Sha => s.toLowerCase() as Sha;
 
+/** A run cancelled or marked stale by a newer push never judged the code, so it counts as skipped, not failed. */
 function checkRunState(status: string, conclusion: string | null): CheckState {
   if (status !== "completed") return "pending";
   switch (conclusion) {
@@ -111,7 +112,11 @@ function checkRunState(status: string, conclusion: string | null): CheckState {
     case "neutral":
       return "success";
     case "skipped":
+    case "cancelled":
+    case "stale":
       return "skipped";
+    case "action_required":
+      return "pending";
     default:
       return "failure";
   }

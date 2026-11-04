@@ -38,6 +38,7 @@ describe("parseReceipts", () => {
       abc0000000000000000000000000000000000000: [
         { id: 9, name: "test", head_sha: "abc0000000000000000000000000000000000000", status: "completed", conclusion: "neutral", html_url: null },
         { id: 10, name: "e2e", head_sha: "abc0000000000000000000000000000000000000", status: "in_progress", conclusion: null, html_url: null },
+        { id: 11, name: "lint", head_sha: "abc0000000000000000000000000000000000000", status: "completed", conclusion: "cancelled", html_url: null },
       ],
     },
     statuses: { abc0000000000000000000000000000000000000: [{ context: "ci/circleci", state: "error", target_url: null }] },
@@ -53,6 +54,7 @@ describe("parseReceipts", () => {
     expect(pr.checks.map((c) => [c.source, c.name, c.state, c.commands.length])).toEqual([
       ["check_run", "test", "success", 3],
       ["check_run", "e2e", "pending", 0],
+      ["check_run", "lint", "skipped", 0],
       ["status", "ci/circleci", "failure", 0],
     ]);
   });

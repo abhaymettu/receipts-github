@@ -20060,7 +20060,11 @@ function checkRunState(status, conclusion) {
     case "neutral":
       return "success";
     case "skipped":
+    case "cancelled":
+    case "stale":
       return "skipped";
+    case "action_required":
+      return "pending";
     default:
       return "failure";
   }
