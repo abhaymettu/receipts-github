@@ -111,7 +111,7 @@ function readme(): string {
     "# Fixtures",
     "",
     "Real public pull requests written by coding agents, recorded once in `RawReceipts` shape (see `packages/checker/src/receipts.ts`).",
-    "Each file holds the pull request, its files and commits (without patches, repository objects or user profiles), the check runs and statuses of the head commit and up to 20 recent commits, and the `##[group]Run` lines of up to 30 Actions job logs.",
+    "Each file holds the pull request, its files and commits (without patches, repository objects or user profiles), the check runs and statuses of the head commit and up to 20 recent commits, and each `##[group]Run` block through its `##[endgroup]` from up to 30 Actions job logs.",
     "",
     "Regenerate with `node --conditions=source scripts/fetch-fixtures.ts` (this README is written from the same list). The pull requests keep changing on GitHub, so a fresh fetch can change verdicts.",
     "",

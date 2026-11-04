@@ -18,7 +18,7 @@ function extract(_report) {
 
 // packages/checker/src/commands.ts
 var GATES = ["tests", "build", "typecheck", "lint", "deploy"];
-var PM = String.raw`(?:npm|pnpm|yarn|bun|deno)\s+(?:-\S+\s+)*(?:run\s+)?`;
+var PM = String.raw`(?:npm|pnpm|yarn|bun|deno|turbo|nx)\s+(?:-\S+\s+)*(?:run\s+)?`;
 var COMMAND = {
   tests: new RegExp(
     String.raw`\b(?:pytest|py\.test|unittest|nosetests|tox|nox|vitest|jest|mocha|ava|playwright test|` + String.raw`cypress run|rspec|phpunit|ctest|bats|` + PM + String.raw`test(?::\S+)?|` + String.raw`(?:cargo|go|swift|dotnet|mix|zig|gradle|gradlew|mvn|sbt|stack|cabal)\s+test|` + String.raw`xcodebuild\b[^|;&]*\btest\b|make\s+(?:test|check)\w*|` + String.raw`(?:Rscript|R\s+-e|python3?|node|bash|sh|uv run|poetry run)\s+[^|;&]*\btests?[\w./-]*|` + String.raw`\btest_[\w./-]*\.py|[\w./-]*_test\.\w+|run_tests?\b|\bverify(?:\.sh|\.py)?\b)`,
@@ -20068,9 +20068,24 @@ function checkRunState(status, conclusion) {
       return "failure";
   }
 }
-var RUN_LINE = /##\[group\]Run (.+)$/gm;
+var STAMP = /^\d{4}-\d\d-\d\dT[\d:.]+Z ?/;
+var ANSI = /\u001b\[[\d;]*m/g;
+var STEP_META = /^(?:shell|with|env):/;
 function commandsFromLog(log) {
-  return [...log.matchAll(RUN_LINE)].map((m) => (m[1] ?? "").trim()).filter((c) => c.length > 0);
+  const out = [];
+  let inStep = false;
+  for (const raw of log.split(/\r?\n/)) {
+    const line = raw.replace(STAMP, "").replace(ANSI, "");
+    if (line.startsWith("##[group]Run ")) {
+      inStep = true;
+      out.push(line.slice("##[group]Run ".length).trim());
+    } else if (line.startsWith("##[endgroup]") || STEP_META.test(line)) {
+      inStep = false;
+    } else if (inStep && line.trim().length > 0) {
+      out.push(line.trim());
+    }
+  }
+  return [...new Set(out.filter((c) => c.length > 0))];
 }
 function parseReceipts(raw) {
   const pull = PullSchema.parse(raw.pull);
