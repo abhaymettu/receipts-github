@@ -20486,6 +20486,7 @@ function gitHub({ token, baseUrl = "https://api.github.com", fetch: send = fetch
     json: async (path) => (await request("GET", path)).json(),
     text: async (path) => (await request("GET", path)).text(),
     post: async (path, body) => (await request("POST", path, body)).json(),
+    patch: async (path, body) => (await request("PATCH", path, body)).json(),
     async pages(path, items) {
       const all = [];
       let next = path + (path.includes("?") ? "&" : "?") + "per_page=100";
@@ -20528,14 +20529,18 @@ function runGroups(log) {
   return kept.join("\n");
 }
 var MISSING_LOG = /* @__PURE__ */ new Set([401, 403, 404, 410]);
-async function fetchReceipts({ github, pull }) {
+async function fetchReceipts({
+  github,
+  pull,
+  limits = { commits: MAX_COMMITS, logs: MAX_LOGS }
+}) {
   const repo = `/repos/${pull.owner}/${pull.repo}`;
   const [pullJson, files2, commits] = await Promise.all([
     github.json(`${repo}/pulls/${pull.number}`),
     github.pages(`${repo}/pulls/${pull.number}/files`, (page) => AnyArray.parse(page)),
     github.pages(`${repo}/pulls/${pull.number}/commits`, (page) => AnyArray.parse(page))
   ]);
-  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-MAX_COMMITS).reverse();
+  const recent = CommitShas.parse(commits).map((c) => c.sha).slice(-limits.commits).reverse();
   const shas = [.../* @__PURE__ */ new Set([PullHead.parse(pullJson).head.sha, ...recent])];
   const perSha = await mapLimit(shas, async (sha) => {
     const [runs2, statuses] = await Promise.all([
@@ -20544,7 +20549,7 @@ async function fetchReceipts({ github, pull }) {
     ]);
     return { sha, runs: runs2, statuses };
   });
-  const actionsJobIds = perSha.flatMap(({ runs: runs2 }) => external_exports.array(ActionsRun).parse(runs2)).filter((run) => run.app?.slug === "github-actions").map((run) => run.id).slice(0, MAX_LOGS);
+  const actionsJobIds = perSha.flatMap(({ runs: runs2 }) => external_exports.array(ActionsRun).parse(runs2)).filter((run) => run.app?.slug === "github-actions").map((run) => run.id).slice(0, limits.logs);
   const logs = await mapLimit(actionsJobIds, async (id) => {
     try {
       return [String(id), runGroups(await github.text(`${repo}/actions/jobs/${id}/logs`))];
