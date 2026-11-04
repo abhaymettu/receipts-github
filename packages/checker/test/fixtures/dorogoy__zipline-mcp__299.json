@@ -1,0 +1,361 @@
+{
+ "pull": {
+  "user": {
+   "login": "google-labs-jules[bot]",
+   "type": "Bot"
+  },
+  "head": {
+   "label": "dorogoy:jules-strip-brackets-ipv6-pinned-address-7678477791282394596",
+   "ref": "jules-strip-brackets-ipv6-pinned-address-7678477791282394596",
+   "sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260"
+  },
+  "base": {
+   "label": "dorogoy:main",
+   "ref": "main",
+   "sha": "3f1437a79506b8eed078d3599dd15ee709efb370"
+  },
+  "url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/299",
+  "id": 5147185455,
+  "node_id": "PR_kwDOPayJAs8AAAABMsvRLw",
+  "html_url": "https://github.com/dorogoy/zipline-mcp/pull/299",
+  "diff_url": "https://github.com/dorogoy/zipline-mcp/pull/299.diff",
+  "patch_url": "https://github.com/dorogoy/zipline-mcp/pull/299.patch",
+  "issue_url": "https://api.github.com/repos/dorogoy/zipline-mcp/issues/299",
+  "commits_url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/299/commits",
+  "review_comments_url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/299/comments",
+  "review_comment_url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/dorogoy/zipline-mcp/issues/299/comments",
+  "statuses_url": "https://api.github.com/repos/dorogoy/zipline-mcp/statuses/fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+  "number": 299,
+  "state": "open",
+  "locked": false,
+  "title": "🛡️ Sentinel: Fix IPv6 literal bracket resolution in download pinning",
+  "body": "🛡️ Sentinel Security Fix: Strip brackets from IPv6 literal hostnames in `resolvePinnedAddress`\n\n- 💡 **Vulnerability/Issue**: Node's WHATWG `URL.hostname` preserves surrounding square brackets for IPv6 address literals (e.g. `[2606:4700:4700::1111]`). Passing bracketed IPv6 hostnames to `dns.lookup` in `resolvePinnedAddress` causes DNS lookup failures (`ENOTFOUND`), preventing legitimate public IPv6 external downloads from functioning and causing unhandled resolution failures during SSRF pinning.\n- 🎯 **Impact**: Public IPv6 literal download requests fail erroneously before DNS pinning and SSRF validation can complete.\n- 🔧 **Fix**: Strip surrounding brackets with `.replace(/^\\[|\\]$/g, '')` in `resolvePinnedAddress` before calling `lookup(...)`.\n- ✅ **Verification**: Added unit test in `src/download.test.ts` verifying that bracketed IPv6 literals are stripped when passed to `lookup(...)` and that connection parameters match. Ran `npm run test:run`, `npm run lint`, `npm run format:check`, and `npm run build` with all checks passing.\n\n---\n*PR created automatically by Jules for task [7678477791282394596](https://jules.google.com/task/7678477791282394596) started by @dorogoy*",
+  "labels": [],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-11-04T01:19:59Z",
+  "updated_at": "2026-11-04T01:20:00Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "aedcb15cd00f2093ac4b63708723e5867f288812",
+  "assignee": null,
+  "assignees": [],
+  "requested_reviewers": [
+   {
+    "login": "dorogoy",
+    "id": 66247,
+    "node_id": "MDQ6VXNlcjY2MjQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/66247?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dorogoy",
+    "html_url": "https://github.com/dorogoy",
+    "followers_url": "https://api.github.com/users/dorogoy/followers",
+    "following_url": "https://api.github.com/users/dorogoy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dorogoy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dorogoy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dorogoy/subscriptions",
+    "organizations_url": "https://api.github.com/users/dorogoy/orgs",
+    "repos_url": "https://api.github.com/users/dorogoy/repos",
+    "events_url": "https://api.github.com/users/dorogoy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dorogoy/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+   }
+  ],
+  "requested_teams": [],
+  "author_association": "CONTRIBUTOR",
+  "auto_merge": null,
+  "draft": false,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": true,
+  "mergeable_state": "blocked",
+  "merged_by": null,
+  "comments": 1,
+  "review_comments": 0,
+  "maintainer_can_modify": false,
+  "commits": 1,
+  "additions": 30,
+  "deletions": 1,
+  "changed_files": 2
+ },
+ "files": [
+  {
+   "sha": "d3c1a472d767257a648b6778f1d0aa1ca46e4628",
+   "filename": "src/download.test.ts",
+   "status": "modified",
+   "additions": 26,
+   "deletions": 0,
+   "changes": 26,
+   "blob_url": "https://github.com/dorogoy/zipline-mcp/blob/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2Fdownload.test.ts",
+   "raw_url": "https://github.com/dorogoy/zipline-mcp/raw/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2Fdownload.test.ts",
+   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2Fdownload.test.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "patch": "+  it('strips surrounding brackets from IPv6 host literals for DNS resolution', async () => {\n+    vi.mocked(lookup).mockResolvedValue([\n+      { address: '2606:4700:4700::1111', family: 6 },\n+    ] as never);\n+    let seen: RequestOptions | undefined;\n+    installRequest((options, callback) => {\n+      seen = options;\n+      callback(\n+        fakeResponse(200, { 'content-length': String(content.length) }, [\n+          content,\n+        ])\n+      );\n+    });\n+\n+    const { downloadExternalUrl } = await import('./httpClient.js');\n+    await downloadExternalUrl('http://[2606:4700:4700::1111]/test.txt');\n+\n+    // lookup should be called with unbracketed IPv6 literal\n+    expect(lookup).toHaveBeenCalledWith(\n+      '2606:4700:4700::1111',\n+      expect.objectContaining({ all: true, verbatim: true })\n+    );\n+    expect(seen?.hostname).toBe('2606:4700:4700::1111');\n+    expect(seen?.servername).toBe('[2606:4700:4700::1111]');\n+  });\n+"
+  },
+  {
+   "sha": "effead92f42baf5a98be5ebfe0422add2ce1ef41",
+   "filename": "src/httpClient.ts",
+   "status": "modified",
+   "additions": 4,
+   "deletions": 1,
+   "changes": 5,
+   "blob_url": "https://github.com/dorogoy/zipline-mcp/blob/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2FhttpClient.ts",
+   "raw_url": "https://github.com/dorogoy/zipline-mcp/raw/fb5c93738b661b9a9dcf4f31b72c3647bc162260/src%2FhttpClient.ts",
+   "contents_url": "https://api.github.com/repos/dorogoy/zipline-mcp/contents/src%2FhttpClient.ts?ref=fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "patch": "+  // Strip surrounding brackets from IPv6 host literals (e.g. \"[2001:db8::1]\" -> \"2001:db8::1\")\n+  // so Node dns.lookup doesn't fail with ENOTFOUND on bracketed literals.\n+  const cleanHostname = hostname.replace(/^\\[|\\]$/g, '');\n+    records = await lookup(cleanHostname, { all: true, verbatim: true });"
+  }
+ ],
+ "commits": [
+  {
+   "author": {
+    "login": "google-labs-jules[bot]",
+    "type": "Bot"
+   },
+   "committer": {
+    "login": "google-labs-jules[bot]",
+    "type": "Bot"
+   },
+   "sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "node_id": "C_kwDOPayJAtoAKGZiNWM5MzczOGI2NjFiOWE5ZGNmNGYzMWI3MmMzNjQ3YmMxNjIyNjA",
+   "commit": {
+    "author": {
+     "name": "google-labs-jules[bot]",
+     "email": "161369871+google-labs-jules[bot]@users.noreply.github.com",
+     "date": "2026-11-04T01:19:56Z"
+    },
+    "committer": {
+     "name": "google-labs-jules[bot]",
+     "email": "161369871+google-labs-jules[bot]@users.noreply.github.com",
+     "date": "2026-11-04T01:19:56Z"
+    },
+    "message": "fix: strip brackets from IPv6 host in resolvePinnedAddress\n\nWHATWG URL.hostname retains enclosing brackets for IPv6 literals\n(e.g., [2001:db8::1]). Node dns.lookup fails with ENOTFOUND on bracketed\nIPv6 literals. Strip surrounding brackets in resolvePinnedAddress before\ncalling lookup.",
+    "tree": {
+     "sha": "5aa8e95ccafa67fd62fdfc8733ff561b00217d8e",
+     "url": "https://api.github.com/repos/dorogoy/zipline-mcp/git/trees/5aa8e95ccafa67fd62fdfc8733ff561b00217d8e"
+    },
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/git/commits/fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "comment_count": 0,
+    "verification": {
+     "verified": false,
+     "reason": "unsigned",
+     "signature": null,
+     "payload": null,
+     "verified_at": null
+    }
+   },
+   "url": "https://api.github.com/repos/dorogoy/zipline-mcp/commits/fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "html_url": "https://github.com/dorogoy/zipline-mcp/commit/fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+   "comments_url": "https://api.github.com/repos/dorogoy/zipline-mcp/commits/fb5c93738b661b9a9dcf4f31b72c3647bc162260/comments",
+   "parents": [
+    {
+     "sha": "3f1437a79506b8eed078d3599dd15ee709efb370",
+     "url": "https://api.github.com/repos/dorogoy/zipline-mcp/commits/3f1437a79506b8eed078d3599dd15ee709efb370",
+     "html_url": "https://github.com/dorogoy/zipline-mcp/commit/3f1437a79506b8eed078d3599dd15ee709efb370"
+    }
+   ]
+  }
+ ],
+ "checkRuns": {
+  "fb5c93738b661b9a9dcf4f31b72c3647bc162260": [
+   {
+    "app": {
+     "slug": "github-advanced-security"
+    },
+    "id": 126323625766,
+    "name": "CodeQL",
+    "node_id": "CR_kwDOPayJAs8AAAAdaXmPJg",
+    "head_sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "external_id": "",
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323625766",
+    "html_url": "https://github.com/dorogoy/zipline-mcp/runs/126323625766",
+    "details_url": "https://github.com/dorogoy/zipline-mcp/runs/126323625766",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T01:20:35Z",
+    "completed_at": "2026-11-04T01:20:36Z",
+    "output": {
+     "title": "No new alerts in code changed by this pull request",
+     "summary": "[View all branch alerts](/dorogoy/zipline-mcp/security/code-scanning?query=pr%3A299+tool%3ACodeQL+is%3Aopen).",
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323625766/annotations"
+    },
+    "check_suite": {
+     "id": 113144043116
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/299",
+      "id": 5147185455,
+      "number": 299,
+      "head": {
+       "ref": "jules-strip-brackets-ipv6-pinned-address-7678477791282394596",
+       "sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+       "repo": {
+        "id": 1034717442,
+        "url": "https://api.github.com/repos/dorogoy/zipline-mcp",
+        "name": "zipline-mcp"
+       }
+      },
+      "base": {
+       "ref": "main",
+       "sha": "3f1437a79506b8eed078d3599dd15ee709efb370",
+       "repo": {
+        "id": 1034717442,
+        "url": "https://api.github.com/repos/dorogoy/zipline-mcp",
+        "name": "zipline-mcp"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126323423562,
+    "name": "test",
+    "node_id": "CR_kwDOPayJAs8AAAAdaXZ5Sg",
+    "head_sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "external_id": "1e5c1e41-d38a-50d8-acee-b899b1baed84",
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323423562",
+    "html_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753322173/job/126323423562",
+    "details_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753322173/job/126323423562",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T01:20:05Z",
+    "completed_at": "2026-11-04T01:20:54Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323423562/annotations"
+    },
+    "check_suite": {
+     "id": 113143873539
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/dorogoy/zipline-mcp/pulls/299",
+      "id": 5147185455,
+      "number": 299,
+      "head": {
+       "ref": "jules-strip-brackets-ipv6-pinned-address-7678477791282394596",
+       "sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+       "repo": {
+        "id": 1034717442,
+        "url": "https://api.github.com/repos/dorogoy/zipline-mcp",
+        "name": "zipline-mcp"
+       }
+      },
+      "base": {
+       "ref": "main",
+       "sha": "3f1437a79506b8eed078d3599dd15ee709efb370",
+       "repo": {
+        "id": 1034717442,
+        "url": "https://api.github.com/repos/dorogoy/zipline-mcp",
+        "name": "zipline-mcp"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126323418321,
+    "name": "Analyze (javascript-typescript)",
+    "node_id": "CR_kwDOPayJAs8AAAAdaXZk0Q",
+    "head_sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "external_id": "2c428817-c945-56b0-9d31-310390dc6fe3",
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323418321",
+    "html_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323418321",
+    "details_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323418321",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T01:20:06Z",
+    "completed_at": "2026-11-04T01:21:13Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323418321/annotations"
+    },
+    "check_suite": {
+     "id": 113143864404
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126323417787,
+    "name": "Analyze (python)",
+    "node_id": "CR_kwDOPayJAs8AAAAdaXZiuw",
+    "head_sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "external_id": "1d4c0b5f-8080-53d8-8593-8b92ece8af0e",
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323417787",
+    "html_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323417787",
+    "details_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323417787",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T01:20:05Z",
+    "completed_at": "2026-11-04T01:20:48Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323417787/annotations"
+    },
+    "check_suite": {
+     "id": 113143864404
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126323417465,
+    "name": "Analyze (actions)",
+    "node_id": "CR_kwDOPayJAs8AAAAdaXZheQ",
+    "head_sha": "fb5c93738b661b9a9dcf4f31b72c3647bc162260",
+    "external_id": "4c356700-e4ab-5421-9ee4-8454933ea551",
+    "url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323417465",
+    "html_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323417465",
+    "details_url": "https://github.com/dorogoy/zipline-mcp/actions/runs/41753318393/job/126323417465",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T01:20:05Z",
+    "completed_at": "2026-11-04T01:20:44Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/dorogoy/zipline-mcp/check-runs/126323417465/annotations"
+    },
+    "check_suite": {
+     "id": 113143864404
+    },
+    "pull_requests": []
+   }
+  ]
+ },
+ "statuses": {
+  "fb5c93738b661b9a9dcf4f31b72c3647bc162260": []
+ },
+ "logs": {
+  "126323423562": "2026-11-04T01:20:07.1346752Z ##[group]Run actions/checkout@v7\n2026-11-04T01:20:07.1347185Z with:\n2026-11-04T01:20:07.1347430Z   fetch-depth: 0\n2026-11-04T01:20:07.1347695Z   repository: dorogoy/zipline-mcp\n2026-11-04T01:20:07.1349912Z   token: ***\n2026-11-04T01:20:07.1350152Z   ssh-strict: true\n2026-11-04T01:20:07.1350407Z   ssh-user: git\n2026-11-04T01:20:07.1350663Z   persist-credentials: true\n2026-11-04T01:20:07.1350948Z   clean: true\n2026-11-04T01:20:07.1351202Z   sparse-checkout-cone-mode: true\n2026-11-04T01:20:07.1351500Z   fetch-tags: false\n2026-11-04T01:20:07.1351751Z   show-progress: true\n2026-11-04T01:20:07.1352008Z   lfs: false\n2026-11-04T01:20:07.1352243Z   submodules: false\n2026-11-04T01:20:07.1352504Z   set-safe-directory: true\n2026-11-04T01:20:07.1352796Z   allow-unsafe-pr-checkout: false\n2026-11-04T01:20:07.1353307Z ##[endgroup]\n2026-11-04T01:20:08.4862465Z ##[group]Run actions/setup-node@v7\n2026-11-04T01:20:08.4863172Z with:\n2026-11-04T01:20:08.4863612Z   node-version: 26\n2026-11-04T01:20:08.4864090Z   cache: npm\n2026-11-04T01:20:08.4864558Z   check-latest: false\n2026-11-04T01:20:08.4870255Z   token: ***\n2026-11-04T01:20:08.4870736Z   package-manager-cache: true\n2026-11-04T01:20:08.4871295Z ##[endgroup]\n2026-11-04T01:20:12.9718351Z ##[group]Run npm ci\n2026-11-04T01:20:12.9718559Z \u001b[36;1mnpm ci\u001b[0m\n2026-11-04T01:20:12.9766141Z shell: /usr/bin/bash -e {0}\n2026-11-04T01:20:12.9766339Z ##[endgroup]\n2026-11-04T01:20:41.4296027Z ##[group]Run make build\n2026-11-04T01:20:41.4296256Z \u001b[36;1mmake build\u001b[0m\n2026-11-04T01:20:41.4341967Z shell: /usr/bin/bash -e {0}\n2026-11-04T01:20:41.4342136Z ##[endgroup]\n2026-11-04T01:20:43.4929321Z ##[group]Run make test\n2026-11-04T01:20:43.4929497Z \u001b[36;1mmake test\u001b[0m\n2026-11-04T01:20:43.4973496Z shell: /usr/bin/bash -e {0}\n2026-11-04T01:20:43.4973654Z ##[endgroup]",
+  "126323418321": "2026-11-04T01:20:08.0880688Z ##[group]Run actions/checkout@v6\n2026-11-04T01:20:08.0881578Z with:\n2026-11-04T01:20:08.0882030Z   repository: dorogoy/zipline-mcp\n2026-11-04T01:20:08.0886261Z   token: ***\n2026-11-04T01:20:08.0886714Z   ssh-strict: true\n2026-11-04T01:20:08.0887157Z   ssh-user: git\n2026-11-04T01:20:08.0887642Z   persist-credentials: true\n2026-11-04T01:20:08.0888121Z   clean: true\n2026-11-04T01:20:08.0888563Z   sparse-checkout-cone-mode: true\n2026-11-04T01:20:08.0889087Z   fetch-depth: 1\n2026-11-04T01:20:08.0889519Z   fetch-tags: false\n2026-11-04T01:20:08.0889958Z   show-progress: true\n2026-11-04T01:20:08.0890393Z   lfs: false\n2026-11-04T01:20:08.0890802Z   submodules: false\n2026-11-04T01:20:08.0891247Z   set-safe-directory: true\n2026-11-04T01:20:08.0891749Z   allow-unsafe-pr-checkout: false\n2026-11-04T01:20:08.0892497Z env:\n2026-11-04T01:20:08.0892929Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:08.0893511Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:08.0894114Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:08.0894905Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:08.0904742Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:08.0915388Z ##[endgroup]\n2026-11-04T01:20:09.0330152Z ##[group]Run github/codeql-action/start-proxy@v4\n2026-11-04T01:20:09.0331402Z with:\n2026-11-04T01:20:09.0332274Z   language: javascript-typescript\n2026-11-04T01:20:09.0333216Z   registry_secrets: []\n2026-11-04T01:20:09.0337629Z   token: ***\n2026-11-04T01:20:09.0339348Z   matrix: {\n  \"language\": \"javascript-typescript\",\n  \"category\": \"/language:javascript-typescript\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:09.0341083Z env:\n2026-11-04T01:20:09.0341949Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:09.0342936Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:09.0343926Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:09.0345212Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:09.0353776Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:09.0362797Z ##[endgroup]\n2026-11-04T01:20:09.4136306Z ##[group]Run github/codeql-action/init@v4\n2026-11-04T01:20:09.4136632Z with:\n2026-11-04T01:20:09.4136850Z   analysis-kinds: code-scanning\n2026-11-04T01:20:09.4137150Z   languages: javascript-typescript\n2026-11-04T01:20:09.4137405Z   build-mode: none\n2026-11-04T01:20:09.4137623Z   dependency-caching: true\n2026-11-04T01:20:09.4137969Z   config: default-setup:\n  org:\n    model-packs: [  ]\nthreat-models: [  ]\n\n2026-11-04T01:20:09.4141068Z   token: ***\n2026-11-04T01:20:09.4141662Z   matrix: {\n  \"language\": \"javascript-typescript\",\n  \"category\": \"/language:javascript-typescript\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:09.4142316Z   debug: false\n2026-11-04T01:20:09.4142534Z   check-run-id: 126323418321\n2026-11-04T01:20:09.4142781Z   job-status: success\n2026-11-04T01:20:09.4143051Z env:\n2026-11-04T01:20:09.4143255Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:09.4143538Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:09.4143861Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:09.4144201Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:09.4150579Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:09.4157366Z   CODEQL_ACTION_JOB_RUN_UUID: 0bf550cf-807e-4d40-8920-573dc092c536\n2026-11-04T01:20:09.4157732Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:09.4157948Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:09.4158170Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:09.4158416Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:09.4158622Z ##[endgroup]\n2026-11-04T01:20:29.6887899Z ##[group]Run github/codeql-action/analyze@v4\n2026-11-04T01:20:29.6888219Z with:\n2026-11-04T01:20:29.6888445Z   category: /language:javascript-typescript\n2026-11-04T01:20:29.6888737Z   output: ../results\n2026-11-04T01:20:29.6888951Z   upload: always\n2026-11-04T01:20:29.6889156Z   skip-queries: false\n2026-11-04T01:20:29.6889437Z   checkout_path: /home/runner/work/zipline-mcp/zipline-mcp\n2026-11-04T01:20:29.6889770Z   upload-database: true\n2026-11-04T01:20:29.6890005Z   wait-for-processing: true\n2026-11-04T01:20:29.6892899Z   token: ***\n2026-11-04T01:20:29.6893488Z   matrix: {\n  \"language\": \"javascript-typescript\",\n  \"category\": \"/language:javascript-typescript\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:29.6894149Z   expect-error: false\n2026-11-04T01:20:29.6894359Z env:\n2026-11-04T01:20:29.6894561Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:29.6895146Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:29.6895469Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:29.6895806Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:29.6902000Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:29.6908640Z   CODEQL_ACTION_JOB_RUN_UUID: 0bf550cf-807e-4d40-8920-573dc092c536\n2026-11-04T01:20:29.6909023Z   CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false\n2026-11-04T01:20:29.6909341Z   CODEQL_ACTION_FEATURE_SANDWICH: false\n2026-11-04T01:20:29.6909633Z   CODEQL_ACTION_FEATURE_SARIF_COMBINE: true\n2026-11-04T01:20:29.6910123Z   CODEQL_ACTION_FEATURE_WILL_UPLOAD: true\n2026-11-04T01:20:29.6910403Z   CODEQL_ACTION_VERSION: 4.39.2\n2026-11-04T01:20:29.6910669Z   CODEQL_ACTION_INIT_HAS_RUN: true\n2026-11-04T01:20:29.6911036Z   CODEQL_ACTION_ANALYSIS_KEY: dynamic/github-code-scanning/codeql:analyze\n2026-11-04T01:20:29.6911464Z   CODEQL_WORKFLOW_STARTED_AT: 2026-11-04T01:20:09.741Z\n2026-11-04T01:20:29.6911786Z   CODEQL_ACTION_HAS_SET_UP_CODEQL: true\n2026-11-04T01:20:29.6912054Z   CODEQL_RAM: 14569\n2026-11-04T01:20:29.6912258Z   CODEQL_THREADS: 4\n2026-11-04T01:20:29.6912462Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:29.6912673Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:29.6912897Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:29.6913134Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:29.6913345Z ##[endgroup]",
+  "126323417787": "2026-11-04T01:20:07.4360459Z ##[group]Run actions/checkout@v6\n2026-11-04T01:20:07.4361170Z with:\n2026-11-04T01:20:07.4361579Z   repository: dorogoy/zipline-mcp\n2026-11-04T01:20:07.4365376Z   token: ***\n2026-11-04T01:20:07.4365765Z   ssh-strict: true\n2026-11-04T01:20:07.4366152Z   ssh-user: git\n2026-11-04T01:20:07.4366537Z   persist-credentials: true\n2026-11-04T01:20:07.4366958Z   clean: true\n2026-11-04T01:20:07.4367344Z   sparse-checkout-cone-mode: true\n2026-11-04T01:20:07.4367791Z   fetch-depth: 1\n2026-11-04T01:20:07.4368170Z   fetch-tags: false\n2026-11-04T01:20:07.4368547Z   show-progress: true\n2026-11-04T01:20:07.4368928Z   lfs: false\n2026-11-04T01:20:07.4369288Z   submodules: false\n2026-11-04T01:20:07.4369682Z   set-safe-directory: true\n2026-11-04T01:20:07.4370119Z   allow-unsafe-pr-checkout: false\n2026-11-04T01:20:07.4370760Z env:\n2026-11-04T01:20:07.4371135Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:07.4371641Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:07.4372191Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:07.4372774Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:07.4381314Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:07.4390606Z ##[endgroup]\n2026-11-04T01:20:08.5994742Z ##[group]Run github/codeql-action/start-proxy@v4\n2026-11-04T01:20:08.5995852Z with:\n2026-11-04T01:20:08.5996569Z   language: python\n2026-11-04T01:20:08.5997357Z   registry_secrets: []\n2026-11-04T01:20:08.6005832Z   token: ***\n2026-11-04T01:20:08.6007431Z   matrix: {\n  \"language\": \"python\",\n  \"category\": \"/language:python\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:08.6009253Z env:\n2026-11-04T01:20:08.6010189Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:08.6011221Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:08.6012274Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:08.6013487Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:08.6033623Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:08.6053450Z ##[endgroup]\n2026-11-04T01:20:08.8832584Z ##[group]Run github/codeql-action/init@v4\n2026-11-04T01:20:08.8833528Z with:\n2026-11-04T01:20:08.8834359Z   analysis-kinds: code-scanning\n2026-11-04T01:20:08.8835224Z   languages: python\n2026-11-04T01:20:08.8835988Z   build-mode: none\n2026-11-04T01:20:08.8836746Z   dependency-caching: true\n2026-11-04T01:20:08.8837869Z   config: default-setup:\n  org:\n    model-packs: [  ]\nthreat-models: [  ]\n\n2026-11-04T01:20:08.8846033Z   token: ***\n2026-11-04T01:20:08.8847563Z   matrix: {\n  \"language\": \"python\",\n  \"category\": \"/language:python\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:08.8849364Z   debug: false\n2026-11-04T01:20:08.8850162Z   check-run-id: 126323417787\n2026-11-04T01:20:08.8851061Z   job-status: success\n2026-11-04T01:20:08.8851887Z env:\n2026-11-04T01:20:08.8852670Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:08.8853776Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:08.8855007Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:08.8856166Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:08.8873447Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:08.8891574Z   CODEQL_ACTION_JOB_RUN_UUID: d2d53c06-7f20-41df-8e57-8bc139137589\n2026-11-04T01:20:08.8892702Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:08.8893458Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:08.8894445Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:08.8895294Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:08.8896030Z ##[endgroup]\n2026-11-04T01:20:18.8840865Z ##[group]Run github/codeql-action/analyze@v4\n2026-11-04T01:20:18.8841123Z with:\n2026-11-04T01:20:18.8841305Z   category: /language:python\n2026-11-04T01:20:18.8841505Z   output: ../results\n2026-11-04T01:20:18.8841680Z   upload: always\n2026-11-04T01:20:18.8841864Z   skip-queries: false\n2026-11-04T01:20:18.8842103Z   checkout_path: /home/runner/work/zipline-mcp/zipline-mcp\n2026-11-04T01:20:18.8842378Z   upload-database: true\n2026-11-04T01:20:18.8842573Z   wait-for-processing: true\n2026-11-04T01:20:18.8844886Z   token: ***\n2026-11-04T01:20:18.8845278Z   matrix: {\n  \"language\": \"python\",\n  \"category\": \"/language:python\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:18.8845701Z   expect-error: false\n2026-11-04T01:20:18.8845894Z env:\n2026-11-04T01:20:18.8846071Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:18.8846322Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:18.8846576Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:18.8846881Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:18.8851471Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:18.8856411Z   CODEQL_ACTION_JOB_RUN_UUID: d2d53c06-7f20-41df-8e57-8bc139137589\n2026-11-04T01:20:18.8856724Z   CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false\n2026-11-04T01:20:18.8856975Z   CODEQL_ACTION_FEATURE_SANDWICH: false\n2026-11-04T01:20:18.8857218Z   CODEQL_ACTION_FEATURE_SARIF_COMBINE: true\n2026-11-04T01:20:18.8857465Z   CODEQL_ACTION_FEATURE_WILL_UPLOAD: true\n2026-11-04T01:20:18.8857696Z   CODEQL_ACTION_VERSION: 4.39.2\n2026-11-04T01:20:18.8857909Z   CODEQL_ACTION_INIT_HAS_RUN: true\n2026-11-04T01:20:18.8858388Z   CODEQL_ACTION_ANALYSIS_KEY: dynamic/github-code-scanning/codeql:analyze\n2026-11-04T01:20:18.8858734Z   CODEQL_WORKFLOW_STARTED_AT: 2026-11-04T01:20:09.119Z\n2026-11-04T01:20:18.8859016Z   CODEQL_ACTION_HAS_SET_UP_CODEQL: true\n2026-11-04T01:20:18.8859235Z   CODEQL_RAM: 14569\n2026-11-04T01:20:18.8859416Z   CODEQL_THREADS: 4\n2026-11-04T01:20:18.8859591Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:18.8859776Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:18.8859963Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:18.8860171Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:18.8860344Z ##[endgroup]",
+  "126323417465": "2026-11-04T01:20:07.1646947Z ##[group]Run actions/checkout@v6\n2026-11-04T01:20:07.1648096Z with:\n2026-11-04T01:20:07.1648570Z   repository: dorogoy/zipline-mcp\n2026-11-04T01:20:07.1652360Z   token: ***\n2026-11-04T01:20:07.1652796Z   ssh-strict: true\n2026-11-04T01:20:07.1653228Z   ssh-user: git\n2026-11-04T01:20:07.1653685Z   persist-credentials: true\n2026-11-04T01:20:07.1654172Z   clean: true\n2026-11-04T01:20:07.1654620Z   sparse-checkout-cone-mode: true\n2026-11-04T01:20:07.1655136Z   fetch-depth: 1\n2026-11-04T01:20:07.1655567Z   fetch-tags: false\n2026-11-04T01:20:07.1656020Z   show-progress: true\n2026-11-04T01:20:07.1656519Z   lfs: false\n2026-11-04T01:20:07.1656923Z   submodules: false\n2026-11-04T01:20:07.1657376Z   set-safe-directory: true\n2026-11-04T01:20:07.1658075Z   allow-unsafe-pr-checkout: false\n2026-11-04T01:20:07.1658860Z env:\n2026-11-04T01:20:07.1659307Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:07.1659900Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:07.1660496Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:07.1661167Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:07.1670980Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:07.1682117Z ##[endgroup]\n2026-11-04T01:20:08.4834537Z ##[group]Run github/codeql-action/start-proxy@v4\n2026-11-04T01:20:08.4834941Z with:\n2026-11-04T01:20:08.4835187Z   language: actions\n2026-11-04T01:20:08.4835446Z   registry_secrets: []\n2026-11-04T01:20:08.4838198Z   token: ***\n2026-11-04T01:20:08.4838741Z   matrix: {\n  \"language\": \"actions\",\n  \"category\": \"/language:actions\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:08.4839309Z env:\n2026-11-04T01:20:08.4839805Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:08.4840137Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:08.4840473Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:08.4840855Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:08.4847216Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:08.4853957Z ##[endgroup]\n2026-11-04T01:20:08.8704401Z ##[group]Run github/codeql-action/init@v4\n2026-11-04T01:20:08.8704717Z with:\n2026-11-04T01:20:08.8704924Z   analysis-kinds: code-scanning\n2026-11-04T01:20:08.8705165Z   languages: actions\n2026-11-04T01:20:08.8705394Z   build-mode: none\n2026-11-04T01:20:08.8705604Z   dependency-caching: true\n2026-11-04T01:20:08.8705961Z   config: default-setup:\n  org:\n    model-packs: [  ]\nthreat-models: [  ]\n\n2026-11-04T01:20:08.8708843Z   token: ***\n2026-11-04T01:20:08.8709323Z   matrix: {\n  \"language\": \"actions\",\n  \"category\": \"/language:actions\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:08.8709847Z   debug: false\n2026-11-04T01:20:08.8710047Z   check-run-id: 126323417465\n2026-11-04T01:20:08.8710289Z   job-status: success\n2026-11-04T01:20:08.8710487Z env:\n2026-11-04T01:20:08.8710726Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:08.8711000Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:08.8711325Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:08.8711656Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:08.8717772Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:08.8724190Z   CODEQL_ACTION_JOB_RUN_UUID: 0e6802e2-014f-4790-ae3c-2db544ffa3d9\n2026-11-04T01:20:08.8724533Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:08.8724758Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:08.8724977Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:08.8725214Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:08.8725415Z ##[endgroup]\n2026-11-04T01:20:19.7413228Z ##[group]Run github/codeql-action/analyze@v4\n2026-11-04T01:20:19.7413542Z with:\n2026-11-04T01:20:19.7413746Z   category: /language:actions\n2026-11-04T01:20:19.7413991Z   output: ../results\n2026-11-04T01:20:19.7414199Z   upload: always\n2026-11-04T01:20:19.7414409Z   skip-queries: false\n2026-11-04T01:20:19.7414687Z   checkout_path: /home/runner/work/zipline-mcp/zipline-mcp\n2026-11-04T01:20:19.7415018Z   upload-database: true\n2026-11-04T01:20:19.7415243Z   wait-for-processing: true\n2026-11-04T01:20:19.7418036Z   token: ***\n2026-11-04T01:20:19.7418511Z   matrix: {\n  \"language\": \"actions\",\n  \"category\": \"/language:actions\",\n  \"build-mode\": \"none\",\n  \"runner\": \"[\\\"ubuntu-latest\\\"]\"\n}\n2026-11-04T01:20:19.7419046Z   expect-error: false\n2026-11-04T01:20:19.7419263Z env:\n2026-11-04T01:20:19.7419464Z   CODE_SCANNING_REF: refs/pull/299/head\n2026-11-04T01:20:19.7419756Z   CODE_SCANNING_BASE_BRANCH: main\n2026-11-04T01:20:19.7420038Z   CODE_SCANNING_IS_ANALYZING_DEFAULT_BRANCH: false\n2026-11-04T01:20:19.7420400Z   CODE_SCANNING_IS_STEADY_STATE_DEFAULT_SETUP: true\n2026-11-04T01:20:19.7426440Z   CODE_SCANNING_WORKFLOW_FILE: H4sIAAAAAAAA/+xVTW/jNhC9+1cM3ALZPdC5FD0IWGAVR0ncGnbWUrBNg4CgqZHMjUwq/HBWu/V/LyjKsd116vTjuJAO0vDxzXCGb0ayJUbQH6ocP4z7Pe0kCaYfv36FUtiFmw9whdIOhKydNQOucqSGMymFLKl2kno8rNc9JSPIG8mWgvd6KFdRD2A4PU9oOownk9Hkks6Si1cTY+E5/8pwFqcJPZvFk+HVa5nmzCCdayb54hDjKKXxJB7f/u5/zpOL+Gac/UMPwlAmWdV88e5yLJir7N97TLMkPr+laRZnybPTNMluriOw2uE3ez5OZ79ejKcf6cVonLw2rielH4pKPdFCVOjP3vuk5saXJYSL/hPA1y+COJjgjedeMqvF50HFZOlY6fe+baHaSUN8nT2o0Gr5SzqdvOnQ2kmJ+q135LE16qUwRijZuvQmxm37CxpZ3tm4khal3TfWjD+wEveNBrnTwjakLYWJ4EkLi92iyIlVDyh3rZ5aSIdESYJaKx1BwSoTFo3VzGLZbGIrmKhIwYzdBUGXiQ0IQEheubzLXHgJbPIUbU64swrAvR+lmwhOn4GHcHMnqpwsVY4RSCU3EYQnJDeCk7u+mztpHamYRWP79ycvhPKJrZjhWtSW2KbG8Hk0sOO7/ucw68YulDwa1wHYfwrEWKy7e0k6BQwXyB+Us6CxVkZYpZuO0hk0z7U95R3u/ern3h5BitbVUGv1uYFCadBYCmO1wE2dRR6F5T3eIORTr93HigQvp8YybUkLfr/6qcM/CbvY3rwtPeUac5RWsMoEbRrkGq0ZXI6yq5szOksuR2k2GyUpvZ5Nf7vdaNQ/21IcVv7+GUdSeDfiC0KYGcePIqSw2zN0g8F/hib3YRxiolfTNOui98UZtIcfKGfbltv+0YUydjf4PYLr6ewoQa30ywTDmA6TWTa6GA3jLDlGxRnlqK0ohFf4i6Q3s3F6jMrpymwJ9svc9mojDHkQMjcR+OSSTY//pormxTIeks0OdGveBedYo8xR8oZwxhdClmFTaEcDlCuhlVyitPDuHZyEq0x8lTA/2SV6dOhvagT9PvwA52FIttYGjNv28bZrF6KM4I9niw+jxRPjFbZNjX+ULvcNAP4QFfEzxERw98ph6dP6WNF2F6zXcL9DahcamW1bsxfYHcB9b18W16gLpZedJsIwNcIcF0c3ib/r41/rYzstdm7zxgjrde/PAQCVMtjs4woAAA==\n2026-11-04T01:20:19.7432872Z   CODEQL_ACTION_JOB_RUN_UUID: 0e6802e2-014f-4790-ae3c-2db544ffa3d9\n2026-11-04T01:20:19.7433239Z   CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false\n2026-11-04T01:20:19.7433533Z   CODEQL_ACTION_FEATURE_SANDWICH: false\n2026-11-04T01:20:19.7433809Z   CODEQL_ACTION_FEATURE_SARIF_COMBINE: true\n2026-11-04T01:20:19.7434090Z   CODEQL_ACTION_FEATURE_WILL_UPLOAD: true\n2026-11-04T01:20:19.7434356Z   CODEQL_ACTION_VERSION: 4.39.2\n2026-11-04T01:20:19.7434600Z   CODEQL_ACTION_INIT_HAS_RUN: true\n2026-11-04T01:20:19.7434956Z   CODEQL_ACTION_ANALYSIS_KEY: dynamic/github-code-scanning/codeql:analyze\n2026-11-04T01:20:19.7435375Z   CODEQL_WORKFLOW_STARTED_AT: 2026-11-04T01:20:09.203Z\n2026-11-04T01:20:19.7435690Z   CODEQL_ACTION_HAS_SET_UP_CODEQL: true\n2026-11-04T01:20:19.7435938Z   CODEQL_RAM: 14569\n2026-11-04T01:20:19.7436134Z   CODEQL_THREADS: 4\n2026-11-04T01:20:19.7436328Z   CODEQL_PROXY_HOST: \n2026-11-04T01:20:19.7436533Z   CODEQL_PROXY_PORT: \n2026-11-04T01:20:19.7436747Z   CODEQL_PROXY_CA_CERTIFICATE: \n2026-11-04T01:20:19.7436975Z   CODEQL_PROXY_URLS: \n2026-11-04T01:20:19.7437173Z ##[endgroup]"
+ }
+}

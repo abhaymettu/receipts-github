@@ -1,0 +1,32 @@
+{
+  "name": "receipts-github",
+  "version": "0.1.0",
+  "description": "Checks what a pull request says it did against what its diff and checks show",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "receipts-github": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/checker && node scripts/bundle.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "bench:prefilter": "nice -n 19 python3 bench/prefilter.py && node --conditions=source bench/prefilter.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

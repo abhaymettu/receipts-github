@@ -1,0 +1,254 @@
+{
+ "pull": {
+  "user": {
+   "login": "YOKEN21",
+   "type": "User"
+  },
+  "head": {
+   "label": "YOKEN21:cursor/matter-search-dev-desired-count-009a",
+   "ref": "cursor/matter-search-dev-desired-count-009a",
+   "sha": "bea02f0299b2b2760613a1ca0846b4b657773212"
+  },
+  "base": {
+   "label": "YOKEN21:main",
+   "ref": "main",
+   "sha": "79a44b9636b1737872a3e18ee83ef547e72d8710"
+  },
+  "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/20",
+  "id": 5148961226,
+  "node_id": "PR_kwDOVPYo1s8AAAABMubpyg",
+  "html_url": "https://github.com/YOKEN21/grok-bot-cursor/pull/20",
+  "diff_url": "https://github.com/YOKEN21/grok-bot-cursor/pull/20.diff",
+  "patch_url": "https://github.com/YOKEN21/grok-bot-cursor/pull/20.patch",
+  "issue_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/issues/20",
+  "commits_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/20/commits",
+  "review_comments_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/20/comments",
+  "review_comment_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/issues/20/comments",
+  "statuses_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/statuses/bea02f0299b2b2760613a1ca0846b4b657773212",
+  "number": 20,
+  "state": "open",
+  "locked": false,
+  "title": "Raise matter-search dev desiredCount to 4",
+  "body": "<!-- CURSOR_AGENT_PR_BODY_BEGIN -->\nIssue: #19\n\nPlan revision: v1\n\nChanges `desiredCount` from 3 to 4 in `services/matter/matter-search/config.json` (matter-search, dev). All other fields are unchanged.\n\nChecks: `npm ci` and `npm run check` pass (29/29 tests).\n<!-- CURSOR_AGENT_PR_BODY_END -->\n\n<div><a href=\"https://cursor.com/agents/bc-6615363d-e917-5922-bd55-8ab8ec91009a?cursor_ref=pr_footer&cursor_cta=open_in_web\"><picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://cursor.com/assets/images/open-in-web-dark.png\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://cursor.com/assets/images/open-in-web-light.png\"><img alt=\"Open in Web\" width=\"114\" height=\"28\" src=\"https://cursor.com/assets/images/open-in-web-dark.png\"></picture></a>&nbsp;<a href=\"https://cursor.com/background-agent?bcId=bc-6615363d-e917-5922-bd55-8ab8ec91009a&cursor_ref=pr_footer&cursor_cta=open_in_cursor\"><picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://cursor.com/assets/images/open-in-cursor-dark.png\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://cursor.com/assets/images/open-in-cursor-light.png\"><img alt=\"Open in Cursor\" width=\"131\" height=\"28\" src=\"https://cursor.com/assets/images/open-in-cursor-dark.png\"></picture></a>&nbsp;</div>\n\n",
+  "labels": [],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-11-04T04:39:14Z",
+  "updated_at": "2026-11-04T04:39:14Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "b80f521cb5432e328dd06452c059d508dc5d61b3",
+  "assignee": null,
+  "assignees": [],
+  "requested_reviewers": [],
+  "requested_teams": [],
+  "author_association": "OWNER",
+  "auto_merge": null,
+  "draft": true,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": true,
+  "mergeable_state": "clean",
+  "merged_by": null,
+  "comments": 0,
+  "review_comments": 0,
+  "maintainer_can_modify": false,
+  "commits": 1,
+  "additions": 1,
+  "deletions": 1,
+  "changed_files": 1
+ },
+ "files": [
+  {
+   "sha": "9cf32199647ce10269960b8726ec1679af6167ac",
+   "filename": "services/matter/matter-search/config.json",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 1,
+   "changes": 2,
+   "blob_url": "https://github.com/YOKEN21/grok-bot-cursor/blob/bea02f0299b2b2760613a1ca0846b4b657773212/services%2Fmatter%2Fmatter-search%2Fconfig.json",
+   "raw_url": "https://github.com/YOKEN21/grok-bot-cursor/raw/bea02f0299b2b2760613a1ca0846b4b657773212/services%2Fmatter%2Fmatter-search%2Fconfig.json",
+   "contents_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/contents/services%2Fmatter%2Fmatter-search%2Fconfig.json?ref=bea02f0299b2b2760613a1ca0846b4b657773212",
+   "patch": "+  \"desiredCount\": 4,"
+  }
+ ],
+ "commits": [
+  {
+   "author": {
+    "login": "cursoragent",
+    "type": "User"
+   },
+   "committer": {
+    "login": "cursoragent",
+    "type": "User"
+   },
+   "sha": "bea02f0299b2b2760613a1ca0846b4b657773212",
+   "node_id": "C_kwDOVPYo1toAKGJlYTAyZjAyOTliMmIyNzYwNjEzYTFjYTA4NDZiNGI2NTc3NzMyMTI",
+   "commit": {
+    "author": {
+     "name": "Cursor Agent",
+     "email": "cursoragent@cursor.com",
+     "date": "2026-11-04T04:39:07Z"
+    },
+    "committer": {
+     "name": "Cursor Agent",
+     "email": "cursoragent@cursor.com",
+     "date": "2026-11-04T04:39:07Z"
+    },
+    "message": "Raise matter-search dev desiredCount to 4 (Issue #19, plan v1)\n\nCo-authored-by: YOKEN21 <YOKEN21@users.noreply.github.com>",
+    "tree": {
+     "sha": "b56ddfdb72be648ba6603c4aa2466b481ba3107e",
+     "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/git/trees/b56ddfdb72be648ba6603c4aa2466b481ba3107e"
+    },
+    "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/git/commits/bea02f0299b2b2760613a1ca0846b4b657773212",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg+qImwGMCy/grKZ50VxRHz3VfWW\nAL3QNbzIy2Nwcn+nQAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQM1aR7S0BnfWPsIM37NyINlu4kl4fhNeBfBDoyExsCniXPf8d3HcLbDB8n1F7U/T9B\n0gD3Ep2nXHGJQ19IHgMgA=\n-----END SSH SIGNATURE-----",
+     "payload": "tree b56ddfdb72be648ba6603c4aa2466b481ba3107e\nparent 79a44b9636b1737872a3e18ee83ef547e72d8710\nauthor Cursor Agent <cursoragent@cursor.com> 1793767147 +0000\ncommitter Cursor Agent <cursoragent@cursor.com> 1793767147 +0000\n\nRaise matter-search dev desiredCount to 4 (Issue #19, plan v1)\n\nCo-authored-by: YOKEN21 <YOKEN21@users.noreply.github.com>\n",
+     "verified_at": "2026-11-04T04:39:09Z"
+    }
+   },
+   "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/commits/bea02f0299b2b2760613a1ca0846b4b657773212",
+   "html_url": "https://github.com/YOKEN21/grok-bot-cursor/commit/bea02f0299b2b2760613a1ca0846b4b657773212",
+   "comments_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/commits/bea02f0299b2b2760613a1ca0846b4b657773212/comments",
+   "parents": [
+    {
+     "sha": "79a44b9636b1737872a3e18ee83ef547e72d8710",
+     "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/commits/79a44b9636b1737872a3e18ee83ef547e72d8710",
+     "html_url": "https://github.com/YOKEN21/grok-bot-cursor/commit/79a44b9636b1737872a3e18ee83ef547e72d8710"
+    }
+   ]
+  }
+ ],
+ "checkRuns": {
+  "bea02f0299b2b2760613a1ca0846b4b657773212": [
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126391614814,
+    "name": "grok-review",
+    "node_id": "CR_kwDOVPYo1s8AAAAdbYb9Xg",
+    "head_sha": "bea02f0299b2b2760613a1ca0846b4b657773212",
+    "external_id": "ae43ee73-bf75-5345-89e3-8ae9c6aa4f29",
+    "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/check-runs/126391614814",
+    "html_url": "https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508608/job/126391614814",
+    "details_url": "https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508608/job/126391614814",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T04:39:21Z",
+    "completed_at": "2026-11-04T04:39:36Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 2,
+     "annotations_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/check-runs/126391614814/annotations"
+    },
+    "check_suite": {
+     "id": 113198750771
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/20",
+      "id": 5148961226,
+      "number": 20,
+      "head": {
+       "ref": "cursor/matter-search-dev-desired-count-009a",
+       "sha": "bea02f0299b2b2760613a1ca0846b4b657773212",
+       "repo": {
+        "id": 1425418454,
+        "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor",
+        "name": "grok-bot-cursor"
+       }
+      },
+      "base": {
+       "ref": "main",
+       "sha": "79a44b9636b1737872a3e18ee83ef547e72d8710",
+       "repo": {
+        "id": 1425418454,
+        "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor",
+        "name": "grok-bot-cursor"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126391611507,
+    "name": "ci / verify",
+    "node_id": "CR_kwDOVPYo1s8AAAAdbYbwcw",
+    "head_sha": "bea02f0299b2b2760613a1ca0846b4b657773212",
+    "external_id": "cb22e123-9073-51d3-a637-38defd1c64ba",
+    "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/check-runs/126391611507",
+    "html_url": "https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508222/job/126391611507",
+    "details_url": "https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508222/job/126391611507",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-04T04:39:20Z",
+    "completed_at": "2026-11-04T04:39:31Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 2,
+     "annotations_url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/check-runs/126391611507/annotations"
+    },
+    "check_suite": {
+     "id": 113198749608
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/pulls/20",
+      "id": 5148961226,
+      "number": 20,
+      "head": {
+       "ref": "cursor/matter-search-dev-desired-count-009a",
+       "sha": "bea02f0299b2b2760613a1ca0846b4b657773212",
+       "repo": {
+        "id": 1425418454,
+        "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor",
+        "name": "grok-bot-cursor"
+       }
+      },
+      "base": {
+       "ref": "main",
+       "sha": "79a44b9636b1737872a3e18ee83ef547e72d8710",
+       "repo": {
+        "id": 1425418454,
+        "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor",
+        "name": "grok-bot-cursor"
+       }
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "statuses": {
+  "bea02f0299b2b2760613a1ca0846b4b657773212": [
+   {
+    "url": "https://api.github.com/repos/YOKEN21/grok-bot-cursor/statuses/bea02f0299b2b2760613a1ca0846b4b657773212",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "id": 58013671855,
+    "node_id": "SC_kwDOVPYo1s8AAAANgeJhrw",
+    "state": "success",
+    "description": "pass: no blocking findings",
+    "target_url": "https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508608",
+    "context": "grok-review",
+    "created_at": "2026-11-04T04:39:34Z",
+    "updated_at": "2026-11-04T04:39:34Z"
+   }
+  ]
+ },
+ "logs": {
+  "126391614814": "2026-11-04T04:39:22.7802499Z ##[group]Run actions/checkout@v4\n2026-11-04T04:39:22.7803450Z with:\n2026-11-04T04:39:22.7803890Z   ref: main\n2026-11-04T04:39:22.7804346Z   persist-credentials: false\n2026-11-04T04:39:22.7804895Z   fetch-depth: 1\n2026-11-04T04:39:22.7805399Z   repository: YOKEN21/grok-bot-cursor\n2026-11-04T04:39:22.7809768Z   token: ***\n2026-11-04T04:39:22.7810232Z   ssh-strict: true\n2026-11-04T04:39:22.7810694Z   ssh-user: git\n2026-11-04T04:39:22.7811141Z   clean: true\n2026-11-04T04:39:22.7811613Z   sparse-checkout-cone-mode: true\n2026-11-04T04:39:22.7812179Z   fetch-tags: false\n2026-11-04T04:39:22.7812654Z   show-progress: true\n2026-11-04T04:39:22.7813140Z   lfs: false\n2026-11-04T04:39:22.7813583Z   submodules: false\n2026-11-04T04:39:22.7814061Z   set-safe-directory: true\n2026-11-04T04:39:22.7814624Z   allow-unsafe-pr-checkout: false\n2026-11-04T04:39:22.7815451Z ##[endgroup]\n2026-11-04T04:39:23.7033827Z ##[group]Run actions/setup-node@v4\n2026-11-04T04:39:23.7034376Z with:\n2026-11-04T04:39:23.7034784Z   node-version: 22\n2026-11-04T04:39:23.7035188Z   cache: npm\n2026-11-04T04:39:23.7035592Z   always-auth: false\n2026-11-04T04:39:23.7036014Z   check-latest: false\n2026-11-04T04:39:23.7039227Z   token: ***\n2026-11-04T04:39:23.7039647Z ##[endgroup]\n2026-11-04T04:39:24.5579673Z ##[group]Run npm ci\n2026-11-04T04:39:24.5580084Z \u001b[36;1mnpm ci\u001b[0m\n2026-11-04T04:39:24.5610889Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:24.5611228Z ##[endgroup]\n2026-11-04T04:39:26.2883938Z ##[group]Run set -euo pipefail\n2026-11-04T04:39:26.2884283Z \u001b[36;1mset -euo pipefail\u001b[0m\n2026-11-04T04:39:26.2884563Z \u001b[36;1mhead=$(git rev-parse HEAD)\u001b[0m\n2026-11-04T04:39:26.2885230Z \u001b[36;1mif [ \"$head\" = \"$PR_HEAD\" ]; then\u001b[0m\n2026-11-04T04:39:26.2885669Z \u001b[36;1m  echo \"checkout resolved to the pull request head; refusing to continue\"\u001b[0m\n2026-11-04T04:39:26.2886081Z \u001b[36;1m  exit 1\u001b[0m\n2026-11-04T04:39:26.2886285Z \u001b[36;1mfi\u001b[0m\n2026-11-04T04:39:26.2907657Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:26.2907914Z env:\n2026-11-04T04:39:26.2908174Z   PR_HEAD: bea02f0299b2b2760613a1ca0846b4b657773212\n2026-11-04T04:39:26.2908494Z ##[endgroup]\n2026-11-04T04:39:26.3007730Z ##[group]Run set -euo pipefail\n2026-11-04T04:39:26.3008086Z \u001b[36;1mset -euo pipefail\u001b[0m\n2026-11-04T04:39:26.3008346Z \u001b[36;1mcase \"$PR_NUMBER\" in\u001b[0m\n2026-11-04T04:39:26.3008824Z \u001b[36;1m  ''|*[!0-9]*)\u001b[0m\n2026-11-04T04:39:26.3009107Z \u001b[36;1m    echo \"pull request number is not numeric\"\u001b[0m\n2026-11-04T04:39:26.3009419Z \u001b[36;1m    exit 1\u001b[0m\n2026-11-04T04:39:26.3009669Z \u001b[36;1m    ;;\u001b[0m\n2026-11-04T04:39:26.3009861Z \u001b[36;1mesac\u001b[0m\n2026-11-04T04:39:26.3010073Z \u001b[36;1mmkdir -p review-input\u001b[0m\n2026-11-04T04:39:26.3010496Z \u001b[36;1mgh api \"repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}\" > review-input/pull.json\u001b[0m\n2026-11-04T04:39:26.3011251Z \u001b[36;1mgh api -H \"Accept: application/vnd.github.diff\" \"repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}\" > review-input/pull.diff\u001b[0m\n2026-11-04T04:39:26.3030862Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:26.3031147Z env:\n2026-11-04T04:39:26.3033728Z   GH_TOKEN: ***\n2026-11-04T04:39:26.3033948Z   PR_NUMBER: 20\n2026-11-04T04:39:26.3034182Z ##[endgroup]\n2026-11-04T04:39:27.2365929Z ##[group]Run set -euo pipefail\n2026-11-04T04:39:27.2366289Z \u001b[36;1mset -euo pipefail\u001b[0m\n2026-11-04T04:39:27.2366542Z \u001b[36;1mnpm run review -- \\\u001b[0m\n2026-11-04T04:39:27.2367220Z \u001b[36;1m  --pull review-input/pull.json \\\u001b[0m\n2026-11-04T04:39:27.2367551Z \u001b[36;1m  --diff review-input/pull.diff \\\u001b[0m\n2026-11-04T04:39:27.2367886Z \u001b[36;1m  --evidence grok-review-evidence.json \\\u001b[0m\n2026-11-04T04:39:27.2368219Z \u001b[36;1m  --summary grok-review-summary.md \\\u001b[0m\n2026-11-04T04:39:27.2368544Z \u001b[36;1m  --status-out grok-review-status.json \\\u001b[0m\n2026-11-04T04:39:27.2368851Z \u001b[36;1m  --reviewed-sha \"$REVIEWED_SHA\" \\\u001b[0m\n2026-11-04T04:39:27.2369134Z \u001b[36;1m  --recheck-head \\\u001b[0m\n2026-11-04T04:39:27.2369380Z \u001b[36;1m  --target-url \"$TARGET_URL\"\u001b[0m\n2026-11-04T04:39:27.2389046Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:27.2389295Z env:\n2026-11-04T04:39:27.2389851Z   XAI_API_KEY: ***\n2026-11-04T04:39:27.2390067Z   XAI_MODEL: grok-4.7\n2026-11-04T04:39:27.2392558Z   GH_TOKEN: ***\n2026-11-04T04:39:27.2392866Z   REVIEWED_SHA: bea02f0299b2b2760613a1ca0846b4b657773212\n2026-11-04T04:39:27.2393319Z   TARGET_URL: https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508608\n2026-11-04T04:39:27.2393717Z ##[endgroup]\n2026-11-04T04:39:32.8153915Z ##[group]Run set -euo pipefail\n2026-11-04T04:39:32.8154246Z \u001b[36;1mset -euo pipefail\u001b[0m\n2026-11-04T04:39:32.8154530Z \u001b[36;1mif [ -f grok-review-summary.md ]; then\u001b[0m\n2026-11-04T04:39:32.8154926Z \u001b[36;1m  cat grok-review-summary.md >> \"$GITHUB_STEP_SUMMARY\"\u001b[0m\n2026-11-04T04:39:32.8155274Z \u001b[36;1mfi\u001b[0m\n2026-11-04T04:39:32.8175604Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:32.8175864Z ##[endgroup]\n2026-11-04T04:39:32.8307454Z ##[group]Run actions/upload-artifact@v4\n2026-11-04T04:39:32.8307785Z with:\n2026-11-04T04:39:32.8307998Z   name: grok-review-evidence.json\n2026-11-04T04:39:32.8308280Z   path: grok-review-evidence.json\n2026-11-04T04:39:32.8308541Z   if-no-files-found: warn\n2026-11-04T04:39:32.8308779Z   compression-level: 6\n2026-11-04T04:39:32.8308991Z   overwrite: false\n2026-11-04T04:39:32.8309222Z   include-hidden-files: false\n2026-11-04T04:39:32.8309456Z ##[endgroup]\n2026-11-04T04:39:33.7472887Z ##[group]Run set -euo pipefail\n2026-11-04T04:39:33.7473256Z \u001b[36;1mset -euo pipefail\u001b[0m\n2026-11-04T04:39:33.7473521Z \u001b[36;1mnpm run review -- \\\u001b[0m\n2026-11-04T04:39:33.7473784Z \u001b[36;1m  --post-status \\\u001b[0m\n2026-11-04T04:39:33.7474083Z \u001b[36;1m  --evidence grok-review-evidence.json \\\u001b[0m\n2026-11-04T04:39:33.7474457Z \u001b[36;1m  --status-file grok-review-status.json \\\u001b[0m\n2026-11-04T04:39:33.7474804Z \u001b[36;1m  --reviewed-sha \"$REVIEWED_SHA\" \\\u001b[0m\n2026-11-04T04:39:33.7475183Z \u001b[36;1m  --target-url \"$TARGET_URL\"\u001b[0m\n2026-11-04T04:39:33.7495099Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:33.7495344Z env:\n2026-11-04T04:39:33.7498284Z   GH_TOKEN: ***\n2026-11-04T04:39:33.7498569Z   REVIEWED_SHA: bea02f0299b2b2760613a1ca0846b4b657773212\n2026-11-04T04:39:33.7499046Z   TARGET_URL: https://github.com/YOKEN21/grok-bot-cursor/actions/runs/41774508608\n2026-11-04T04:39:33.7499459Z ##[endgroup]",
+  "126391611507": "2026-11-04T04:39:22.3658054Z ##[group]Run actions/checkout@v4\n2026-11-04T04:39:22.3658991Z with:\n2026-11-04T04:39:22.3659468Z   repository: YOKEN21/grok-bot-cursor\n2026-11-04T04:39:22.3663462Z   token: ***\n2026-11-04T04:39:22.3663919Z   ssh-strict: true\n2026-11-04T04:39:22.3664371Z   ssh-user: git\n2026-11-04T04:39:22.3664829Z   persist-credentials: true\n2026-11-04T04:39:22.3665330Z   clean: true\n2026-11-04T04:39:22.3665791Z   sparse-checkout-cone-mode: true\n2026-11-04T04:39:22.3666344Z   fetch-depth: 1\n2026-11-04T04:39:22.3666784Z   fetch-tags: false\n2026-11-04T04:39:22.3667256Z   show-progress: true\n2026-11-04T04:39:22.3667716Z   lfs: false\n2026-11-04T04:39:22.3668129Z   submodules: false\n2026-11-04T04:39:22.3668583Z   set-safe-directory: true\n2026-11-04T04:39:22.3669095Z   allow-unsafe-pr-checkout: false\n2026-11-04T04:39:22.3669886Z ##[endgroup]\n2026-11-04T04:39:23.3569115Z ##[group]Run actions/setup-node@v4\n2026-11-04T04:39:23.3571232Z with:\n2026-11-04T04:39:23.3572854Z   node-version: 22\n2026-11-04T04:39:23.3574413Z   cache: npm\n2026-11-04T04:39:23.3575853Z   always-auth: false\n2026-11-04T04:39:23.3577391Z   check-latest: false\n2026-11-04T04:39:23.3591179Z   token: ***\n2026-11-04T04:39:23.3592425Z ##[endgroup]\n2026-11-04T04:39:24.3352767Z ##[group]Run npm ci\n2026-11-04T04:39:24.3353142Z \u001b[36;1mnpm ci\u001b[0m\n2026-11-04T04:39:24.3394358Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:24.3394678Z ##[endgroup]\n2026-11-04T04:39:26.2195097Z ##[group]Run npm run typecheck\n2026-11-04T04:39:26.2195436Z \u001b[36;1mnpm run typecheck\u001b[0m\n2026-11-04T04:39:26.2217013Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:26.2217290Z ##[endgroup]\n2026-11-04T04:39:26.5015827Z ##[group]Run npm run validate-config\n2026-11-04T04:39:26.5016185Z \u001b[36;1mnpm run validate-config\u001b[0m\n2026-11-04T04:39:26.5037087Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:26.5037353Z ##[endgroup]\n2026-11-04T04:39:26.9972224Z ##[group]Run npm test\n2026-11-04T04:39:26.9972666Z \u001b[36;1mnpm test\u001b[0m\n2026-11-04T04:39:26.9999908Z shell: /usr/bin/bash -e {0}\n2026-11-04T04:39:27.0000170Z ##[endgroup]"
+ }
+}

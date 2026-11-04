@@ -1,0 +1,1106 @@
+{
+ "pull": {
+  "user": {
+   "login": "andrebrait",
+   "type": "User"
+  },
+  "head": {
+   "label": "andrebrait:feat/codex-transcription",
+   "ref": "feat/codex-transcription",
+   "sha": "b8e26f843f621120c0f50ce981740d1a777cc2b4"
+  },
+  "base": {
+   "label": "can1357:main",
+   "ref": "main",
+   "sha": "686b5e2fb542848dc3ff1a9e36a42a8fefdd2278"
+  },
+  "url": "https://api.github.com/repos/can1357/oh-my-pi/pulls/15391",
+  "id": 4820712673,
+  "node_id": "PR_kwDOQxs0bc8AAAABH1Y84Q",
+  "html_url": "https://github.com/can1357/oh-my-pi/pull/15391",
+  "diff_url": "https://github.com/can1357/oh-my-pi/pull/15391.diff",
+  "patch_url": "https://github.com/can1357/oh-my-pi/pull/15391.patch",
+  "issue_url": "https://api.github.com/repos/can1357/oh-my-pi/issues/15391",
+  "commits_url": "https://api.github.com/repos/can1357/oh-my-pi/pulls/15391/commits",
+  "review_comments_url": "https://api.github.com/repos/can1357/oh-my-pi/pulls/15391/comments",
+  "review_comment_url": "https://api.github.com/repos/can1357/oh-my-pi/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/issues/15391/comments",
+  "statuses_url": "https://api.github.com/repos/can1357/oh-my-pi/statuses/b8e26f843f621120c0f50ce981740d1a777cc2b4",
+  "number": 15391,
+  "state": "open",
+  "locked": false,
+  "title": "feat(ai): transcribe speech with a ChatGPT/Codex subscription",
+  "body": "## What\n\nAdd support for transcription over Codex subscriptions.\n\nAdds the `openai-codex/codex-transcribe` speech-to-text model on a new `openai-codex-transcriptions` runner API. It posts multipart `file`/`language` to ChatGPT's dictation endpoint (`POST https://chatgpt.com/backend-api/transcribe`) with the Codex OAuth bearer, `ChatGPT-Account-Id` and the Codex Desktop identity that live mode already sends (Cloudflare answers 403 without it). Non-chatgpt.com base URL overrides are ignored, so the bearer only goes to chatgpt.com.\n\n- TUI dictation, `omp auth-gateway serve` and `omp auth-gateway stdio` (`/v1/audio/transcriptions`) accept it: the gates now check `runnerApiKind(api) === \"stt\"` instead of `openai-transcriptions`.\n- `omp auth-gateway stdio` resolved only chat selectors, so every stt/tts/image model answered 404. It now tries chat models first and falls back to the full catalog, so a chat selector still wins over a same-named runner.\n- The upload is renamed to match its container: the endpoint answers `500 {\"detail\":\"Error in ASR API\"}` for `voice.oga` or an extensionless name, even with valid Ogg/Opus bytes. The ext/MIME table moved to `transcription/types.ts` and is shared with the gateway parser (which now knows `oga`).\n- Transcription error details are capped at 500 characters, so a Cloudflare HTML page no longer becomes the whole error message.\n\n## Why\n\nChatGPT/Codex subscribers can dictate without an OpenAI API key or a local STT model, using the login omp already holds. omp-web uses this through `omp auth-gateway stdio`.\n\nThe endpoint is private and undocumented (the one Codex Desktop dictation uses), so it can change without notice.\n\n## Testing\n\n- Live, against a real Codex subscription, with the Whisper JFK clip piped to `bun packages/coding-agent/src/cli.ts auth-gateway stdio` as `{\"model\":\"openai-codex/codex-transcribe\",\"input_audio\":{...}}`: FLAC returns 200 with the text (\"And so, my fellow Americans, ask not what your country can do for you…\"), and Ogg/Opus declared as `format: \"oga\"` returns 200 too (it returned 500 before the rename).\n- Direct endpoint probes: Ogg/Opus `audio.ogg`, WebM/Opus `audio.webm` and AAC `audio.mp4` answer 200; the same Ogg bytes as `voice.oga`, `audio` or `audio.webm` answer 500; no Codex Desktop identity gives a 403.\n- `bun check:ts` passes. `packages/ai` transcription and gateway tests, the full `packages/catalog` suite, and `packages/coding-agent` `stt-cloud`, `auth-gateway-stdio`, `role-info` and `live/` tests pass.\n- I did not test TUI dictation with a real microphone; `stt-cloud.test.ts` covers the gate.\n\n---\n\n- [x] `bun check` passes\n- [x] Tested locally\n- [x] CHANGELOG updated with the required attribution (if user-facing; internal issue fixes use issue links, external contributions add the PR link and contributor credit after creation)\n",
+  "labels": [
+   {
+    "id": 10202048066,
+    "node_id": "LA_kwDOQxs0bc8AAAACYBbmQg",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/providers",
+    "name": "providers",
+    "description": "LLM provider-specific issues",
+    "color": "f9d0c4",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 10202048109,
+    "node_id": "LA_kwDOQxs0bc8AAAACYBbmbQ",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/auth",
+    "name": "auth",
+    "description": "Authentication and login flows",
+    "color": "fbca04",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 10202048203,
+    "node_id": "LA_kwDOQxs0bc8AAAACYBbmyw",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/cli",
+    "name": "cli",
+    "description": "CLI commands and arguments",
+    "color": "bfdadc",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 10202048254,
+    "node_id": "LA_kwDOQxs0bc8AAAACYBbm_g",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/ux",
+    "name": "ux",
+    "description": "User experience improvements",
+    "color": "d4c5f9",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 10955473852,
+    "node_id": "LA_kwDOQxs0bc8AAAACjP9DvA",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/triaged",
+    "name": "triaged",
+    "description": null,
+    "color": "ededed",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 11120578476,
+    "node_id": "LA_kwDOQxs0bc8AAAACltaPrA",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/feat",
+    "name": "feat",
+    "description": null,
+    "color": "ededed",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 11120600100,
+    "node_id": "LA_kwDOQxs0bc8AAAACltbkJA",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/review:p2",
+    "name": "review:p2",
+    "description": null,
+    "color": "ededed",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   },
+   {
+    "id": 11160132022,
+    "node_id": "LA_kwDOQxs0bc8AAAACmTIZtg",
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/labels/provider:openai-codex",
+    "name": "provider:openai-codex",
+    "description": null,
+    "color": "ededed",
+    "default": false,
+    "archived_at": null,
+    "archived_by": null
+   }
+  ],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-10-11T16:53:30Z",
+  "updated_at": "2026-11-01T20:51:40Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "assignee": null,
+  "assignees": [],
+  "requested_reviewers": [],
+  "requested_teams": [],
+  "author_association": "CONTRIBUTOR",
+  "auto_merge": null,
+  "draft": false,
+  "merged": false,
+  "mergeable": false,
+  "rebaseable": false,
+  "mergeable_state": "dirty",
+  "merged_by": null,
+  "comments": 6,
+  "review_comments": 38,
+  "maintainer_can_modify": true,
+  "commits": 12,
+  "additions": 701,
+  "deletions": 69,
+  "changed_files": 29
+ },
+ "files": [
+  {
+   "sha": "811a6960cb8ee3f207478b5b7fbc1b04f6e0ac7d",
+   "filename": "docs/auth-broker-gateway.md",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 2,
+   "changes": 4,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/docs%2Fauth-broker-gateway.md",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/docs%2Fauth-broker-gateway.md",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/docs%2Fauth-broker-gateway.md?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+- `model` takes any `--model` selector (chat, speech-to-text, text-to-speech and image models all resolve; a chat match wins over a same-named runner): an exact `provider/id`, a bare fuzzy name, a role (`@smol`), or a comma list whose first entry that resolves wins. An attempt that fails with a status above `400` (other than `499`) moves on along that model's `retry.fallbackChains`, the role's chain when the entry named a role; the response's `model` names the model that answered.\n+| `POST` | `/v1/audio/transcriptions` | bearer | Speech-to-text, OpenAI multipart `file` or OpenRouter JSON `input_audio` base64 (`stt` models on `openai-transcriptions`, plus `openai-codex/codex-transcribe` on `openai-codex-transcriptions` via the ChatGPT `/transcribe` endpoint; 25 MiB cap) |"
+  },
+  {
+   "sha": "ec30c453c048e23e750eab354a373f59e8b9ccc7",
+   "filename": "packages/ai/CHANGELOG.md",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 0,
+   "changes": 2,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2FCHANGELOG.md",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2FCHANGELOG.md",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2FCHANGELOG.md?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+- Added Codex subscription speech-to-text: `transcribeAudio` and the auth gateway's `/v1/audio/transcriptions` accept `openai-codex/codex-transcribe` with an existing `openai-codex` login ([#15391](https://github.com/can1357/oh-my-pi/pull/15391) by [@andrebrait](https://github.com/andrebrait))\n+"
+  },
+  {
+   "sha": "f7869ead9bca7ebf86ca2ae238a405974955dea8",
+   "filename": "packages/ai/src/auth-gateway/index.ts",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 0,
+   "changes": 1,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Findex.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Findex.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fauth-gateway%2Findex.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+export * from \"./routable\";"
+  },
+  {
+   "sha": "6fa4f1a6638024622c9794d1fffb0a9f991990d7",
+   "filename": "packages/ai/src/auth-gateway/routable.ts",
+   "status": "added",
+   "additions": 40,
+   "deletions": 0,
+   "changes": 40,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutable.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutable.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutable.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { type Api, type ModelKind, runnerApiKind } from \"@oh-my-pi/pi-catalog/types\";\n+import { isJudgmentApi } from \"../judgment/native\";\n+import { isSpeechApi } from \"../speech\";\n+\n+/** Image APIs `/v1/images/*` serves; the hosted Responses pair needs a carrier model the gateway cannot resolve. */\n+const GATEWAY_IMAGE_APIS: Readonly<Partial<Record<Api, true>>> = {\n+\t\"openai-images\": true,\n+\t\"openrouter-images\": true,\n+\t\"google-generative-ai\": true,\n+\t\"google-gemini-cli\": true,\n+\t\"factory-droid-agent\": true,\n+};\n+\n+/**\n+ * Whether the gateway route for a model of `kind` accepts `api`. The routes answer `400` for any other API, so\n+ * the served catalog and stdio fallback chains use this to skip models no route can run. On-device\n+ * `local-inference` runners never qualify.\n+ */\n+export function gatewayRouteAccepts(kind: ModelKind, api: Api): boolean {\n+\tswitch (kind) {\n+\t\tcase \"chat\":\n+\t\t\treturn api !== \"local-inference\";\n+\t\tcase \"judge\":\n+\t\t\treturn isJudgmentApi(api);\n+\t\tcase \"image\":\n+\t\t\treturn GATEWAY_IMAGE_APIS[api] === true;\n+\t\tcase \"tts\":\n+\t\t\treturn isSpeechApi(api);\n+\t\tcase \"stt\":\n+\t\t\treturn runnerApiKind(api) === \"stt\";\n+\t\tcase \"embedding\":\n+\t\t\treturn api === \"openai-embeddings\";\n+\t\tcase \"rerank\":\n+\t\t\treturn api === \"openrouter-rerank\";\n+\t\tcase \"video\":\n+\t\t\treturn api === \"openrouter-video\";\n+\t\tdefault:\n+\t\t\treturn false;\n+\t}\n+}"
+  },
+  {
+   "sha": "6d2336b7d2c22a3894ea39040a98c02560f0e723",
+   "filename": "packages/ai/src/auth-gateway/routes/images.ts",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 11,
+   "changes": 13,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Fimages.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Fimages.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Fimages.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { gatewayRouteAccepts } from \"../routable\";\n+\tif (!gatewayRouteAccepts(\"image\", model.api)) {"
+  },
+  {
+   "sha": "33eb28e5338b4475ddc04c8bcf14af7a16917f1c",
+   "filename": "packages/ai/src/auth-gateway/routes/transcriptions.ts",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 1,
+   "changes": 3,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Ftranscriptions.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Ftranscriptions.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fauth-gateway%2Froutes%2Ftranscriptions.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { runnerApiKind } from \"@oh-my-pi/pi-catalog/types\";\n+\tif (runnerApiKind(model.api) !== \"stt\") {"
+  },
+  {
+   "sha": "b9a88056be9ea8117b2f3a89b05f3bb8a15b7f8b",
+   "filename": "packages/ai/src/providers/transcriptions-server.ts",
+   "status": "modified",
+   "additions": 7,
+   "deletions": 20,
+   "changes": 27,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fproviders%2Ftranscriptions-server.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fproviders%2Ftranscriptions-server.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fproviders%2Ftranscriptions-server.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import {\n+\tTRANSCRIPTION_AUDIO_MIME_TYPES,\n+\ttype TranscriptionRequest,\n+\ttype TranscriptionResponseFormat,\n+\ttype TranscriptionResult,\n+\ttype TranscriptionTimestampGranularity,\n+\treturn TRANSCRIPTION_AUDIO_MIME_TYPES[format.trim().toLowerCase().replace(/^\\./, \"\")] ?? \"application/octet-stream\";"
+  },
+  {
+   "sha": "0417ec00dee1a27d1e0f86bf005c2f1b5251c63a",
+   "filename": "packages/ai/src/transcription/index.ts",
+   "status": "modified",
+   "additions": 3,
+   "deletions": 0,
+   "changes": 3,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Findex.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Findex.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Ftranscription%2Findex.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { transcribeOpenAICodex } from \"./openai-codex-transcriptions\";\n+export * from \"./openai-codex-transcriptions\";\n+\tif (model.api === \"openai-codex-transcriptions\") return transcribeOpenAICodex(model, request, options);"
+  },
+  {
+   "sha": "1f2e8d7ae60b578f44c4df0cb88df58c3918ee79",
+   "filename": "packages/ai/src/transcription/openai-codex-transcriptions.ts",
+   "status": "added",
+   "additions": 130,
+   "deletions": 0,
+   "changes": 130,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-codex-transcriptions.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-codex-transcriptions.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-codex-transcriptions.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { type } from \"@oh-my-pi/omptype\";\n+import type { Api, Model } from \"@oh-my-pi/pi-catalog/types\";\n+import {\n+\tapplyCodexResidencyHeader,\n+\tCODEX_DESKTOP_ORIGINATOR,\n+\tCODEX_DESKTOP_USER_AGENT,\n+\tgetCodexAccountId,\n+\tOPENAI_HEADERS,\n+} from \"@oh-my-pi/pi-catalog/wire/codex\";\n+import { withAuth } from \"../auth-retry\";\n+import * as AIError from \"../error\";\n+import { emptyUsage } from \"../images/shared\";\n+import { getCodexAttestationHeader } from \"../providers/openai-codex-attestation\";\n+import { isChatGptBaseUrl, normalizeCodexBaseUrl } from \"../usage/openai-codex-base-url\";\n+import { type TranscriptionOptions, transcriptionResponseError } from \"./openai-transcriptions\";\n+import { TRANSCRIPTION_AUDIO_MIME_TYPES, type TranscriptionRequest, type TranscriptionResult } from \"./types\";\n+\n+const responseSchema = type({ text: \"string\" });\n+\n+/** Extensions the endpoint decodes. */\n+const DECODABLE_EXTENSIONS: Readonly<Record<string, true>> = {\n+\twav: true,\n+\tmp3: true,\n+\tmpeg: true,\n+\tmp4: true,\n+\tm4a: true,\n+\togg: true,\n+\twebm: true,\n+\tflac: true,\n+};\n+\n+/** MIME spellings browsers report for containers the table names differently. */\n+const MIME_ALIASES: Readonly<Record<string, string>> = {\n+\t\"audio/m4a\": \"audio/mp4\",\n+\t\"audio/mp3\": \"audio/mpeg\",\n+\t\"audio/opus\": \"audio/ogg\",\n+};\n+\n+/** The table's first extension for `mimeType`: its canonical name for that container. */\n+function containerExtension(mimeType: string | undefined): string | undefined {\n+\treturn mimeType\n+\t\t? Object.entries(TRANSCRIPTION_AUDIO_MIME_TYPES).find(([, mime]) => mime === mimeType)?.[0]\n+\t\t: undefined;\n+}\n+\n+/**\n+ * The endpoint picks its decoder from the upload's file extension and answers `500 Error in ASR API` when the\n+ * extension is missing or unknown (`voice.oga`, `audio`), even for audio it can decode. Keep a decodable name\n+ * whose container agrees with the MIME type (`mp3`/`mpeg`, `m4a`/`mp4` share one MIME type); otherwise name the\n+ * file after the container the MIME type declares. A generic or empty MIME type declares nothing, so a known\n+ * suffix names the container instead (`voice.oga` → `audio.ogg`); with neither, the caller's name is kept.\n+ */\n+function uploadFileName(request: TranscriptionRequest): string {\n+\tconst name = request.fileName?.trim() || \"audio\";\n+\tconst dot = name.lastIndexOf(\".\");\n+\tconst extension = dot >= 0 ? name.slice(dot + 1).toLowerCase() : \"\";\n+\tconst rawMime = request.mimeType.split(\";\", 1)[0]?.trim().toLowerCase().replace(\"audio/x-\", \"audio/\") ?? \"\";\n+\tconst mimeType = MIME_ALIASES[rawMime] ?? rawMime;\n+\tconst declared = containerExtension(mimeType);\n+\tif (\n+\t\tDECODABLE_EXTENSIONS[extension] === true &&\n+\t\t(!declared || TRANSCRIPTION_AUDIO_MIME_TYPES[extension] === mimeType)\n+\t) {\n+\t\treturn name;\n+\t}\n+\tconst container = declared ?? containerExtension(TRANSCRIPTION_AUDIO_MIME_TYPES[extension]);\n+\treturn container ? `audio.${container}` : name;\n+}\n+\n+/**\n+ * Transcribe through the ChatGPT backend dictation endpoint (`POST /transcribe`) with a Codex OAuth bearer.\n+ *\n+ * The endpoint takes only `file` and `language` and reports no usage or segments, so prompt, temperature,\n+ * response format and timestamp options are not forwarded and the result carries text with zero usage.\n+ *\n+ * A `baseUrl` that is not on the ChatGPT origin is refused: it means `providers.openai-codex` points at a relay,\n+ * and the key configured for that relay outranks the stored OAuth login, so sending it to chatgpt.com would\n+ * disclose it and fail anyway.\n+ */\n+export async function transcribeOpenAICodex(\n+\tmodel: Model<Api>,\n+\trequest: TranscriptionRequest,\n+\toptions: TranscriptionOptions,\n+): Promise<TranscriptionResult> {\n+\tif (model.baseUrl?.trim() && !isChatGptBaseUrl(model.baseUrl)) {\n+\t\tthrow new AIError.ConfigurationError(\n+\t\t\t`${model.provider}/${model.id} only runs on chatgpt.com, but its base URL is ${model.baseUrl}; remove the providers.${model.provider}.baseUrl override or pick another speech-to-text model`,\n+\t\t);\n+\t}\n+\tconst form = new FormData();\n+\tform.append(\"file\", new File([request.audio], uploadFileName(request), { type: request.mimeType }));\n+\tif (request.language !== undefined) form.append(\"language\", request.language);\n+\n+\tconst fetchImpl = options.fetch ?? fetch;\n+\tconst response = await withAuth(\n+\t\toptions.apiKey,\n+\t\tasync key => {\n+\t\t\tconst headers: Record<string, string> = {\n+\t\t\t\tAuthorization: `Bearer ${key}`,\n+\t\t\t\tAccept: \"application/json\",\n+\t\t\t\t\"User-Agent\": CODEX_DESKTOP_USER_AGENT,\n+\t\t\t\t[OPENAI_HEADERS.ORIGINATOR]: CODEX_DESKTOP_ORIGINATOR,\n+\t\t\t};\n+\t\t\tconst accountId = getCodexAccountId(key);\n+\t\t\tif (accountId) headers[OPENAI_HEADERS.ACCOUNT_ID] = accountId;\n+\t\t\tconst attestation = await getCodexAttestationHeader(accountId);\n+\t\t\tif (attestation) headers[OPENAI_HEADERS.ATTESTATION] = attestation;\n+\t\t\t// The backend 401s a region-pinned workspace unless the request declares its residency.\n+\t\t\tapplyCodexResidencyHeader(headers, key);\n+\t\t\tconst attempt = await fetchImpl(`${normalizeCodexBaseUrl(model.baseUrl)}/transcribe`, {\n+\t\t\t\tmethod: \"POST\",\n+\t\t\t\theaders,\n+\t\t\t\tbody: form,\n+\t\t\t\tsignal: options.signal,\n+\t\t\t});\n+\t\t\tif (!attempt.ok) throw await transcriptionResponseError(attempt, model);\n+\t\t\treturn attempt;\n+\t\t},\n+\t\t{ signal: options.signal },\n+\t);\n+\n+\tconst parsed = responseSchema(await response.json());\n+\tif (parsed instanceof type.errors) {\n+\t\tthrow new AIError.ProviderResponseError(\n+\t\t\t`${model.provider}/${model.id} transcription response is malformed: ${parsed.summary}`,\n+\t\t\t{ provider: model.provider, kind: \"envelope\" },\n+\t\t);\n+\t}\n+\treturn { text: parsed.text, usage: emptyUsage() };\n+}"
+  },
+  {
+   "sha": "2b5376e101affa98ff353f8c131de9627208c958",
+   "filename": "packages/ai/src/transcription/openai-transcriptions.ts",
+   "status": "modified",
+   "additions": 14,
+   "deletions": 4,
+   "changes": 18,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-transcriptions.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-transcriptions.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Ftranscription%2Fopenai-transcriptions.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+/** Upstream error bodies can be whole HTML pages (Cloudflare 403); only this much reaches the message. */\n+const MAX_ERROR_DETAIL_LENGTH = 500;\n+\n+/** Map a non-2xx transcription response onto {@link TranscriptionApiError}; shared by every transcription transport. */\n+export async function transcriptionResponseError(\n+\tresponse: Response,\n+\tmodel: Model<Api>,\n+): Promise<TranscriptionApiError> {\n+\t\tif (parsed && typeof parsed === \"object\" && \"detail\" in parsed && typeof parsed.detail === \"string\") {\n+\t\t\t// ChatGPT backend error envelope: `{\"detail\":\"Error in ASR API\"}`.\n+\t\t\tdetail = parsed.detail;\n+\t\t} else if (parsed && typeof parsed === \"object\" && \"error\" in parsed) {\n+\t\t`${model.provider}/${model.id} transcription API error (${response.status}): ${(detail || response.statusText).slice(0, MAX_ERROR_DETAIL_LENGTH)}`,\n+\t\t\tif (!attempt.ok) throw await transcriptionResponseError(attempt, model);"
+  },
+  {
+   "sha": "999d63badc5447328edb64959d718a9727f425ca",
+   "filename": "packages/ai/src/transcription/types.ts",
+   "status": "modified",
+   "additions": 16,
+   "deletions": 0,
+   "changes": 16,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Ftypes.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Ftranscription%2Ftypes.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Ftranscription%2Ftypes.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+/** Audio container MIME type by file extension, as the gateway wire and the Codex dictation upload name resolve them. */\n+export const TRANSCRIPTION_AUDIO_MIME_TYPES: Readonly<Record<string, string>> = {\n+\twav: \"audio/wav\",\n+\twave: \"audio/wav\",\n+\tmp3: \"audio/mpeg\",\n+\tmpeg: \"audio/mpeg\",\n+\tflac: \"audio/flac\",\n+\tm4a: \"audio/mp4\",\n+\tmp4: \"audio/mp4\",\n+\togg: \"audio/ogg\",\n+\topus: \"audio/ogg\",\n+\toga: \"audio/ogg\",\n+\twebm: \"audio/webm\",\n+\taac: \"audio/aac\",\n+};\n+"
+  },
+  {
+   "sha": "239e6be137c00b89eac9ecf84547a45b8fe7c119",
+   "filename": "packages/ai/src/usage/openai-codex-base-url.ts",
+   "status": "modified",
+   "additions": 18,
+   "deletions": 7,
+   "changes": 25,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fusage%2Fopenai-codex-base-url.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Fsrc%2Fusage%2Fopenai-codex-base-url.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Fsrc%2Fusage%2Fopenai-codex-base-url.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\tconst origin = chatGptOrigin(baseUrl);\n+\t// wham/usage always lives at `${origin}/backend-api/...` on the canonical\n+\t// ChatGPT origin, so ignore any extra path (e.g. `/backend-api/codex/responses`\n+\t// from a streaming baseUrl) — otherwise we'd build `.../codex/responses/wham/usage`.\n+\treturn origin ? `${origin}/backend-api` : CODEX_BASE_URL;\n+}\n+\n+/** Whether `baseUrl` is on the canonical ChatGPT origin over HTTPS, the only host a Codex bearer may reach. */\n+export function isChatGptBaseUrl(baseUrl: string): boolean {\n+\treturn chatGptOrigin(baseUrl) !== undefined;\n+}\n+\n+function chatGptOrigin(baseUrl?: string): string | undefined {\n+\tif (!trimmed) return undefined;\n+\t\treturn undefined;\n+\t// The Codex bearer must never travel over plain HTTP.\n+\tif (parsed.protocol !== \"https:\" || (host !== \"chatgpt.com\" && host !== \"chat.openai.com\")) return undefined;\n+\treturn parsed.origin;"
+  },
+  {
+   "sha": "393d1e6c35800ab3e21cb21e6fedc390199c1e15",
+   "filename": "packages/ai/test/auth-gateway-transcriptions.test.ts",
+   "status": "modified",
+   "additions": 31,
+   "deletions": 0,
+   "changes": 31,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Ftest%2Fauth-gateway-transcriptions.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Ftest%2Fauth-gateway-transcriptions.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Ftest%2Fauth-gateway-transcriptions.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\tstorage.keys.setRuntime(\"openai-codex\", \"codex-secret\");\n+\tconst codex = transcriptionModel(\n+\t\t\"openai-codex\",\n+\t\t\"codex-transcribe\",\n+\t\t\"openai-codex-transcriptions\",\n+\t\t\"https://chatgpt.com/backend-api\",\n+\t);\n+\t\t\tif (id === codex.id || id === `openai-codex/${codex.id}`) return codex;\n+\tit(\"serves Codex subscription dictation through the ChatGPT /transcribe endpoint\", async () => {\n+\t\tharness = await boot();\n+\t\tconst response = await fetch(`${harness.url}/v1/audio/transcriptions`, {\n+\t\t\tmethod: \"POST\",\n+\t\t\theaders: gatewayHeaders(\"application/json\"),\n+\t\t\tbody: JSON.stringify({\n+\t\t\t\tmodel: \"openai-codex/codex-transcribe\",\n+\t\t\t\tinput_audio: { data: AUDIO.toBase64(), format: \"flac\" },\n+\t\t\t}),\n+\t\t});\n+\n+\t\texpect(response.status).toBe(200);\n+\t\texpect(await response.json()).toMatchObject({ text: UPSTREAM_RESULT.text });\n+\t\texpect(harness.upstream).toHaveLength(1);\n+\t\texpect(harness.upstream[0]).toMatchObject({\n+\t\t\turl: \"https://chatgpt.com/backend-api/transcribe\",\n+\t\t\tauthorization: \"Bearer codex-secret\",\n+\t\t\tmodel: null,\n+\t\t\tfileName: \"audio.flac\",\n+\t\t});\n+\t\texpect(harness.upstream[0]?.audio).toEqual(AUDIO);\n+\t});\n+"
+  },
+  {
+   "sha": "1a5208ce604aeb6bdb454f7385ca62fb3d44138d",
+   "filename": "packages/ai/test/openai-codex-transcriptions.test.ts",
+   "status": "added",
+   "additions": 214,
+   "deletions": 0,
+   "changes": 214,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Ftest%2Fopenai-codex-transcriptions.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fai%2Ftest%2Fopenai-codex-transcriptions.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fai%2Ftest%2Fopenai-codex-transcriptions.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { afterEach, describe, expect, it, vi } from \"bun:test\";\n+import { buildModel } from \"@oh-my-pi/pi-catalog/build\";\n+import type { Api, FetchImpl, Model, ModelSpec } from \"@oh-my-pi/pi-catalog/types\";\n+import * as codexAttestation from \"@oh-my-pi/pi-ai/providers/openai-codex-attestation\";\n+import { TranscriptionApiError, transcribeAudio } from \"@oh-my-pi/pi-ai/transcription\";\n+\n+const AUDIO = new Uint8Array([0x66, 0x4c, 0x61, 0x43, 0x01, 0x02, 0x03, 0x04]);\n+\n+const model: Model<Api> = buildModel({\n+\tid: \"codex-transcribe\",\n+\tname: \"Codex Dictation\",\n+\tapi: \"openai-codex-transcriptions\",\n+\tprovider: \"openai-codex\",\n+\tbaseUrl: \"https://chatgpt.com/backend-api\",\n+\treasoning: false,\n+\tinput: [\"text\"],\n+\tcost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },\n+\tcontextWindow: null,\n+\tmaxTokens: null,\n+\tkind: \"stt\",\n+} satisfies ModelSpec<Api>);\n+\n+/** Unsigned JWT carrying the ChatGPT account claim the Codex backend routes on. */\n+function codexToken(accountId: string): string {\n+\tconst payload = btoa(JSON.stringify({ \"https://api.openai.com/auth\": { chatgpt_account_id: accountId } }));\n+\treturn `header.${payload}.signature`;\n+}\n+\n+describe(\"openai-codex-transcriptions transport\", () => {\n+\tafterEach(() => {\n+\t\tvi.restoreAllMocks();\n+\t});\n+\n+\tit(\"posts audio to the ChatGPT dictation endpoint as the Codex Desktop client\", async () => {\n+\t\tconst seen: Array<{ url: string; method?: string; headers: Headers; form: FormData }> = [];\n+\t\tconst fetchImpl: FetchImpl = async (input, init) => {\n+\t\t\tif (!(init?.body instanceof FormData)) throw new Error(\"Expected multipart body\");\n+\t\t\tseen.push({ url: String(input), method: init.method, headers: new Headers(init.headers), form: init.body });\n+\t\t\treturn Response.json({\n+\t\t\t\ttext: \"Ask not.\",\n+\t\t\t\tasset_pointer: \"sediment://x\",\n+\t\t\t\tasset_ttl: \"30d\",\n+\t\t\t\tasset_format: \"flac\",\n+\t\t\t});\n+\t\t};\n+\n+\t\tconst result = await transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{\n+\t\t\t\taudio: AUDIO,\n+\t\t\t\tmimeType: \"audio/flac\",\n+\t\t\t\tfileName: \"jfk.flac\",\n+\t\t\t\tlanguage: \"en\",\n+\t\t\t\tprompt: \"ignored\",\n+\t\t\t\ttemperature: 0.2,\n+\t\t\t\tresponseFormat: \"verbose_json\",\n+\t\t\t\ttimestampGranularities: [\"word\"],\n+\t\t\t},\n+\t\t\t{ apiKey: codexToken(\"acct-1\"), fetch: fetchImpl },\n+\t\t);\n+\n+\t\texpect(result.text).toBe(\"Ask not.\");\n+\t\texpect(result.usage.cost.total).toBe(0);\n+\t\texpect(seen).toHaveLength(1);\n+\t\tconst [request] = seen;\n+\t\texpect(request?.url).toBe(\"https://chatgpt.com/backend-api/transcribe\");\n+\t\texpect(request?.method).toBe(\"POST\");\n+\t\t// Cloudflare 403s the backend unless it sees the Codex Desktop identity.\n+\t\texpect(request?.headers.get(\"authorization\")).toBe(`Bearer ${codexToken(\"acct-1\")}`);\n+\t\texpect(request?.headers.get(\"chatgpt-account-id\")).toBe(\"acct-1\");\n+\t\texpect(request?.headers.get(\"originator\")).toBe(\"Codex Desktop\");\n+\t\texpect(request?.headers.get(\"user-agent\")).toStartWith(\"Codex Desktop/\");\n+\t\t// The endpoint takes only `file` and `language`; OpenAI-only fields are dropped.\n+\t\texpect([...(request?.form.keys() ?? [])]).toEqual([\"file\", \"language\"]);\n+\t\tconst file = request?.form.get(\"file\");\n+\t\tif (!(file instanceof File)) throw new Error(\"Expected audio file part\");\n+\t\texpect(file.name).toBe(\"jfk.flac\");\n+\t\texpect(new Uint8Array(await file.arrayBuffer())).toEqual(AUDIO);\n+\t\texpect(request?.form.get(\"language\")).toBe(\"en\");\n+\t});\n+\n+\tit(\"renames an upload whose extension the endpoint cannot decode after its declared container\", async () => {\n+\t\t// The backend answers 500 for Ogg/Opus unless the upload is named `*.ogg`; `.oga` and bare names fail.\n+\t\tconst upload = async (fileName: string, mimeType: string): Promise<string | undefined> => {\n+\t\t\tlet uploaded: string | undefined;\n+\t\t\tconst fetchImpl: FetchImpl = async (_input, init) => {\n+\t\t\t\tconst file = init?.body instanceof FormData ? init.body.get(\"file\") : null;\n+\t\t\t\tuploaded = file instanceof File ? file.name : undefined;\n+\t\t\t\treturn Response.json({ text: \"ok\" });\n+\t\t\t};\n+\t\t\tawait transcribeAudio(\n+\t\t\t\tmodel,\n+\t\t\t\t{ audio: AUDIO, mimeType, fileName, responseFormat: \"json\" },\n+\t\t\t\t{ apiKey: codexToken(\"acct-1\"), fetch: fetchImpl },\n+\t\t\t);\n+\t\t\treturn uploaded;\n+\t\t};\n+\t\texpect(await upload(\"voice.oga\", \"audio/ogg\")).toBe(\"audio.ogg\");\n+\t\t// A decodable extension whose container contradicts the MIME type is renamed too: the decoder follows the name.\n+\t\texpect(await upload(\"clip.webm\", \"audio/ogg\")).toBe(\"audio.ogg\");\n+\t\t// Browser MIME aliases name their container: `audio/x-m4a` is M4A, `audio/mp3` and `audio/x-mp3` are MP3.\n+\t\texpect(await upload(\"blob\", \"audio/x-m4a\")).toBe(\"audio.m4a\");\n+\t\texpect(await upload(\"blob\", \"audio/mp3\")).toBe(\"audio.mp3\");\n+\t\texpect(await upload(\"blob\", \"audio/x-mp3\")).toBe(\"audio.mp3\");\n+\t\t// A generic or missing MIME type leaves the container to a known suffix.\n+\t\texpect(await upload(\"voice.oga\", \"application/octet-stream\")).toBe(\"audio.ogg\");\n+\t\texpect(await upload(\"voice.oga\", \"\")).toBe(\"audio.ogg\");\n+\t\t// Agreeing containers (including aliases) and unknown MIME types keep the caller's name.\n+\t\texpect(await upload(\"clip.mp3\", \"audio/mpeg\")).toBe(\"clip.mp3\");\n+\t\texpect(await upload(\"clip.mpeg\", \"audio/mpeg\")).toBe(\"clip.mpeg\");\n+\t\texpect(await upload(\"clip.m4a\", \"audio/mp4\")).toBe(\"clip.m4a\");\n+\t\texpect(await upload(\"clip.webm\", \"application/octet-stream\")).toBe(\"clip.webm\");\n+\t});\n+\n+\tit(\"declares the token's workspace residency so a region-pinned workspace is not rejected\", async () => {\n+\t\tconst payload = btoa(\n+\t\t\tJSON.stringify({\n+\t\t\t\t\"https://api.openai.com/auth\": { chatgpt_account_id: \"acct-1\", chatgpt_data_residency: \"us\" },\n+\t\t\t}),\n+\t\t);\n+\t\tlet residency: string | null | undefined;\n+\t\tconst fetchImpl: FetchImpl = async (_input, init) => {\n+\t\t\tresidency = new Headers(init?.headers).get(\"x-openai-internal-codex-residency\");\n+\t\t\treturn Response.json({ text: \"ok\" });\n+\t\t};\n+\t\tawait transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{ audio: AUDIO, mimeType: \"audio/wav\", fileName: \"dictation.wav\", responseFormat: \"json\" },\n+\t\t\t{ apiKey: `header.${payload}.signature`, fetch: fetchImpl },\n+\t\t);\n+\t\texpect(residency).toBe(\"us\");\n+\t});\n+\n+\tit(\"attaches the host's DeviceCheck attestation like other Codex requests\", async () => {\n+\t\tlet attestation: string | null | undefined;\n+\t\tconst fetchImpl: FetchImpl = async (_input, init) => {\n+\t\t\tattestation = new Headers(init?.headers).get(\"x-oai-attestation\");\n+\t\t\treturn Response.json({ text: \"ok\" });\n+\t\t};\n+\t\tvi.spyOn(codexAttestation, \"getCodexAttestationHeader\").mockResolvedValue(\"attest-envelope\");\n+\t\tawait transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{ audio: AUDIO, mimeType: \"audio/wav\", fileName: \"dictation.wav\", responseFormat: \"json\" },\n+\t\t\t{ apiKey: codexToken(\"acct-1\"), fetch: fetchImpl },\n+\t\t);\n+\t\texpect(attestation).toBe(\"attest-envelope\");\n+\t});\n+\n+\tit(\"refuses a base URL off the ChatGPT HTTPS origin instead of sending its key anywhere\", async () => {\n+\t\tlet called = false;\n+\t\tconst fetchImpl: FetchImpl = async () => {\n+\t\t\tcalled = true;\n+\t\t\treturn Response.json({ text: \"ok\" });\n+\t\t};\n+\t\t// A relay's configured key outranks the OAuth login, so rewriting to chatgpt.com would disclose it.\n+\t\tfor (const baseUrl of [\"https://relay.example.com/v1\", \"http://chatgpt.com/backend-api\"]) {\n+\t\t\tconst failure = transcribeAudio(\n+\t\t\t\t{ ...model, baseUrl },\n+\t\t\t\t{ audio: AUDIO, mimeType: \"audio/flac\", fileName: \"a.flac\", responseFormat: \"json\" },\n+\t\t\t\t{ apiKey: \"relay-key\", fetch: fetchImpl },\n+\t\t\t);\n+\t\t\tawait expect(failure).rejects.toThrow(\"only runs on chatgpt.com\");\n+\t\t}\n+\t\texpect(called).toBe(false);\n+\t});\n+\n+\tit(\"surfaces backend ASR failures as TranscriptionApiError with the upstream detail\", async () => {\n+\t\tconst fetchImpl: FetchImpl = async () => Response.json({ detail: \"Error in ASR API\" }, { status: 500 });\n+\t\tconst failure = transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{ audio: AUDIO, mimeType: \"audio/ogg\", fileName: \"clip.ogg\", responseFormat: \"json\" },\n+\t\t\t{ apiKey: codexToken(\"acct-1\"), fetch: fetchImpl },\n+\t\t);\n+\t\tawait expect(failure).rejects.toBeInstanceOf(TranscriptionApiError);\n+\t\tawait expect(failure).rejects.toMatchObject({\n+\t\t\tstatus: 500,\n+\t\t\tmessage: \"openai-codex/codex-transcribe transcription API error (500): Error in ASR API\",\n+\t\t});\n+\t});\n+\n+\tit(\"bounds an HTML error page from Cloudflare instead of embedding it whole in the message\", async () => {\n+\t\tconst page = `<html>${\"x\".repeat(20_000)}</html>`;\n+\t\tconst fetchImpl: FetchImpl = async () => new Response(page, { status: 403 });\n+\t\tconst failure = transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{ audio: AUDIO, mimeType: \"audio/wav\", fileName: \"dictation.wav\", responseFormat: \"json\" },\n+\t\t\t{ apiKey: codexToken(\"acct-1\"), fetch: fetchImpl },\n+\t\t);\n+\t\tawait expect(failure).rejects.toMatchObject({\n+\t\t\tstatus: 403,\n+\t\t\tmessage: `openai-codex/codex-transcribe transcription API error (403): ${page.slice(0, 500)}`,\n+\t\t});\n+\t});\n+\n+\tit(\"retries a 401 with the resolver's next credential and that credential's account\", async () => {\n+\t\tconst accounts: Array<string | null> = [];\n+\t\tconst fetchImpl: FetchImpl = async (_input, init) => {\n+\t\t\tconst headers = new Headers(init?.headers);\n+\t\t\taccounts.push(headers.get(\"chatgpt-account-id\"));\n+\t\t\tif (accounts.length === 1) return Response.json({ detail: \"Unauthorized\" }, { status: 401 });\n+\t\t\treturn Response.json({ text: \"after refresh\" });\n+\t\t};\n+\t\tconst result = await transcribeAudio(\n+\t\t\tmodel,\n+\t\t\t{ audio: AUDIO, mimeType: \"audio/wav\", fileName: \"dictation.wav\", responseFormat: \"json\" },\n+\t\t\t{\n+\t\t\t\tapiKey: ctx => (ctx.error === undefined ? codexToken(\"acct-old\") : codexToken(\"acct-new\")),\n+\t\t\t\tfetch: fetchImpl,\n+\t\t\t},\n+\t\t);\n+\t\texpect(result.text).toBe(\"after refresh\");\n+\t\texpect(accounts).toEqual([\"acct-old\", \"acct-new\"]);\n+\t});\n+});"
+  },
+  {
+   "sha": "6b587caee1c3eb02cf977508fcdf92cef0ded7cd",
+   "filename": "packages/catalog/CHANGELOG.md",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 0,
+   "changes": 1,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2FCHANGELOG.md",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2FCHANGELOG.md",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2FCHANGELOG.md?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+- Added the `openai-codex/codex-transcribe` (Codex Dictation) speech-to-text model on the new `openai-codex-transcriptions` runner API ([#15391](https://github.com/can1357/oh-my-pi/pull/15391) by [@andrebrait](https://github.com/andrebrait))"
+  },
+  {
+   "sha": "fe7d2802f46df452ae7ac8ea61bbe7fc9e5708b2",
+   "filename": "packages/catalog/src/compat/rules.json",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 1,
+   "changes": 2,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules.json",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules.json",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules.json?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4"
+  },
+  {
+   "sha": "ad50890e72ce0c8a56a089cf1c565667c6fdc91d",
+   "filename": "packages/catalog/src/compat/rules/providers/openai-codex.kdl",
+   "status": "modified",
+   "additions": 13,
+   "deletions": 0,
+   "changes": 13,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules%2Fproviders%2Fopenai-codex.kdl",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules%2Fproviders%2Fopenai-codex.kdl",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Fsrc%2Fcompat%2Frules%2Fproviders%2Fopenai-codex.kdl?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\t\tstt \"openai-codex-transcriptions\"\n+\t\t// ChatGPT dictation endpoint (`POST /transcribe`): the subscription backend\n+\t\t// takes no model field and reports no usage, so the id is a local label.\n+\t\tmodel \"codex-transcribe\" name=\"Codex Dictation\" api=\"openai-codex-transcriptions\" {\n+\t\t\treasoning #false\n+\t\t\tinput \"text\"\n+\t\t\tcost input=0 output=0 cache-read=0 cache-write=0\n+\t\t\tlimits\n+\t\t\tsupports-tools #false\n+\t\t}\n+\tmodels \"codex-transcribe\" {\n+\t\tkind \"stt\"\n+\t}"
+  },
+  {
+   "sha": "6cdd6ae3e6d8e2655efa9d569731af3718fb4e3d",
+   "filename": "packages/catalog/src/models.json",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 1,
+   "changes": 2,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fmodels.json",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fmodels.json",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Fsrc%2Fmodels.json?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4"
+  },
+  {
+   "sha": "f04e0e4a6de0423cdcfe66b015a96272fbcd00bb",
+   "filename": "packages/catalog/src/types.ts",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 0,
+   "changes": 2,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Ftypes.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Ftypes.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Fsrc%2Ftypes.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\t\"openai-codex-transcriptions\",\n+\t\"openai-codex-transcriptions\": \"stt\","
+  },
+  {
+   "sha": "c2e37bd0a2fe42394287b12665dad7661a721f9a",
+   "filename": "packages/catalog/src/wire/codex.ts",
+   "status": "modified",
+   "additions": 4,
+   "deletions": 0,
+   "changes": 4,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fwire%2Fcodex.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Fsrc%2Fwire%2Fcodex.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Fsrc%2Fwire%2Fcodex.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+/** Identity of the Codex Desktop client; Cloudflare 403s ChatGPT backend endpoints (live, transcribe) without it. */\n+export const CODEX_DESKTOP_ORIGINATOR = \"Codex Desktop\";\n+export const CODEX_DESKTOP_USER_AGENT = `${CODEX_DESKTOP_ORIGINATOR}/${CODEX_CLIENT_VERSION}`;\n+"
+  },
+  {
+   "sha": "b4dc1c82dd21ac99c86a12c84a409a3da9837f08",
+   "filename": "packages/catalog/test/transcription-provider.test.ts",
+   "status": "modified",
+   "additions": 11,
+   "deletions": 0,
+   "changes": 11,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Ftest%2Ftranscription-provider.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcatalog%2Ftest%2Ftranscription-provider.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcatalog%2Ftest%2Ftranscription-provider.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\n+\ttest(\"openai-codex maps stt onto the Codex dictation runner and seeds codex-transcribe as that kind\", async () => {\n+\t\tconst rules = await compileCompatRules(RULES_DIR);\n+\t\tconst provider = rules.providers[\"openai-codex\"];\n+\t\texpect(provider?.kindApis?.stt).toBe(\"openai-codex-transcriptions\");\n+\t\tconst row = provider?.seed?.models.find(seed => seed.id === \"codex-transcribe\");\n+\t\tif (!row) throw new Error(\"openai-codex has no codex-transcribe seed\");\n+\t\tconst model = buildModel(row as ModelSpec);\n+\t\texpect(model.kind).toBe(\"stt\");\n+\t\texpect(model.api).toBe(\"openai-codex-transcriptions\");\n+\t});"
+  },
+  {
+   "sha": "cd13927a6a24d2f00a5c50fcd94c424fcc430f6f",
+   "filename": "packages/coding-agent/CHANGELOG.md",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 0,
+   "changes": 2,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2FCHANGELOG.md",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2FCHANGELOG.md",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2FCHANGELOG.md?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+- Added the Codex Dictation speech-to-text model: select `openai-codex/codex-transcribe` as the dictation model to transcribe voice input with your ChatGPT/Codex subscription login ([#15391](https://github.com/can1357/oh-my-pi/pull/15391) by [@andrebrait](https://github.com/andrebrait))\n+- Added speech-to-text, text-to-speech and image model selectors (e.g. `openai-codex/codex-transcribe`) to `omp auth-gateway stdio`, which previously answered 404 for anything but chat models ([#15391](https://github.com/can1357/oh-my-pi/pull/15391) by [@andrebrait](https://github.com/andrebrait))"
+  },
+  {
+   "sha": "e62d4929abf99b0d13fca657a3d8c217b2008138",
+   "filename": "packages/coding-agent/src/cli/auth-gateway-cli.ts",
+   "status": "modified",
+   "additions": 15,
+   "deletions": 3,
+   "changes": 18,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-cli.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-cli.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-cli.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\tgatewayRouteAccepts,\n+/**\n+ * Every registry model a gateway route can serve ({@link gatewayRouteAccepts}: a routable kind on an API its route\n+ * accepts, never an on-device runner), bundled catalog order within each kind. `availableOnly` restricts to models\n+ * with usable auth (`getAvailable`) instead of the whole catalog (`getAll`).\n+ */\n+export function gatewayRoutableModels(\n+\tregistry: Pick<ModelRegistry, \"getAll\" | \"getAvailable\">,\n+\tavailableOnly = false,\n+): Model<Api>[] {\n+\tfor (const kind of GATEWAY_MODEL_KINDS) {\n+\t\tfor (const model of availableOnly ? registry.getAvailable(kind) : registry.getAll(kind)) {\n+\t\t\tif (gatewayRouteAccepts(kind, model.api)) models.push(model);\n+\t\t}\n+\t}"
+  },
+  {
+   "sha": "3f3a1f56aabb2c5aa1ed01a2474037db2f29398a",
+   "filename": "packages/coding-agent/src/cli/auth-gateway-stdio.ts",
+   "status": "modified",
+   "additions": 41,
+   "deletions": 13,
+   "changes": 54,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-stdio.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-stdio.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Fsrc%2Fcli%2Fauth-gateway-stdio.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { modelKind } from \"@oh-my-pi/pi-catalog/types\";\n+import { createAuthGatewayRouter, gatewayRouteAccepts, serveAuthGatewayStdio } from \"@oh-my-pi/pi-ai/auth-gateway\";\n+import { gatewayRoutableModels } from \"./auth-gateway-cli\";\n+type RegistryView = Pick<ModelRegistry, \"getAll\" | \"getAvailable\"> & Partial<Pick<ModelRegistry, \"hasProvider\">>;\n+\n+function viewCandidates(selector: string, settings: Settings, registry: RegistryView): Model<Api>[] {\n+/**\n+ * The models a request naming `selector` may run on, in order: the model\n+ * `--model` would pick (the first entry of a comma list that resolves), then\n+ * that model's `retry.fallbackChains` (its role's chain when the entry named a\n+ * role). Each entry tries chat models first so a chat selector never lands on a\n+ * same-named runner; runner kinds (stt, tts, image, …) only resolve in the full\n+ * catalog. Fallbacks keep only models of the same kind on an API that kind's\n+ * route accepts, so an unroutable fallback (an on-device runner, say) never\n+ * masks the failure that triggered it. Empty when no entry resolves.\n+ */\n+export function selectorCandidates(selector: string, settings: Settings, registry: RegistryView): Model<Api>[] {\n+\tfor (const pattern of normalizeModelPatternList(selector)) {\n+\t\tfor (const kind of [\"chat\", \"all\"] as const) {\n+\t\t\tconst candidates = viewCandidates(pattern, settings, {\n+\t\t\t\tgetAll: () => registry.getAll(kind),\n+\t\t\t\tgetAvailable: () => registry.getAvailable(kind),\n+\t\t\t\t// Keeps `provider/id` selectors for a known provider from fuzzy-matching another provider's ids.\n+\t\t\t\thasProvider: registry.hasProvider ? provider => registry.hasProvider?.(provider) ?? false : undefined,\n+\t\t\t});\n+\t\t\t// A runner's fallback chain may name chat models (`retry.fallbackChains.default`) or on-device runners; its route cannot serve them.\n+\t\t\tconst [first] = candidates;\n+\t\t\tif (first) {\n+\t\t\t\tconst firstKind = modelKind(first);\n+\t\t\t\treturn candidates.filter(\n+\t\t\t\t\tcandidate =>\n+\t\t\t\t\t\tcandidate === first ||\n+\t\t\t\t\t\t(modelKind(candidate) === firstKind && gatewayRouteAccepts(firstKind, candidate.api)),\n+\t\t\t\t);\n+\t\t\t}\n+\t\t}\n+\t}\n+\treturn [];\n+}\n+\n+\t\tlistModels: () => gatewayRoutableModels(registry, true),"
+  },
+  {
+   "sha": "755539dc4b01272b966ac6a064baea572ace3a53",
+   "filename": "packages/coding-agent/src/live/transport.ts",
+   "status": "modified",
+   "additions": 4,
+   "deletions": 3,
+   "changes": 7,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Flive%2Ftransport.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Flive%2Ftransport.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Fsrc%2Flive%2Ftransport.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\tCODEX_DESKTOP_ORIGINATOR,\n+\tCODEX_DESKTOP_USER_AGENT,\n+\t\t\"User-Agent\": CODEX_DESKTOP_USER_AGENT,\n+\t\t[OPENAI_HEADERS.ORIGINATOR]: CODEX_DESKTOP_ORIGINATOR,"
+  },
+  {
+   "sha": "fa9d36d403fee207a51a0af68f96c19ed21757ea",
+   "filename": "packages/coding-agent/src/stt/stt-controller.ts",
+   "status": "modified",
+   "additions": 3,
+   "deletions": 3,
+   "changes": 6,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fstt%2Fstt-controller.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Fsrc%2Fstt%2Fstt-controller.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Fsrc%2Fstt%2Fstt-controller.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { type Api, type Model, runnerApiKind } from \"@oh-my-pi/pi-catalog/types\";\n+\t\tif (model && runnerApiKind(model.api) === \"stt\") {\n+\t\tif (model && runnerApiKind(model.api) === \"stt\") {"
+  },
+  {
+   "sha": "87d1e30812f7b4739cb37d72f8901db6fb057bcc",
+   "filename": "packages/coding-agent/test/auth-gateway-stdio.test.ts",
+   "status": "modified",
+   "additions": 76,
+   "deletions": 0,
+   "changes": 76,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fauth-gateway-stdio.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fauth-gateway-stdio.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Ftest%2Fauth-gateway-stdio.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+import { buildModel } from \"@oh-my-pi/pi-catalog/build\";\n+\n+\tit(\"resolves runner-kind models that the chat-only registry view hides\", () => {\n+\t\tconst dictation = getBundledModel(\"openai-codex\", \"codex-transcribe\")!;\n+\t\tconst kindRegistry = {\n+\t\t\tgetAll: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t\tgetAvailable: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t};\n+\t\texpect(selectorCandidates(key(dictation), Settings.isolated({}), kindRegistry)).toEqual([dictation]);\n+\t});\n+\n+\tit(\"uses the first comma entry that resolves, even when it is a runner and a later entry is chat\", () => {\n+\t\tconst dictation = getBundledModel(\"openai-codex\", \"codex-transcribe\")!;\n+\t\tconst kindRegistry = {\n+\t\t\tgetAll: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t\tgetAvailable: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t};\n+\t\texpect(selectorCandidates(`${key(dictation)},${key(mini)}`, Settings.isolated({}), kindRegistry)).toEqual([\n+\t\t\tdictation,\n+\t\t]);\n+\t});\n+\n+\tit(\"drops chat models a runner's default fallback chain names, since the runner's route cannot serve them\", () => {\n+\t\tconst dictation = getBundledModel(\"openai-codex\", \"codex-transcribe\")!;\n+\t\tconst kindRegistry = {\n+\t\t\tgetAll: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t\tgetAvailable: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation] : models),\n+\t\t};\n+\t\tconst settings = Settings.isolated({ \"retry.fallbackChains\": { default: [key(mini)] } });\n+\t\texpect(selectorCandidates(key(dictation), settings, kindRegistry)).toEqual([dictation]);\n+\t});\n+\n+\tit(\"drops on-device runners from a hosted runner's chain, so their 400 never masks the hosted failure\", () => {\n+\t\tconst dictation = getBundledModel(\"openai-codex\", \"codex-transcribe\")!;\n+\t\tconst local = getBundledModel(\"local\", \"whisper-small\")!;\n+\t\tconst kindRegistry = {\n+\t\t\tgetAll: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation, local] : models),\n+\t\t\tgetAvailable: (kind = \"chat\") => (kind === \"all\" ? [...models, dictation, local] : models),\n+\t\t};\n+\t\tconst settings = Settings.isolated({ \"retry.fallbackChains\": { [key(dictation)]: [key(local)] } });\n+\t\texpect(selectorCandidates(key(dictation), settings, kindRegistry)).toEqual([dictation]);\n+\t});\n+\n+\tit(\"prefers the chat model when the chat view and the full catalog both match a selector\", () => {\n+\t\tconst dictation = getBundledModel(\"openai-codex\", \"codex-transcribe\")!;\n+\t\t// A runner that shares the chat model's bare id and sorts ahead of it in the full catalog.\n+\t\tconst runner = { ...dictation, id: mini.id };\n+\t\tconst registryWithRunner = {\n+\t\t\tgetAll: (kind = \"chat\") => (kind === \"all\" ? [runner, mini] : [mini]),\n+\t\t\tgetAvailable: (kind = \"chat\") => (kind === \"all\" ? [runner, mini] : [mini]),\n+\t\t};\n+\t\texpect(selectorCandidates(mini.id, Settings.isolated({}), registryWithRunner)).toEqual([mini]);\n+\t});\n+\n+\tit(\"keeps a known provider's prefix locked, so `proxy/foo` never resolves to another provider's `proxy/foo-latest`\", () => {\n+\t\tconst routed = buildModel({\n+\t\t\tid: \"proxy/foo-latest\",\n+\t\t\tname: \"Foo\",\n+\t\t\tapi: \"openai-completions\",\n+\t\t\tprovider: \"custom-gateway\",\n+\t\t\tbaseUrl: \"https://gateway.example/v1\",\n+\t\t\treasoning: false,\n+\t\t\tinput: [\"text\"],\n+\t\t\tcost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },\n+\t\t\tcontextWindow: 128_000,\n+\t\t\tmaxTokens: 8_192,\n+\t\t});\n+\t\t// `proxy` is a configured discovery provider whose catalog is still empty.\n+\t\tconst proxyRegistry = {\n+\t\t\tgetAll: () => [routed],\n+\t\t\tgetAvailable: () => [routed],\n+\t\t\thasProvider: (provider: string) => provider === \"proxy\",\n+\t\t};\n+\t\texpect(selectorCandidates(\"proxy/foo\", Settings.isolated({}), proxyRegistry)).toEqual([]);\n+\t\texpect(selectorCandidates(\"proxy/foo-latest\", Settings.isolated({}), proxyRegistry)).toEqual([routed]);\n+\t});"
+  },
+  {
+   "sha": "84704e14198ac793a95f7eb2efd1170df5b01e5e",
+   "filename": "packages/coding-agent/test/cli/auth-gateway-catalog.test.ts",
+   "status": "modified",
+   "additions": 17,
+   "deletions": 0,
+   "changes": 17,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fcli%2Fauth-gateway-catalog.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fcli%2Fauth-gateway-catalog.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Ftest%2Fcli%2Fauth-gateway-catalog.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\n+\ttest(\"available-only listing advertises credentialed non-chat kinds and nothing unauthenticated\", async () => {\n+\t\tusing tempDir = TempDir.createSync(\"@omp-auth-gateway-catalog-\");\n+\t\tconst storage = await createAuthStorage();\n+\t\tawait storage.credentials.set(\"openai-codex\", { type: \"api_key\", key: \"sk-test-codex\" });\n+\t\tconst registry = new ModelRegistry(storage, tempDir.join(\"models.yml\"));\n+\t\tconst listed = gatewayRoutableModels(registry, true);\n+\n+\t\t// `/v1/models` on the stdio gateway used chat-only `getAvailable()`, which hid dictation.\n+\t\texpect(listed.find(model => model.id === \"codex-transcribe\")?.provider).toBe(\"openai-codex\");\n+\t\t// Uncredentialed providers' runners stay out.\n+\t\texpect(listed.some(model => model.provider === \"openai\" && modelKind(model) === \"stt\")).toBe(false);\n+\t\t// Always-available on-device runners (local/whisper-*, local/kokoro) would always answer 400.\n+\t\texpect(listed.some(model => model.api === \"local-inference\")).toBe(false);\n+\t\t// `/v1/images/*` refuses the hosted Responses image model, so a Codex login must not advertise it.\n+\t\texpect(listed.some(model => model.provider === \"openai-codex\" && model.id === \"gpt-image-2\")).toBe(false);\n+\t});"
+  },
+  {
+   "sha": "980c2f2060295f165eff37c416b3c1b2de59f481",
+   "filename": "packages/coding-agent/test/stt-cloud.test.ts",
+   "status": "modified",
+   "additions": 28,
+   "deletions": 0,
+   "changes": 28,
+   "blob_url": "https://github.com/can1357/oh-my-pi/blob/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fstt-cloud.test.ts",
+   "raw_url": "https://github.com/can1357/oh-my-pi/raw/b8e26f843f621120c0f50ce981740d1a777cc2b4/packages%2Fcoding-agent%2Ftest%2Fstt-cloud.test.ts",
+   "contents_url": "https://api.github.com/repos/can1357/oh-my-pi/contents/packages%2Fcoding-agent%2Ftest%2Fstt-cloud.test.ts?ref=b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "patch": "+\tit(\"routes the Codex Dictation model through buffered cloud transcription instead of warning unsupported\", async () => {\n+\t\tconst model = getBundledModel(\"openai-codex\", \"codex-transcribe\");\n+\t\tsettings.setModelRole(\"dictation\", \"openai-codex/codex-transcribe\");\n+\t\tconst registry = registryFor(model);\n+\t\tconst transcribe = vi.spyOn(transcription, \"transcribeAudio\").mockResolvedValue({\n+\t\t\ttext: \"codex transcript\",\n+\t\t\tusage: ZERO_USAGE,\n+\t\t});\n+\t\tlet onAudio: ((error: Error | null, samples: Float32Array) => void) | undefined;\n+\t\tcontroller = new STTController(\n+\t\t\tcallback => {\n+\t\t\t\tonAudio = callback;\n+\t\t\t\treturn { stop: vi.fn() };\n+\t\t\t},\n+\t\t\t{ settings, registry },\n+\t\t);\n+\t\tconst editor = makeEditor();\n+\t\tconst options = makeOptions();\n+\n+\t\tawait controller.toggle(editor, options);\n+\t\tonAudio?.(null, new Float32Array([0, 0.5]));\n+\t\tawait controller.toggle(editor, options);\n+\n+\t\texpect(options.showWarning).not.toHaveBeenCalled();\n+\t\texpect(transcribe.mock.calls[0]?.[0]).toBe(model);\n+\t\texpect(editor.commitVolatileText).toHaveBeenCalledWith(\"codex transcript\");\n+\t});\n+"
+  }
+ ],
+ "commits": [
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "66bf841269499534a2661a101e241eb09ec0a1ef",
+   "node_id": "C_kwDOUUyRodoAKDY2YmY4NDEyNjk0OTk1MzRhMjY2MWExMDFlMjQxZWIwOWVjMGExZWY",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T12:11:59Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:08Z"
+    },
+    "message": "feat(ai): transcribe speech with a ChatGPT/Codex subscription\n\nAdds the openai-codex/codex-transcribe model on a new\nopenai-codex-transcriptions runner API: POST /backend-api/transcribe with the\nCodex OAuth bearer, account id and Codex Desktop identity. TUI dictation, the\nauth gateway's /v1/audio/transcriptions and auth-gateway stdio (which now\nresolves stt/tts/image selectors) can use it.",
+    "tree": {
+     "sha": "ba794a0df33fca37e8c5b55e2999f68aedf761df",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/ba794a0df33fca37e8c5b55e2999f68aedf761df"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/66bf841269499534a2661a101e241eb09ec0a1ef",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhAIcyK0bz/vMZSUpQJ7PGNQG32A4qTfGGKCutoiHR9XLKAAAA\nIQCvF9h798HFSyly+jmgQMNARvKTwTj8tJm0+Zo+z4EjDQ==\n-----END SSH SIGNATURE-----",
+     "payload": "tree ba794a0df33fca37e8c5b55e2999f68aedf761df\nparent 686b5e2fb542848dc3ff1a9e36a42a8fefdd2278\nauthor Andre Brait <andrebrait@gmail.com> 1791720719 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553608 +0000\n\nfeat(ai): transcribe speech with a ChatGPT/Codex subscription\n\nAdds the openai-codex/codex-transcribe model on a new\nopenai-codex-transcriptions runner API: POST /backend-api/transcribe with the\nCodex OAuth bearer, account id and Codex Desktop identity. TUI dictation, the\nauth gateway's /v1/audio/transcriptions and auth-gateway stdio (which now\nresolves stt/tts/image selectors) can use it.\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/66bf841269499534a2661a101e241eb09ec0a1ef",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/66bf841269499534a2661a101e241eb09ec0a1ef",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/66bf841269499534a2661a101e241eb09ec0a1ef/comments",
+   "parents": [
+    {
+     "sha": "686b5e2fb542848dc3ff1a9e36a42a8fefdd2278",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/686b5e2fb542848dc3ff1a9e36a42a8fefdd2278",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/686b5e2fb542848dc3ff1a9e36a42a8fefdd2278"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "0002bd9f727cc4946aecbb79291bb4a29157a77f",
+   "node_id": "C_kwDOUUyRodoAKDAwMDJiZDlmNzI3Y2M0OTQ2YWVjYmI3OTI5MWJiNGEyOTE1N2E3N2Y",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T16:53:46Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:09Z"
+    },
+    "message": "docs(changelog): credit #15391",
+    "tree": {
+     "sha": "a7e83fcd9da1f675794d2e098ffac921f9b58269",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/a7e83fcd9da1f675794d2e098ffac921f9b58269"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/0002bd9f727cc4946aecbb79291bb4a29157a77f",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhAL09hFK+nPIPdhv12LFnSQf7pEChnNMFKux9LKO2DoaOAAAA\nIQD8RxQuVbCTvZfmibnej39iG5+XiilA6Blz9n/99BZobw==\n-----END SSH SIGNATURE-----",
+     "payload": "tree a7e83fcd9da1f675794d2e098ffac921f9b58269\nparent 66bf841269499534a2661a101e241eb09ec0a1ef\nauthor Andre Brait <andrebrait@gmail.com> 1791737626 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553609 +0000\n\ndocs(changelog): credit #15391\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/0002bd9f727cc4946aecbb79291bb4a29157a77f",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/0002bd9f727cc4946aecbb79291bb4a29157a77f",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/0002bd9f727cc4946aecbb79291bb4a29157a77f/comments",
+   "parents": [
+    {
+     "sha": "66bf841269499534a2661a101e241eb09ec0a1ef",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/66bf841269499534a2661a101e241eb09ec0a1ef",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/66bf841269499534a2661a101e241eb09ec0a1ef"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+   "node_id": "C_kwDOUUyRodoAKDcyMjAzMjlmN2FjYjc0ZTdhMTY1MmZiNWUyMmYwYWI4NWFhZDBhN2Y",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T17:05:00Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:09Z"
+    },
+    "message": "fix(ai): keep the Codex bearer on HTTPS and resolve stdio selectors per comma entry",
+    "tree": {
+     "sha": "f7f864879d765b557a37099e836a5fe4eca58c8f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/f7f864879d765b557a37099e836a5fe4eca58c8f"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGQAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEkAAAAgSdLZ5bDqVMUiGmtmU7x/b3XGIU6H5lJXJ3HTxW5/kh0AAAAh\nAO7ZXigJy2YupmJ7BDvNxIZCGF6n+PrMqJLVyAYqJ2ya\n-----END SSH SIGNATURE-----",
+     "payload": "tree f7f864879d765b557a37099e836a5fe4eca58c8f\nparent 0002bd9f727cc4946aecbb79291bb4a29157a77f\nauthor Andre Brait <andrebrait@gmail.com> 1791738300 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553609 +0000\n\nfix(ai): keep the Codex bearer on HTTPS and resolve stdio selectors per comma entry\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f/comments",
+   "parents": [
+    {
+     "sha": "0002bd9f727cc4946aecbb79291bb4a29157a77f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/0002bd9f727cc4946aecbb79291bb4a29157a77f",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/0002bd9f727cc4946aecbb79291bb4a29157a77f"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "d993c59da61e0408c0476c75da1b37599b8a8f08",
+   "node_id": "C_kwDOUUyRodoAKGQ5OTNjNTlkYTYxZTA0MDhjMDQ3NmM3NWRhMWIzNzU5OWI4YThmMDg",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T17:13:25Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:10Z"
+    },
+    "message": "fix(ai): address Codex transcription review",
+    "tree": {
+     "sha": "ee1ddbe638d1f219bbd0a324eb66c32e5e3899d9",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/ee1ddbe638d1f219bbd0a324eb66c32e5e3899d9"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/d993c59da61e0408c0476c75da1b37599b8a8f08",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhAN7qNwXJJ1SrA5AE2fg4hQFOST6annzBy4hBGEjLYXyLAAAA\nIQD+X0kjmhG2DxqEzo5VrD69PzfVlpJmlmhANvRWVq1RkQ==\n-----END SSH SIGNATURE-----",
+     "payload": "tree ee1ddbe638d1f219bbd0a324eb66c32e5e3899d9\nparent 7220329f7acb74e7a1652fb5e22f0ab85aad0a7f\nauthor Andre Brait <andrebrait@gmail.com> 1791738805 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553610 +0000\n\nfix(ai): address Codex transcription review\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/d993c59da61e0408c0476c75da1b37599b8a8f08",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/d993c59da61e0408c0476c75da1b37599b8a8f08",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/d993c59da61e0408c0476c75da1b37599b8a8f08/comments",
+   "parents": [
+    {
+     "sha": "7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/7220329f7acb74e7a1652fb5e22f0ab85aad0a7f"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+   "node_id": "C_kwDOUUyRodoAKGUwZDA1MGY5MjkxYjJiNGVkMjIxZTBkNmNiMjZhMTFjZjJkZmY0NjA",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T17:19:23Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:10Z"
+    },
+    "message": "fix(ai): name Codex uploads from browser MIME aliases (audio/x-m4a, audio/opus)",
+    "tree": {
+     "sha": "26ee1bd1ac394998c95418f6af49106a1f6638ef",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/26ee1bd1ac394998c95418f6af49106a1f6638ef"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGQAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEkAAAAgee1rgn7ZJvm7RfuweNj4bJ0q3YPpLmn/5XnTiTEj84QAAAAh\nAI00Ysx4mRvK5qXlXq5sqGYFFsyyPfssDS9+sNHydwNs\n-----END SSH SIGNATURE-----",
+     "payload": "tree 26ee1bd1ac394998c95418f6af49106a1f6638ef\nparent d993c59da61e0408c0476c75da1b37599b8a8f08\nauthor Andre Brait <andrebrait@gmail.com> 1791739163 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553610 +0000\n\nfix(ai): name Codex uploads from browser MIME aliases (audio/x-m4a, audio/opus)\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460/comments",
+   "parents": [
+    {
+     "sha": "d993c59da61e0408c0476c75da1b37599b8a8f08",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/d993c59da61e0408c0476c75da1b37599b8a8f08",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/d993c59da61e0408c0476c75da1b37599b8a8f08"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+   "node_id": "C_kwDOUUyRodoAKDc3NTQ2Mzk2YjBjYWQxM2Y1YWZiMDA4NGZhNWMxYWExYWNiMTY1ZTE",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-11T17:31:15Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:10Z"
+    },
+    "message": "fix(coding-agent): keep on-device runners out of the auth gateway catalog",
+    "tree": {
+     "sha": "440eaef528226f12b376741f99d405fe8397aa7f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/440eaef528226f12b376741f99d405fe8397aa7f"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhAK4m3+fQUoJzC/6uN9/iJ4YoXrCWCucpryxAZX/97b62AAAA\nIQDRBER/1PrXHYeSU5K09wKrvzJP4rfnwqtIPXMcpY1zDg==\n-----END SSH SIGNATURE-----",
+     "payload": "tree 440eaef528226f12b376741f99d405fe8397aa7f\nparent e0d050f9291b2b4ed221e0d6cb26a11cf2dff460\nauthor Andre Brait <andrebrait@gmail.com> 1791739875 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553610 +0000\n\nfix(coding-agent): keep on-device runners out of the auth gateway catalog\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/77546396b0cad13f5afb0084fa5c1aa1acb165e1/comments",
+   "parents": [
+    {
+     "sha": "e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/e0d050f9291b2b4ed221e0d6cb26a11cf2dff460"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "05543990f633bfdd19cce7993a6048bfd5157793",
+   "node_id": "C_kwDOUUyRodoAKDA1NTQzOTkwZjYzM2JmZGQxOWNjZTc5OTNhNjA0OGJmZDUxNTc3OTM",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-12T07:29:24Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:10Z"
+    },
+    "message": "feat(ai): attach Codex DeviceCheck attestation to transcription requests",
+    "tree": {
+     "sha": "5b97d1201256fcf0e8ba99559797da709d9d290f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/5b97d1201256fcf0e8ba99559797da709d9d290f"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/05543990f633bfdd19cce7993a6048bfd5157793",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGMAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEgAAAAgT/VJDHrVKWQ2kwvXHcBVAU1/KLhFYCHHRuJc1I+tH8EAAAAg\nJEnDzWfJMohdkdrFeORJSjhu7/WM3B20y49YbmZY7O0=\n-----END SSH SIGNATURE-----",
+     "payload": "tree 5b97d1201256fcf0e8ba99559797da709d9d290f\nparent 77546396b0cad13f5afb0084fa5c1aa1acb165e1\nauthor Andre Brait <andrebrait@gmail.com> 1791790164 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553610 +0000\n\nfeat(ai): attach Codex DeviceCheck attestation to transcription requests\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/05543990f633bfdd19cce7993a6048bfd5157793",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/05543990f633bfdd19cce7993a6048bfd5157793",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/05543990f633bfdd19cce7993a6048bfd5157793/comments",
+   "parents": [
+    {
+     "sha": "77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/77546396b0cad13f5afb0084fa5c1aa1acb165e1",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/77546396b0cad13f5afb0084fa5c1aa1acb165e1"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+   "node_id": "C_kwDOUUyRodoAKDg2YmQ4NGI3OGIyNzU1NWJiNjNkOGQzNzM1MjA5Zjk5YjNhOGRhYjI",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-13T07:18:31Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:11Z"
+    },
+    "message": "fix(coding-agent): keep stdio runner fallbacks on the runner's kind",
+    "tree": {
+     "sha": "ac07cd801970e1602b0da4f805bde1c175eeb052",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/ac07cd801970e1602b0da4f805bde1c175eeb052"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhANBMqwlbcTKFPJPTii+37TozFKjBfYzY3csLuqOTzv5YAAAA\nIQCRJ4qbYQwAnQSSaO1UJQUAKZNqQ15fiGEsBxJzyZ3AQg==\n-----END SSH SIGNATURE-----",
+     "payload": "tree ac07cd801970e1602b0da4f805bde1c175eeb052\nparent 05543990f633bfdd19cce7993a6048bfd5157793\nauthor Andre Brait <andrebrait@gmail.com> 1791875911 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553611 +0000\n\nfix(coding-agent): keep stdio runner fallbacks on the runner's kind\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/86bd84b78b27555bb63d8d3735209f99b3a8dab2/comments",
+   "parents": [
+    {
+     "sha": "05543990f633bfdd19cce7993a6048bfd5157793",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/05543990f633bfdd19cce7993a6048bfd5157793",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/05543990f633bfdd19cce7993a6048bfd5157793"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+   "node_id": "C_kwDOUUyRodoAKGI2Y2M2NTViNDliZmE0NjhlZDNlZDMzNmI3YzI1ZWU0YTM5NmY5YTM",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-13T07:31:17Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:20:11Z"
+    },
+    "message": "docs(changelog): move #15391 entries to Unreleased",
+    "tree": {
+     "sha": "c4d4590d0c1a8e6385f983e80104e2e645a6911d",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/c4d4590d0c1a8e6385f983e80104e2e645a6911d"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGQAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEkAAAAhAJGu3jxprL6SCJDBcXu3fQsgCKd0olIkPlFBR/vhg3CWAAAA\nIFVMp+OS4q2S/ZOY+un+EAi9+Zu3mG3oM9H6NbO5CUs3\n-----END SSH SIGNATURE-----",
+     "payload": "tree c4d4590d0c1a8e6385f983e80104e2e645a6911d\nparent 86bd84b78b27555bb63d8d3735209f99b3a8dab2\nauthor Andre Brait <andrebrait@gmail.com> 1791876677 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553611 +0000\n\ndocs(changelog): move #15391 entries to Unreleased\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3/comments",
+   "parents": [
+    {
+     "sha": "86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/86bd84b78b27555bb63d8d3735209f99b3a8dab2",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/86bd84b78b27555bb63d8d3735209f99b3a8dab2"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "c10725a8d58c3557df15f69d709813972b7134e4",
+   "node_id": "C_kwDOUUyRodoAKGMxMDcyNWE4ZDU4YzM1NTdkZjE1ZjY5ZDcwOTgxMzk3MmI3MTM0ZTQ",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-10-30T03:46:43Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:22:54Z"
+    },
+    "message": "fix(ai): address Codex transcription review\n\n- Name browser `audio/mp3` and `audio/x-mp3` uploads `audio.mp3`, and infer the container from a known suffix when the MIME type is generic (`voice.oga` -> `audio.ogg`).\n- Refuse an `openai-codex` base URL off the ChatGPT HTTPS origin: it points at a relay whose key outranks the OAuth login and must not reach chatgpt.com.\n- Share one route/API predicate (`gatewayRouteAccepts`) between the image route, the served `/v1/models` catalog and stdio fallback chains, so unroutable models (Codex `gpt-image-2`, on-device runners) are neither advertised nor tried as fallbacks.\n- Spy on the attestation header in the test instead of clearing the process-wide provider.\n- Move the #15391 changelog entries under [Unreleased].",
+    "tree": {
+     "sha": "ee3ab0aeecffe5691c4b887e5c96a86561f85398",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/ee3ab0aeecffe5691c4b887e5c96a86561f85398"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/c10725a8d58c3557df15f69d709813972b7134e4",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGQAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEkAAAAgcODKUXyrOyS1urTsyv4dzK/lOLPahgFYmcPSiTE/aaYAAAAh\nAIwEOKvQVifMLxIQ/MCpZRtkGXkKZ3xo3nAdsKGVIjmR\n-----END SSH SIGNATURE-----",
+     "payload": "tree ee3ab0aeecffe5691c4b887e5c96a86561f85398\nparent b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3\nauthor Andre Brait <andrebrait@gmail.com> 1793332003 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793553774 +0000\n\nfix(ai): address Codex transcription review\n\n- Name browser `audio/mp3` and `audio/x-mp3` uploads `audio.mp3`, and infer the container from a known suffix when the MIME type is generic (`voice.oga` -> `audio.ogg`).\n- Refuse an `openai-codex` base URL off the ChatGPT HTTPS origin: it points at a relay whose key outranks the OAuth login and must not reach chatgpt.com.\n- Share one route/API predicate (`gatewayRouteAccepts`) between the image route, the served `/v1/models` catalog and stdio fallback chains, so unroutable models (Codex `gpt-image-2`, on-device runners) are neither advertised nor tried as fallbacks.\n- Spy on the attestation header in the test instead of clearing the process-wide provider.\n- Move the #15391 changelog entries under [Unreleased].\n",
+     "verified_at": "2026-11-01T17:23:01Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/c10725a8d58c3557df15f69d709813972b7134e4",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/c10725a8d58c3557df15f69d709813972b7134e4",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/c10725a8d58c3557df15f69d709813972b7134e4/comments",
+   "parents": [
+    {
+     "sha": "b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "f27f076a9d557b3299f6be53e0b0b380decee96e",
+   "node_id": "C_kwDOUUyRodoAKGYyN2YwNzZhOWQ1NTdiMzI5OWY2YmU1M2UwYjBiMzgwZGVjZWU5NmU",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:33:35Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:33:35Z"
+    },
+    "message": "fix(coding-agent): keep known-provider prefixes locked in auth-gateway stdio selectors\n\nThe per-kind registry views dropped ModelRegistry.hasProvider, so a selector for a configured provider with an empty catalog (proxy/foo) could fuzzy-match another provider's proxy/foo-latest. Forward it through both views.",
+    "tree": {
+     "sha": "eb2c277402f40644528aec2d771ee170993f443f",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/eb2c277402f40644528aec2d771ee170993f443f"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/f27f076a9d557b3299f6be53e0b0b380decee96e",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGMAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEgAAAAgCyvDxU2s9tixe4Usa9PNUR06ICNq70OIFAN4fK6FMTsAAAAg\nODgQozfE5cDtIbMbJcmFs1mgA5/m2OahnKsuS1dtAUc=\n-----END SSH SIGNATURE-----",
+     "payload": "tree eb2c277402f40644528aec2d771ee170993f443f\nparent c10725a8d58c3557df15f69d709813972b7134e4\nauthor Andre Brait <andrebrait@gmail.com> 1793554415 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793554415 +0000\n\nfix(coding-agent): keep known-provider prefixes locked in auth-gateway stdio selectors\n\nThe per-kind registry views dropped ModelRegistry.hasProvider, so a selector for a configured provider with an empty catalog (proxy/foo) could fuzzy-match another provider's proxy/foo-latest. Forward it through both views.\n",
+     "verified_at": "2026-11-01T17:33:38Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/f27f076a9d557b3299f6be53e0b0b380decee96e",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/f27f076a9d557b3299f6be53e0b0b380decee96e",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/f27f076a9d557b3299f6be53e0b0b380decee96e/comments",
+   "parents": [
+    {
+     "sha": "c10725a8d58c3557df15f69d709813972b7134e4",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/c10725a8d58c3557df15f69d709813972b7134e4",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/c10725a8d58c3557df15f69d709813972b7134e4"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "committer": {
+    "login": "andrebrait",
+    "type": "User"
+   },
+   "sha": "b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "node_id": "C_kwDOUUyRodoAKGI4ZTI2Zjg0M2Y2MjExMjBjMGY1MGNlOTgxNzQwZDFhNzc3Y2MyYjQ",
+   "commit": {
+    "author": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:43:56Z"
+    },
+    "committer": {
+     "name": "Andre Brait",
+     "email": "andrebrait@gmail.com",
+     "date": "2026-11-01T17:43:56Z"
+    },
+    "message": "docs(changelog): keep #15391 entries under Unreleased after the rebase\n\nThe rebase onto 18.15.0 left the catalog entry in the released 18.14.1 section and a second Added heading in ai; shorten the ai entry to one user-facing line.",
+    "tree": {
+     "sha": "ebc01d0c3c57b90e973b8a2defccfc4246589df6",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/git/trees/ebc01d0c3c57b90e973b8a2defccfc4246589df6"
+    },
+    "url": "https://api.github.com/repos/can1357/oh-my-pi/git/commits/b8e26f843f621120c0f50ce981740d1a777cc2b4",
+    "comment_count": 0,
+    "verification": {
+     "verified": true,
+     "reason": "valid",
+     "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAAGgAAAATZWNkc2Etc2hhMi1uaXN0cDI1NgAAAAhuaXN0cDI1NgAAAE\nEEq6Oc2xcg40fmi8ECETC48fSHBXdO2PB+wvSWosp5EFUj3PfNqZt2ku/OMM15A3XM8Eqh\nRbeVl1Z+AbqVimMrkgAAAANnaXQAAAAAAAAABnNoYTUxMgAAAGUAAAATZWNkc2Etc2hhMi\n1uaXN0cDI1NgAAAEoAAAAhAJhqFFA9MbJ3HW1+q0oG+Ka8xl73Kfyt0kA8fXtPJ6SGAAAA\nIQCi7NThoiKZrCZPChVKxQMXoXhEXIuqbK9FZQffvHqQaQ==\n-----END SSH SIGNATURE-----",
+     "payload": "tree ebc01d0c3c57b90e973b8a2defccfc4246589df6\nparent f27f076a9d557b3299f6be53e0b0b380decee96e\nauthor Andre Brait <andrebrait@gmail.com> 1793555036 +0000\ncommitter Andre Brait <andrebrait@gmail.com> 1793555036 +0000\n\ndocs(changelog): keep #15391 entries under Unreleased after the rebase\n\nThe rebase onto 18.15.0 left the catalog entry in the released 18.14.1 section and a second Added heading in ai; shorten the ai entry to one user-facing line.\n",
+     "verified_at": "2026-11-01T17:44:00Z"
+    }
+   },
+   "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "html_url": "https://github.com/can1357/oh-my-pi/commit/b8e26f843f621120c0f50ce981740d1a777cc2b4",
+   "comments_url": "https://api.github.com/repos/can1357/oh-my-pi/commits/b8e26f843f621120c0f50ce981740d1a777cc2b4/comments",
+   "parents": [
+    {
+     "sha": "f27f076a9d557b3299f6be53e0b0b380decee96e",
+     "url": "https://api.github.com/repos/can1357/oh-my-pi/commits/f27f076a9d557b3299f6be53e0b0b380decee96e",
+     "html_url": "https://github.com/can1357/oh-my-pi/commit/f27f076a9d557b3299f6be53e0b0b380decee96e"
+    }
+   ]
+  }
+ ],
+ "checkRuns": {
+  "b8e26f843f621120c0f50ce981740d1a777cc2b4": [],
+  "f27f076a9d557b3299f6be53e0b0b380decee96e": [],
+  "c10725a8d58c3557df15f69d709813972b7134e4": [],
+  "b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3": [],
+  "86bd84b78b27555bb63d8d3735209f99b3a8dab2": [],
+  "05543990f633bfdd19cce7993a6048bfd5157793": [],
+  "77546396b0cad13f5afb0084fa5c1aa1acb165e1": [],
+  "e0d050f9291b2b4ed221e0d6cb26a11cf2dff460": [],
+  "d993c59da61e0408c0476c75da1b37599b8a8f08": [],
+  "7220329f7acb74e7a1652fb5e22f0ab85aad0a7f": [],
+  "0002bd9f727cc4946aecbb79291bb4a29157a77f": [],
+  "66bf841269499534a2661a101e241eb09ec0a1ef": []
+ },
+ "statuses": {
+  "b8e26f843f621120c0f50ce981740d1a777cc2b4": [],
+  "f27f076a9d557b3299f6be53e0b0b380decee96e": [],
+  "c10725a8d58c3557df15f69d709813972b7134e4": [],
+  "b6cc655b49bfa468ed3ed336b7c25ee4a396f9a3": [],
+  "86bd84b78b27555bb63d8d3735209f99b3a8dab2": [],
+  "05543990f633bfdd19cce7993a6048bfd5157793": [],
+  "77546396b0cad13f5afb0084fa5c1aa1acb165e1": [],
+  "e0d050f9291b2b4ed221e0d6cb26a11cf2dff460": [],
+  "d993c59da61e0408c0476c75da1b37599b8a8f08": [],
+  "7220329f7acb74e7a1652fb5e22f0ab85aad0a7f": [],
+  "0002bd9f727cc4946aecbb79291bb4a29157a77f": [],
+  "66bf841269499534a2661a101e241eb09ec0a1ef": []
+ },
+ "logs": {}
+}
