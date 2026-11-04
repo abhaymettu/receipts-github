@@ -8,6 +8,10 @@ It reads the claims in a pull request's title, description and commit messages (
 diff, the check runs and statuses, the commands its Actions jobs ran, and its commits. Each claim comes back
 **verified**, **unbacked** or **unverifiable**, in one check run, with a link to the receipt that decided it.
 
+It caught a Devin pull request ticking "`make test` and `make lint` pass locally" while CI ran only on the commit
+before the head, and a Codex pull request saying three test suites pass with no check on any of its 12 commits. Its
+claim reader gives the same output as receipts' on all 2,082 hand-labelled claims.
+
 ![The receipts check run on this repository's first pull request: 0 unbacked, 1 unverifiable, 5 verified of 6 claims](docs/check-run.png)
 
 It is the pull request side of [receipts](https://github.com/abhaymettu/receipts), which checks the same claims
