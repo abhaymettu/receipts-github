@@ -11,6 +11,9 @@
   "bin": {
     "receipts-github": "dist/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "workspaces": [
     "packages/*"
   ],
