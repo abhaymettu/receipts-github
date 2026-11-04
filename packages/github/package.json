@@ -5,8 +5,11 @@
   "license": "MIT",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
-    "@receipts-github/checker": "0.1.0"
+    "@receipts-github/checker": "0.1.0",
+    "zod": "^4.6.7"
   }
 }
