@@ -1,26 +1,25 @@
 # receipts-github
 
-**Your coding agent's pull request says the tests pass. receipts-github checks whether anything on the pull request
-shows it.**
+A Devin pull request, [Open-MBEE/OpenSysML#1908](https://github.com/Open-MBEE/OpenSysML/pull/1908), ticks "`make
+test` and `make lint` pass locally" while CI ran only on the commit before the head. A Codex pull request,
+[can1357/oh-my-pi#15391](https://github.com/can1357/oh-my-pi/pull/15391), says three test suites pass, and no check
+ran on any of its 12 commits. receipts-github marks both claims unbacked. Its claim reader comes from
+[receipts](https://github.com/abhaymettu/receipts) and gives the same output on all 2,082 claims labelled by hand
+there.
+
+[![Install the GitHub App](https://img.shields.io/badge/Install-GitHub%20App-2ea44f?logo=github&style=for-the-badge)](https://github.com/apps/receipts-github/installations/new)
 
 It reads the claims in a pull request's title, description and commit messages ("tests pass", "updated
 `src/config.ts`", "committed as `a41c9e2`"). It checks each one against the receipts the pull request carries: the
 diff, the check runs and statuses, the commands its Actions jobs ran, and its commits. Each claim comes back
 **verified**, **unbacked** or **unverifiable**, in one check run, with a link to the receipt that decided it.
-
-It caught a Devin pull request ticking "`make test` and `make lint` pass locally" while CI ran only on the commit
-before the head, and a Codex pull request saying three test suites pass with no check on any of its 12 commits. Its
-claim reader gives the same output as receipts' on all 2,082 hand-labelled claims.
+receipts checks the same claims against an agent's own session log; this is the pull request side.
 
 ![The receipts check run on this repository's first pull request: 0 unbacked, 1 unverifiable, 5 verified of 6 claims](docs/check-run.png)
 
-It is the pull request side of [receipts](https://github.com/abhaymettu/receipts), which checks the same claims
-against an agent's own session log.
-
 ## What it caught
 
-Devin opened [Open-MBEE/OpenSysML#1908](https://github.com/Open-MBEE/OpenSysML/pull/1908). Its checklist ticks
-"`make test` and `make lint` pass locally". CI ran on the commit before the head, and nothing ran on the head:
+The Devin pull request from the command line:
 
 ```
 $ npx github:abhaymettu/receipts-github https://github.com/Open-MBEE/OpenSysML/pull/1908
@@ -33,9 +32,8 @@ body           VERIFIED      file_change     `go test -C tools ./census/notation
 https://github.com/Open-MBEE/OpenSysML/pull/1908 @ eb8e5c7: 1 unbacked, 2 unverifiable, 3 verified of 6 claims
 ```
 
-(Three verified and unverifiable rows are cut here.) A Codex pull request,
-[can1357/oh-my-pi#15391](https://github.com/can1357/oh-my-pi/pull/15391), says three test suites pass, and no check
-ran on any of its 12 commits. That one comes back `unbacked: no check ran on this pull request`.
+(Three verified and unverifiable rows are cut here.) The Codex one comes back `unbacked: no check ran on this pull
+request`.
 
 This repository runs the App on its own pull requests. On [#2](https://github.com/abhaymettu/receipts-github/pull/2),
 the pull request that added the App, its verdict on the first push caught me: the description said `npm test` passes, and CI
@@ -46,10 +44,9 @@ request can carry that receipt. The picture above is the action's run on [#1](ht
 
 ## Install
 
-[![Install the GitHub App](https://img.shields.io/badge/Install-GitHub%20App-2ea44f?logo=github&style=for-the-badge)](https://github.com/apps/receipts-github/installations/new)
-
-Pick the repositories, and the `receipts` check appears on their next pull request. There is no workflow file and no
-token to set. The App reads code, pull requests, Actions logs and commit statuses, and writes only check runs.
+[Install the GitHub App](https://github.com/apps/receipts-github/installations/new) and pick the repositories. The
+`receipts` check appears on their next pull request, with nothing added to the repository. The App reads code, pull
+requests, Actions logs and commit statuses, and writes only check runs.
 
 It checks a pull request when it opens, when its description is edited and on every push. While the pull request's
 other checks are still running, the check stays in progress. When they finish, it posts the verdicts. Re-running the
