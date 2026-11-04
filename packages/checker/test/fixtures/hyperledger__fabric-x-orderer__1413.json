@@ -1,0 +1,1199 @@
+{
+ "pull": {
+  "user": {
+   "login": "HagarMeir",
+   "type": "User"
+  },
+  "head": {
+   "label": "HagarMeir:batcher-single-term-source",
+   "ref": "batcher-single-term-source",
+   "sha": "2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  "base": {
+   "label": "hyperledger:main",
+   "ref": "main",
+   "sha": "2d93a3442ed7345677cc9e99212fa8cfb011279d"
+  },
+  "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/pulls/1413",
+  "id": 5135811685,
+  "node_id": "PR_kwDOPFB4g88AAAABMh5EZQ",
+  "html_url": "https://github.com/hyperledger/fabric-x-orderer/pull/1413",
+  "diff_url": "https://github.com/hyperledger/fabric-x-orderer/pull/1413.diff",
+  "patch_url": "https://github.com/hyperledger/fabric-x-orderer/pull/1413.patch",
+  "issue_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/issues/1413",
+  "commits_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/pulls/1413/commits",
+  "review_comments_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/pulls/1413/comments",
+  "review_comment_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/issues/1413/comments",
+  "statuses_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/statuses/2a85d95d7578be160b0283bfae00b48243ed2d16",
+  "number": 1413,
+  "state": "open",
+  "locked": false,
+  "title": "batcher: keep the term only in the batcher; complain in the term the fault was seen in",
+  "body": "Fixes #1401\n\n## Problem\n\nThe batcher kept the shard's term in two places, updated by different goroutines on different triggers:\n\n- `Batcher.term` was set by the decision loop on every decision, and complaints were signed with it, read when the complaint was sent.\n- `BatcherRole.term` was set from a buffer-1 `stateChan` that can coalesce states. The role acted on it, and logged it in the complaint reason.\n\nSo the two could drift apart (#1371 was one such case), and a complaint was signed with the term current when it was *sent*, not the term in which the fault was *seen*. A decision landing between a failed `verifyBatch` (or a second-strike timeout) and the complaint moved the complaint to the new primary.\n\n## Change\n\n**The batcher is the only source of the primary and the term.**\n- They stay under the batcher's lock, renamed `primaryTermLock` since it guards both. A new `CurrentPrimaryAndTerm()` reads them together, so they are always of the same decision. `GetTerm()` and `GetPrimaryID()` go through it.\n- The role reads them through a new `TermProvider` interface (implemented by the batcher) each time it starts acting as primary or secondary. It keeps that term as the term it acts in, exposed as `Term()`.\n\n**The decision loop tells the role of a term change directly.**\n- When the term changes, it calls the new `BatcherRole.NotifyTermChange(state, prevPrimary)`. This does a non-blocking send on the role's `termChan`, which is now a `chan struct{}`, since the role re-reads the term when it restarts. It then resubmits the requests of this batcher's pending BAFs of the previous primary, as before.\n- This replaces `stateChan`, the role's `getTermAndNotifyChange` goroutine, and the role's own primary computation (`getTerm`, `getPrimaryID`, the `Batchers` field). The unused `GetBatchersIDs` helper is removed.\n- `Run()` now starts the role before the decision loop, since the loop calls into it.\n\n**Complaints carry the term they are about.** `Complainer.Complain` now takes the term: `Complain(term, reason)`.\n- The verify path passes the term the role acts in.\n- The second-strike timeout passes the role's term too. The pool is restarted whenever the role restarts in a new term, so that is the term in which the requests timed out. The batcher's own term can already be the next one at that point.\n\n**Also:** the role's `term` seed added in #1403 is dropped, since `run()` now reads the term from the batcher on every iteration. The batcher's own term is still seeded from the WAL, so restarts are unchanged.\n\n## Testing\n\n- `TestComplainInTermFaultSeenIn`: verification of a pulled batch is held until the term changes from 0 to 1, then fails. The complaint must carry term 0. If the complaint reads the term at send time, it carries 1 and the test fails.\n- `TestRoleTermIsTheTermItActsIn`: the batcher's term moves on without telling the role. The role's `Term()` must stay 0 until the role is notified, then become the new term. If `Term()` reads the batcher's term instead, the test fails.\n- After review: `TestRoleTermIsSetAfterThePoolRestarts` (the role's term is set only after the pool restarts), `TestRoleDoesNotRestartInTheSameTerm` (a notification for the current term doesn't restart the role) and `TestResubmitOnTermChangeDoesNotBlockTheCaller` (a slow resubmission doesn't delay the decision loop). Each fails against the code it guards.\n- The role unit tests drive term changes through a small `testTermProvider` that stands in for the batcher, instead of `stateChan` sends. The `StateProvider` mock is removed and a `TermProvider` mock added.\n- `make unit-tests-batcher` passes (55 tests, `-race`), including `TestBatcherRestartsInLastKnownTerm` (#1403) and `TestBatcherComplainsInTermWithSamePrimary` (#1398).\n\n## Review notes\n\n- **Second-strike window (closed after review).** The role sets its term only once the pool is restarted in it (`restartPool`), so a second-strike complaint about a request of the previous term is never sent in the new term.\n- No docs change: `docs/batcher.md` section 3.3 only says the role starts again with the new primary on a term change, which is still the case.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\n",
+  "labels": [],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-11-03T10:41:52Z",
+  "updated_at": "2026-11-03T13:11:46Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "6599e639d53896b4504826279ea8a21fe999088d",
+  "assignee": null,
+  "assignees": [],
+  "requested_reviewers": [],
+  "requested_teams": [],
+  "author_association": "CONTRIBUTOR",
+  "auto_merge": null,
+  "draft": false,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": false,
+  "mergeable_state": "clean",
+  "merged_by": null,
+  "comments": 0,
+  "review_comments": 12,
+  "maintainer_can_modify": true,
+  "commits": 2,
+  "additions": 619,
+  "deletions": 333,
+  "changed_files": 9
+ },
+ "files": [
+  {
+   "sha": "5eb6e418b29c38ebb676015c3fba07e0c6570895",
+   "filename": "node/batcher/batcher.go",
+   "status": "modified",
+   "additions": 45,
+   "deletions": 46,
+   "changes": 91,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fbatcher.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "ecd81c8ee73d7de141c0434ed801e0db1e8f8acf",
+   "filename": "node/batcher/batcher_builder.go",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 3,
+   "changes": 4,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_builder.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_builder.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fbatcher_builder.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "a6600af921206b257f0e07db8824d6fedbfa7da6",
+   "filename": "node/batcher/batcher_role.go",
+   "status": "modified",
+   "additions": 111,
+   "deletions": 67,
+   "changes": 178,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fbatcher_role.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "df8d95b706f5e1e6c4e04df9486b6933d240c514",
+   "filename": "node/batcher/batcher_role_old_test.go",
+   "status": "modified",
+   "additions": 2,
+   "deletions": 4,
+   "changes": 6,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role_old_test.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role_old_test.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fbatcher_role_old_test.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "c27317fce53093d3f7a8286d7e558577c38c518a",
+   "filename": "node/batcher/batcher_role_test.go",
+   "status": "modified",
+   "additions": 340,
+   "deletions": 91,
+   "changes": 431,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role_test.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fbatcher_role_test.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fbatcher_role_test.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "5257f0beb5b6f57d245c057a7b7fbf7e00131e4f",
+   "filename": "node/batcher/mocks/complainer.go",
+   "status": "modified",
+   "additions": 12,
+   "deletions": 10,
+   "changes": 22,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fmocks%2Fcomplainer.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fmocks%2Fcomplainer.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fmocks%2Fcomplainer.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "6aeac80f185b30c156249784a416be7c40823002",
+   "filename": "node/batcher/mocks/state_provider.go",
+   "status": "removed",
+   "additions": 0,
+   "deletions": 103,
+   "changes": 103,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2d93a3442ed7345677cc9e99212fa8cfb011279d/node%2Fbatcher%2Fmocks%2Fstate_provider.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2d93a3442ed7345677cc9e99212fa8cfb011279d/node%2Fbatcher%2Fmocks%2Fstate_provider.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fmocks%2Fstate_provider.go?ref=2d93a3442ed7345677cc9e99212fa8cfb011279d"
+  },
+  {
+   "sha": "4f31fa3df2f8dc03c30b3bf5be14a6b12937566c",
+   "filename": "node/batcher/mocks/term_provider.go",
+   "status": "added",
+   "additions": 108,
+   "deletions": 0,
+   "changes": 108,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fmocks%2Fterm_provider.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Fmocks%2Fterm_provider.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Fmocks%2Fterm_provider.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  },
+  {
+   "sha": "add404d58437b69adec45bda0bf9c4a6368784ac",
+   "filename": "node/batcher/utils.go",
+   "status": "modified",
+   "additions": 0,
+   "deletions": 9,
+   "changes": 9,
+   "blob_url": "https://github.com/hyperledger/fabric-x-orderer/blob/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Futils.go",
+   "raw_url": "https://github.com/hyperledger/fabric-x-orderer/raw/2a85d95d7578be160b0283bfae00b48243ed2d16/node%2Fbatcher%2Futils.go",
+   "contents_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/contents/node%2Fbatcher%2Futils.go?ref=2a85d95d7578be160b0283bfae00b48243ed2d16"
+  }
+ ],
+ "commits": [
+  {
+   "author": {
+    "login": "HagarMeir",
+    "type": "User"
+   },
+   "committer": {
+    "login": "HagarMeir",
+    "type": "User"
+   },
+   "sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+   "node_id": "C_kwDOPMO5wdoAKDdiZGU4ZjExZThhNjJjNWZjNzFlNjdjMzAxYWE3MzUxOTdlNmE4ZTg",
+   "commit": {
+    "author": {
+     "name": "Hagar Meir",
+     "email": "hagar.meir@ibm.com",
+     "date": "2026-11-03T10:41:26Z"
+    },
+    "committer": {
+     "name": "Hagar Meir",
+     "email": "hagar.meir@ibm.com",
+     "date": "2026-11-03T10:41:26Z"
+    },
+    "message": "batcher: keep the term only in the batcher; complain in the term the fault was seen in\n\nThe term of the shard was kept in two places: the batcher set its term\nfrom every decision and signed complaints with it, while the batcher\nrole kept its own term from a buffer-1 state channel and acted on it.\nThe two could drift apart, and a complaint was signed with the term\ncurrent when it was sent, so a decision landing after the fault moved\nthe complaint to the new primary.\n\nKeep the primary and the term only in the batcher, read together by\nCurrentPrimaryAndTerm. The role reads both through a TermProvider each\ntime it starts acting as primary or secondary, and keeps that term as\nthe term it acts in. The decision loop tells the role of a term change\ndirectly, which replaces the state channel and the role's goroutine\nthat read it.\n\nComplaints now carry the term they are about: the verify path passes\nthe term the role acts in, and so does the second-strike timeout, since\nthe pool is restarted whenever the role restarts in a new term.\n\nRename primaryLock to primaryTermLock, since it guards both.\n\nRefs #1401\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nSigned-off-by: Hagar Meir <hagar.meir@ibm.com>",
+    "tree": {
+     "sha": "ebf97d32040c927014924a1ae99ca8730f599da0",
+     "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/git/trees/ebf97d32040c927014924a1ae99ca8730f599da0"
+    },
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/git/commits/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "comment_count": 0,
+    "verification": {
+     "verified": false,
+     "reason": "unsigned",
+     "signature": null,
+     "payload": null,
+     "verified_at": null
+    }
+   },
+   "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+   "html_url": "https://github.com/hyperledger/fabric-x-orderer/commit/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+   "comments_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8/comments",
+   "parents": [
+    {
+     "sha": "2d93a3442ed7345677cc9e99212fa8cfb011279d",
+     "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/2d93a3442ed7345677cc9e99212fa8cfb011279d",
+     "html_url": "https://github.com/hyperledger/fabric-x-orderer/commit/2d93a3442ed7345677cc9e99212fa8cfb011279d"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "HagarMeir",
+    "type": "User"
+   },
+   "committer": {
+    "login": "HagarMeir",
+    "type": "User"
+   },
+   "sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+   "node_id": "C_kwDOPMO5wdoAKDJhODVkOTVkNzU3OGJlMTYwYjAyODNiZmFlMDBiNDgyNDNlZDJkMTY",
+   "commit": {
+    "author": {
+     "name": "Hagar Meir",
+     "email": "hagar.meir@ibm.com",
+     "date": "2026-11-03T13:10:48Z"
+    },
+    "committer": {
+     "name": "Hagar Meir",
+     "email": "hagar.meir@ibm.com",
+     "date": "2026-11-03T13:10:48Z"
+    },
+    "message": "batcher: switch the connectors before resubmitting; set the role's term after the pool restarts\n\nAddress review of the single term source change:\n\n- The decision loop resubmitted the pending BAFs of a term change before\n  it switched the ack and request connectors to the new primary. The role,\n  already notified, restarted as a secondary of the new primary and acked\n  its batches meanwhile, and the ack connector dropped those acks. Now the\n  decision loop notifies the role, switches the connectors, and hands the\n  resubmission to a role goroutine, so it no longer waits for it.\n- The role set its term before restarting the pool, so a second-strike\n  complaint about a request of the previous term could be sent in the new\n  term. The role now sets its term only once the pool is restarted in it.\n- A notification can arrive for the term the role already acts in. The\n  role now re-reads the term and keeps acting instead of restarting in the\n  same term, which would cancel a BAF send in flight.\n- Drop the redundant primary-changed flag, and fix two test comments.\n\nRefs #1401\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nSigned-off-by: Hagar Meir <hagar.meir@ibm.com>",
+    "tree": {
+     "sha": "71e970b0a4a19b16893aa4c75d6fff12effb5da8",
+     "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/git/trees/71e970b0a4a19b16893aa4c75d6fff12effb5da8"
+    },
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/git/commits/2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "comment_count": 0,
+    "verification": {
+     "verified": false,
+     "reason": "unsigned",
+     "signature": null,
+     "payload": null,
+     "verified_at": null
+    }
+   },
+   "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/2a85d95d7578be160b0283bfae00b48243ed2d16",
+   "html_url": "https://github.com/hyperledger/fabric-x-orderer/commit/2a85d95d7578be160b0283bfae00b48243ed2d16",
+   "comments_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/2a85d95d7578be160b0283bfae00b48243ed2d16/comments",
+   "parents": [
+    {
+     "sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+     "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/commits/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+     "html_url": "https://github.com/hyperledger/fabric-x-orderer/commit/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8"
+    }
+   ]
+  }
+ ],
+ "checkRuns": {
+  "2a85d95d7578be160b0283bfae00b48243ed2d16": [
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939518076,
+    "name": "Integration Basic Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSKfA",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "0ec4fc17-b31c-5e83-a7e9-f932d97b6fc5",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939518076",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939518076",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939518076",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:33Z",
+    "completed_at": "2026-11-03T13:19:15Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939518076/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939518014,
+    "name": "Reconfig Membership Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSKPg",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "74dd26aa-3fd1-52e0-b5e9-a7851b498718",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939518014",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939518014",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939518014",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:23:21Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939518014/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517999,
+    "name": "Reconfig Identity Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSKLw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "bae665b9-6341-57ca-8a54-3f0d413bdb8f",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517999",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517999",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517999",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:19:28Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517999/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517989,
+    "name": "Reconfig Endpoints Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSKJQ",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "5b4b1f59-84aa-54cb-89a4-40e330cec50f",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517989",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517989",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517989",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:17:05Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517989/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517963,
+    "name": "Reconfig Configtx Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSKCw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "395cb394-6f5c-5feb-9785-fd14e58aa5ae",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517963",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517963",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517963",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:16:49Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517963/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517925,
+    "name": "Reconfig Params Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSJ5Q",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "1c903e49-c699-590c-895b-9ee6ea0e0bd7",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517925",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517925",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517925",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:16:59Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517925/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517794,
+    "name": "Unit Tests Other",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSJYg",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "bc7ef593-1f50-5dbf-8865-ac0727b96263",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517794",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517794",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517794",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:22:31Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517794/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517741,
+    "name": "Unit Tests Batcher",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSJLQ",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "1694ce1d-4147-5605-b355-3027c48a9d69",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517741",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517741",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517741",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:32Z",
+    "completed_at": "2026-11-03T13:18:45Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517741/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517719,
+    "name": "Unit Tests Consensus",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSJFw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "caefed3e-1f6e-5b27-a182-91fdf6f42827",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517719",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517719",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517719",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:32Z",
+    "completed_at": "2026-11-03T13:29:15Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517719/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517698,
+    "name": "Sample Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSJAg",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "d88e7170-70e4-5ca6-b78a-9afa92b900bc",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517698",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517698",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517698",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:17:02Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517698/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517670,
+    "name": "Integration Fault Tolerance Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSI5g",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "4e298663-a568-5fd0-ab7e-10d36ab8d250",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517670",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517670",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517670",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:18:24Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517670/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517575,
+    "name": "Reconfig Membership Rejoin Single Party",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSIhw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "20560d95-13ea-50e1-b683-47de752c24a2",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517575",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517575",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517575",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:20:03Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517575/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517499,
+    "name": "Reconfig Membership Full Parties Replacement",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSIOw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "c3452c5b-810a-586a-b5c8-6e5e17e16c75",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517499",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517499",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517499",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:31Z",
+    "completed_at": "2026-11-03T13:28:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517499/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125939517494,
+    "name": "Unit Tests Consensus Full Replacement",
+    "node_id": "CR_kwDOPFB4g88AAAAdUpSINg",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "a7a66239-bad4-5576-8a4c-4f1cbe9759a3",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517494",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517494",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125939517494",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:14:32Z",
+    "completed_at": "2026-11-03T13:27:37Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125939517494/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125937758823,
+    "name": "Basic Checks",
+    "node_id": "CR_kwDOPFB4g88AAAAdUnmyZw",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "906468ee-c59d-5889-9553-2f7b4c51a323",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125937758823",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125937758823",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41642053190/job/125937758823",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:11:00Z",
+    "completed_at": "2026-11-03T13:14:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125937758823/annotations"
+    },
+    "check_suite": {
+     "id": 112840303140
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "dco-2"
+    },
+    "id": 125937735449,
+    "name": "DCO",
+    "node_id": "CR_kwDOPFB4g88AAAAdUnlXGQ",
+    "head_sha": "2a85d95d7578be160b0283bfae00b48243ed2d16",
+    "external_id": "1413",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125937735449",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/runs/125937735449",
+    "details_url": "https://github.com/cncf/dco2",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T13:10:53Z",
+    "completed_at": "2026-11-03T13:10:54Z",
+    "output": {
+     "title": "Check passed!",
+     "summary": "All commits are signed off, the check **passed**.\n## Summary\n\n<br />\n\n| | Sha | Message | Pass or fail reason |\n| -- | ---- | :---- | :---- |\n| :green_circle: | [7bde8f1](https://github.com/hyperledger/fabric-x-orderer/commit/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8) |batcher: keep the term only in the batcher; compla...|`Valid sign-off found`|\n| :green_circle: | [2a85d95](https://github.com/hyperledger/fabric-x-orderer/commit/2a85d95d7578be160b0283bfae00b48243ed2d16) |batcher: switch the connectors before resubmitting...|`Valid sign-off found`|\n\n",
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125937735449/annotations"
+    },
+    "check_suite": {
+     "id": 112840287775
+    },
+    "pull_requests": []
+   }
+  ],
+  "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8": [
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130514,
+    "name": "Unit Tests Batcher",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKDEg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "238889c5-70eb-5b83-820d-98cf27a885a8",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130514",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130514",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130514",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:48:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130514/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130452,
+    "name": "Unit Tests Consensus Full Replacement",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKC1A",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "1eddb68d-a1b7-5930-8ed5-94c872d0a8cd",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130452",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130452",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130452",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:52Z",
+    "completed_at": "2026-11-03T10:58:15Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130452/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130450,
+    "name": "Reconfig Identity Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKC0g",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "03426301-8b15-526f-b8e8-4c619d6cc6dd",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130450",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130450",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130450",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:50:42Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130450/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130440,
+    "name": "Reconfig Membership Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKCyA",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "060d062d-5b97-5ab9-ae6d-c8d428c57c01",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130440",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130440",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130440",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:55:10Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130440/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130338,
+    "name": "Integration Basic Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKCYg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "40d9d741-0963-58f4-b943-6410450584b0",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130338",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130338",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130338",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:49:40Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130338/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130306,
+    "name": "Reconfig Params Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKCQg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "1596cf5c-419f-5716-8e52-55d757574438",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130306",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130306",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130306",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:48:13Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130306/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130291,
+    "name": "Sample Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKCMw",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "c44177f9-4ae6-526b-be7e-b2eab9966471",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130291",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130291",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130291",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:52Z",
+    "completed_at": "2026-11-03T10:48:06Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130291/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130241,
+    "name": "Reconfig Configtx Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKCAQ",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "6f8c89a7-d209-593c-b5f6-240f73a6d2a6",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130241",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130241",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130241",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:46:59Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130241/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130238,
+    "name": "Reconfig Endpoints Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKB_g",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "d197ab1f-ebc0-55fb-b898-5acf8e2f2b0f",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130238",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130238",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130238",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:52Z",
+    "completed_at": "2026-11-03T10:47:38Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130238/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130225,
+    "name": "Reconfig Membership Full Parties Replacement",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKB8Q",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "02e2dd85-2a70-55d9-b1ac-5629edac124b",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130225",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130225",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130225",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:58:35Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130225/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130199,
+    "name": "Unit Tests Other",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKB1w",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "5394d2cb-c3a0-5b5a-9b3d-4a35169e2027",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130199",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130199",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130199",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:52:40Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130199/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130182,
+    "name": "Unit Tests Consensus",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKBxg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "8760b832-eb9a-5571-936a-3826c9eff23d",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130182",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130182",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130182",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:59:20Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130182/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130166,
+    "name": "Reconfig Membership Rejoin Single Party",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKBtg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "ba925288-2258-5942-9c13-05219a2e5027",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130166",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130166",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130166",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:52Z",
+    "completed_at": "2026-11-03T10:50:26Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130166/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125869130158,
+    "name": "Integration Fault Tolerance Tests",
+    "node_id": "CR_kwDOPFB4g88AAAAdTmKBrg",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "329748fb-1af5-5834-b7d6-a695110cd67b",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130158",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130158",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125869130158",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:44:51Z",
+    "completed_at": "2026-11-03T10:48:43Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125869130158/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 125867803227,
+    "name": "Basic Checks",
+    "node_id": "CR_kwDOPFB4g88AAAAdTk5CWw",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "ecba8bd4-4bbb-52c4-942c-8ac595b0812f",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125867803227",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125867803227",
+    "details_url": "https://github.com/hyperledger/fabric-x-orderer/actions/runs/41621419852/job/125867803227",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:42:02Z",
+    "completed_at": "2026-11-03T10:44:48Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125867803227/annotations"
+    },
+    "check_suite": {
+     "id": 112783581849
+    },
+    "pull_requests": []
+   },
+   {
+    "app": {
+     "slug": "dco-2"
+    },
+    "id": 125867793096,
+    "name": "DCO",
+    "node_id": "CR_kwDOPFB4g88AAAAdTk4ayA",
+    "head_sha": "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8",
+    "external_id": "1413",
+    "url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125867793096",
+    "html_url": "https://github.com/hyperledger/fabric-x-orderer/runs/125867793096",
+    "details_url": "https://github.com/cncf/dco2",
+    "status": "completed",
+    "conclusion": "success",
+    "started_at": "2026-11-03T10:41:54Z",
+    "completed_at": "2026-11-03T10:41:55Z",
+    "output": {
+     "title": "Check passed!",
+     "summary": "All commits are signed off, the check **passed**.\n## Summary\n\n<br />\n\n| | Sha | Message | Pass or fail reason |\n| -- | ---- | :---- | :---- |\n| :green_circle: | [7bde8f1](https://github.com/hyperledger/fabric-x-orderer/commit/7bde8f11e8a62c5fc71e67c301aa735197e6a8e8) |batcher: keep the term only in the batcher; compla...|`Valid sign-off found`|\n\n",
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/hyperledger/fabric-x-orderer/check-runs/125867793096/annotations"
+    },
+    "check_suite": {
+     "id": 112783576882
+    },
+    "pull_requests": []
+   }
+  ]
+ },
+ "statuses": {
+  "2a85d95d7578be160b0283bfae00b48243ed2d16": [],
+  "7bde8f11e8a62c5fc71e67c301aa735197e6a8e8": []
+ },
+ "logs": {
+  "125939518076": "2026-11-03T13:14:34.8671368Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:34.8672335Z with:\n2026-11-03T13:14:34.8672789Z   fetch-depth: 0\n2026-11-03T13:14:34.8673311Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:34.8677733Z   token: ***\n2026-11-03T13:14:34.8678198Z   ssh-strict: true\n2026-11-03T13:14:34.8678667Z   ssh-user: git\n2026-11-03T13:14:34.8679137Z   persist-credentials: true\n2026-11-03T13:14:34.8679653Z   clean: true\n2026-11-03T13:14:34.8680127Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:34.8680671Z   fetch-tags: false\n2026-11-03T13:14:34.8681149Z   show-progress: true\n2026-11-03T13:14:34.8681619Z   lfs: false\n2026-11-03T13:14:34.8682063Z   submodules: false\n2026-11-03T13:14:34.8682538Z   set-safe-directory: true\n2026-11-03T13:14:34.8683076Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:34.8683924Z env:\n2026-11-03T13:14:34.8684357Z   GOPATH: /opt/go\n2026-11-03T13:14:34.8685011Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:34.8685797Z ##[endgroup]\n2026-11-03T13:14:37.2089340Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:37.2089864Z with:\n2026-11-03T13:14:37.2090298Z   go-version-file: go.mod\n2026-11-03T13:14:37.2091020Z   check-latest: false\n2026-11-03T13:14:37.2094481Z   token: ***\n2026-11-03T13:14:37.2094909Z   cache: true\n2026-11-03T13:14:37.2095308Z env:\n2026-11-03T13:14:37.2095696Z   GOPATH: /opt/go\n2026-11-03T13:14:37.2096282Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:37.2096903Z ##[endgroup]\n2026-11-03T13:14:52.5625637Z ##[group]Run make integration-basic\n2026-11-03T13:14:52.5626074Z \u001b[36;1mmake integration-basic\u001b[0m\n2026-11-03T13:14:52.5657121Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:52.5657650Z env:\n2026-11-03T13:14:52.5657883Z   GOPATH: /opt/go\n2026-11-03T13:14:52.5658236Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:52.5658710Z   GOTOOLCHAIN: local\n2026-11-03T13:14:52.5658954Z ##[endgroup]",
+  "125939518014": "2026-11-03T13:14:32.6572181Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.6573151Z with:\n2026-11-03T13:14:32.6573586Z   fetch-depth: 0\n2026-11-03T13:14:32.6574089Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.6577969Z   token: ***\n2026-11-03T13:14:32.6578417Z   ssh-strict: true\n2026-11-03T13:14:32.6579081Z   ssh-user: git\n2026-11-03T13:14:32.6579546Z   persist-credentials: true\n2026-11-03T13:14:32.6580045Z   clean: true\n2026-11-03T13:14:32.6580597Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.6581138Z   fetch-tags: false\n2026-11-03T13:14:32.6581594Z   show-progress: true\n2026-11-03T13:14:32.6582045Z   lfs: false\n2026-11-03T13:14:32.6582461Z   submodules: false\n2026-11-03T13:14:32.6582917Z   set-safe-directory: true\n2026-11-03T13:14:32.6583434Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.6584275Z env:\n2026-11-03T13:14:32.6584715Z   GOPATH: /opt/go\n2026-11-03T13:14:32.6585357Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.6586124Z ##[endgroup]\n2026-11-03T13:14:35.0127239Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:35.0128550Z with:\n2026-11-03T13:14:35.0129934Z   go-version-file: go.mod\n2026-11-03T13:14:35.0131371Z   check-latest: false\n2026-11-03T13:14:35.0142271Z   token: ***\n2026-11-03T13:14:35.0143280Z   cache: true\n2026-11-03T13:14:35.0144220Z env:\n2026-11-03T13:14:35.0145125Z   GOPATH: /opt/go\n2026-11-03T13:14:35.0146621Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:35.0148411Z ##[endgroup]\n2026-11-03T13:14:50.7403544Z ##[group]Run make integration-reconfig-membership\n2026-11-03T13:14:50.7404033Z \u001b[36;1mmake integration-reconfig-membership\u001b[0m\n2026-11-03T13:14:50.7429769Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:50.7430041Z env:\n2026-11-03T13:14:50.7430238Z   GOPATH: /opt/go\n2026-11-03T13:14:50.7430573Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:50.7430967Z   GOTOOLCHAIN: local\n2026-11-03T13:14:50.7431184Z ##[endgroup]",
+  "125939517999": "2026-11-03T13:14:32.6124616Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.6125092Z with:\n2026-11-03T13:14:32.6125334Z   fetch-depth: 0\n2026-11-03T13:14:32.6125605Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.6127935Z   token: ***\n2026-11-03T13:14:32.6128173Z   ssh-strict: true\n2026-11-03T13:14:32.6128419Z   ssh-user: git\n2026-11-03T13:14:32.6128670Z   persist-credentials: true\n2026-11-03T13:14:32.6128946Z   clean: true\n2026-11-03T13:14:32.6129198Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.6129492Z   fetch-tags: false\n2026-11-03T13:14:32.6129743Z   show-progress: true\n2026-11-03T13:14:32.6129993Z   lfs: false\n2026-11-03T13:14:32.6130224Z   submodules: false\n2026-11-03T13:14:32.6130483Z   set-safe-directory: true\n2026-11-03T13:14:32.6130777Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.6132713Z env:\n2026-11-03T13:14:32.6132982Z   GOPATH: /opt/go\n2026-11-03T13:14:32.6133337Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.6133801Z ##[endgroup]\n2026-11-03T13:14:34.7240751Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:34.7241546Z with:\n2026-11-03T13:14:34.7242148Z   go-version-file: go.mod\n2026-11-03T13:14:34.7243034Z   check-latest: false\n2026-11-03T13:14:34.7249409Z   token: ***\n2026-11-03T13:14:34.7249992Z   cache: true\n2026-11-03T13:14:34.7250544Z env:\n2026-11-03T13:14:34.7251074Z   GOPATH: /opt/go\n2026-11-03T13:14:34.7251950Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:34.7252971Z ##[endgroup]\n2026-11-03T13:14:48.9007251Z ##[group]Run make integration-reconfig-identity\n2026-11-03T13:14:48.9007819Z \u001b[36;1mmake integration-reconfig-identity\u001b[0m\n2026-11-03T13:14:48.9029173Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:48.9029325Z env:\n2026-11-03T13:14:48.9029437Z   GOPATH: /opt/go\n2026-11-03T13:14:48.9029623Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:48.9029833Z   GOTOOLCHAIN: local\n2026-11-03T13:14:48.9029956Z ##[endgroup]",
+  "125939517989": "2026-11-03T13:14:32.5504314Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.5505230Z with:\n2026-11-03T13:14:32.5505912Z   fetch-depth: 0\n2026-11-03T13:14:32.5506408Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.5510072Z   token: ***\n2026-11-03T13:14:32.5510511Z   ssh-strict: true\n2026-11-03T13:14:32.5510951Z   ssh-user: git\n2026-11-03T13:14:32.5511397Z   persist-credentials: true\n2026-11-03T13:14:32.5511894Z   clean: true\n2026-11-03T13:14:32.5512343Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.5512872Z   fetch-tags: false\n2026-11-03T13:14:32.5513318Z   show-progress: true\n2026-11-03T13:14:32.5513768Z   lfs: false\n2026-11-03T13:14:32.5514179Z   submodules: false\n2026-11-03T13:14:32.5514629Z   set-safe-directory: true\n2026-11-03T13:14:32.5515166Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.5516111Z env:\n2026-11-03T13:14:32.5516536Z   GOPATH: /opt/go\n2026-11-03T13:14:32.5517168Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.5517920Z ##[endgroup]\n2026-11-03T13:14:34.8349099Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:34.8349581Z with:\n2026-11-03T13:14:34.8349842Z   go-version-file: go.mod\n2026-11-03T13:14:34.8350366Z   check-latest: false\n2026-11-03T13:14:34.8352843Z   token: ***\n2026-11-03T13:14:34.8353048Z   cache: true\n2026-11-03T13:14:34.8353232Z env:\n2026-11-03T13:14:34.8353408Z   GOPATH: /opt/go\n2026-11-03T13:14:34.8353759Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:34.8354161Z ##[endgroup]\n2026-11-03T13:14:49.4727358Z ##[group]Run make integration-reconfig-endpoints\n2026-11-03T13:14:49.4727818Z \u001b[36;1mmake integration-reconfig-endpoints\u001b[0m\n2026-11-03T13:14:49.4752284Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:49.4752556Z env:\n2026-11-03T13:14:49.4752755Z   GOPATH: /opt/go\n2026-11-03T13:14:49.4753101Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:49.4753505Z   GOTOOLCHAIN: local\n2026-11-03T13:14:49.4753723Z ##[endgroup]",
+  "125939517963": "2026-11-03T13:14:32.7203021Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.7203569Z with:\n2026-11-03T13:14:32.7203870Z   fetch-depth: 0\n2026-11-03T13:14:32.7204195Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.7206668Z   token: ***\n2026-11-03T13:14:32.7206944Z   ssh-strict: true\n2026-11-03T13:14:32.7207232Z   ssh-user: git\n2026-11-03T13:14:32.7207526Z   persist-credentials: true\n2026-11-03T13:14:32.7207845Z   clean: true\n2026-11-03T13:14:32.7208141Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.7208483Z   fetch-tags: false\n2026-11-03T13:14:32.7208783Z   show-progress: true\n2026-11-03T13:14:32.7209076Z   lfs: false\n2026-11-03T13:14:32.7209356Z   submodules: false\n2026-11-03T13:14:32.7209667Z   set-safe-directory: true\n2026-11-03T13:14:32.7209997Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.7210789Z env:\n2026-11-03T13:14:32.7211054Z   GOPATH: /opt/go\n2026-11-03T13:14:32.7211470Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.7211982Z ##[endgroup]\n2026-11-03T13:14:35.0048819Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:35.0049005Z with:\n2026-11-03T13:14:35.0049140Z   go-version-file: go.mod\n2026-11-03T13:14:35.0049512Z   check-latest: false\n2026-11-03T13:14:35.0051350Z   token: ***\n2026-11-03T13:14:35.0051469Z   cache: true\n2026-11-03T13:14:35.0051589Z env:\n2026-11-03T13:14:35.0051706Z   GOPATH: /opt/go\n2026-11-03T13:14:35.0051901Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:35.0052121Z ##[endgroup]\n2026-11-03T13:14:48.3307828Z ##[group]Run make integration-reconfig-configtx\n2026-11-03T13:14:48.3308108Z \u001b[36;1mmake integration-reconfig-configtx\u001b[0m\n2026-11-03T13:14:48.3329329Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:48.3329485Z env:\n2026-11-03T13:14:48.3329604Z   GOPATH: /opt/go\n2026-11-03T13:14:48.3329798Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:48.3330018Z   GOTOOLCHAIN: local\n2026-11-03T13:14:48.3330374Z ##[endgroup]",
+  "125939517925": "2026-11-03T13:14:33.7342907Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.7343931Z with:\n2026-11-03T13:14:33.7344407Z   fetch-depth: 0\n2026-11-03T13:14:33.7344941Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.7349349Z   token: ***\n2026-11-03T13:14:33.7349838Z   ssh-strict: true\n2026-11-03T13:14:33.7350323Z   ssh-user: git\n2026-11-03T13:14:33.7350818Z   persist-credentials: true\n2026-11-03T13:14:33.7351352Z   clean: true\n2026-11-03T13:14:33.7351832Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.7352408Z   fetch-tags: false\n2026-11-03T13:14:33.7353024Z   show-progress: true\n2026-11-03T13:14:33.7353546Z   lfs: false\n2026-11-03T13:14:33.7353997Z   submodules: false\n2026-11-03T13:14:33.7354482Z   set-safe-directory: true\n2026-11-03T13:14:33.7355036Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.7356204Z env:\n2026-11-03T13:14:33.7356678Z   GOPATH: /opt/go\n2026-11-03T13:14:33.7357388Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.7358246Z ##[endgroup]\n2026-11-03T13:14:36.1858535Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:36.1859138Z with:\n2026-11-03T13:14:36.1859579Z   go-version-file: go.mod\n2026-11-03T13:14:36.1860371Z   check-latest: false\n2026-11-03T13:14:36.1864982Z   token: ***\n2026-11-03T13:14:36.1865292Z   cache: true\n2026-11-03T13:14:36.1865865Z env:\n2026-11-03T13:14:36.1866115Z   GOPATH: /opt/go\n2026-11-03T13:14:36.1866542Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:36.1866997Z ##[endgroup]\n2026-11-03T13:14:53.7739239Z ##[group]Run make integration-reconfig-params\n2026-11-03T13:14:53.7739924Z \u001b[36;1mmake integration-reconfig-params\u001b[0m\n2026-11-03T13:14:53.7771939Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:53.7772220Z env:\n2026-11-03T13:14:53.7772434Z   GOPATH: /opt/go\n2026-11-03T13:14:53.7772786Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:53.7773187Z   GOTOOLCHAIN: local\n2026-11-03T13:14:53.7773414Z ##[endgroup]",
+  "125939517794": "2026-11-03T13:14:33.3232145Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.3233130Z with:\n2026-11-03T13:14:33.3233601Z   fetch-depth: 0\n2026-11-03T13:14:33.3234128Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.3238088Z   token: ***\n2026-11-03T13:14:33.3238573Z   ssh-strict: true\n2026-11-03T13:14:33.3239053Z   ssh-user: git\n2026-11-03T13:14:33.3239524Z   persist-credentials: true\n2026-11-03T13:14:33.3240039Z   clean: true\n2026-11-03T13:14:33.3240506Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.3241056Z   fetch-tags: false\n2026-11-03T13:14:33.3241531Z   show-progress: true\n2026-11-03T13:14:33.3242000Z   lfs: false\n2026-11-03T13:14:33.3242434Z   submodules: false\n2026-11-03T13:14:33.3242914Z   set-safe-directory: true\n2026-11-03T13:14:33.3243450Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.3244287Z env:\n2026-11-03T13:14:33.3244745Z   GOPATH: /opt/go\n2026-11-03T13:14:33.3245417Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.3246216Z ##[endgroup]\n2026-11-03T13:14:36.0221395Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:36.0221680Z with:\n2026-11-03T13:14:36.0221887Z   go-version-file: go.mod\n2026-11-03T13:14:36.0222385Z   check-latest: false\n2026-11-03T13:14:36.0224903Z   token: ***\n2026-11-03T13:14:36.0225106Z   cache: true\n2026-11-03T13:14:36.0225294Z env:\n2026-11-03T13:14:36.0225477Z   GOPATH: /opt/go\n2026-11-03T13:14:36.0225803Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:36.0226183Z ##[endgroup]\n2026-11-03T13:14:52.6317380Z ##[group]Run make unit-tests-other\n2026-11-03T13:14:52.6318095Z \u001b[36;1mmake unit-tests-other\u001b[0m\n2026-11-03T13:14:52.6347003Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:52.6347285Z env:\n2026-11-03T13:14:52.6347496Z   GOPATH: /opt/go\n2026-11-03T13:14:52.6348222Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:52.6348624Z   GOTOOLCHAIN: local\n2026-11-03T13:14:52.6348852Z ##[endgroup]",
+  "125939517741": "2026-11-03T13:14:35.1015052Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:35.1016079Z with:\n2026-11-03T13:14:35.1016559Z   fetch-depth: 0\n2026-11-03T13:14:35.1017129Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:35.1021757Z   token: ***\n2026-11-03T13:14:35.1022258Z   ssh-strict: true\n2026-11-03T13:14:35.1022761Z   ssh-user: git\n2026-11-03T13:14:35.1023470Z   persist-credentials: true\n2026-11-03T13:14:35.1024030Z   clean: true\n2026-11-03T13:14:35.1024527Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:35.1025106Z   fetch-tags: false\n2026-11-03T13:14:35.1025598Z   show-progress: true\n2026-11-03T13:14:35.1026096Z   lfs: false\n2026-11-03T13:14:35.1026567Z   submodules: false\n2026-11-03T13:14:35.1027077Z   set-safe-directory: true\n2026-11-03T13:14:35.1027635Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:35.1028513Z env:\n2026-11-03T13:14:35.1028988Z   GOPATH: /opt/go\n2026-11-03T13:14:35.1029709Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:35.1030567Z ##[endgroup]\n2026-11-03T13:14:38.7406194Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:38.7406632Z with:\n2026-11-03T13:14:38.7406905Z   go-version-file: go.mod\n2026-11-03T13:14:38.7407463Z   check-latest: false\n2026-11-03T13:14:38.7410396Z   token: ***\n2026-11-03T13:14:38.7410670Z   cache: true\n2026-11-03T13:14:38.7410927Z env:\n2026-11-03T13:14:38.7411172Z   GOPATH: /opt/go\n2026-11-03T13:14:38.7411585Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:38.7412032Z ##[endgroup]\n2026-11-03T13:15:01.7090524Z ##[group]Run make unit-tests-batcher\n2026-11-03T13:15:01.7090923Z \u001b[36;1mmake unit-tests-batcher\u001b[0m\n2026-11-03T13:15:01.7116748Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:15:01.7117032Z env:\n2026-11-03T13:15:01.7117230Z   GOPATH: /opt/go\n2026-11-03T13:15:01.7117584Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:15:01.7118003Z   GOTOOLCHAIN: local\n2026-11-03T13:15:01.7118222Z ##[endgroup]",
+  "125939517719": "2026-11-03T13:14:33.7411112Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.7412118Z with:\n2026-11-03T13:14:33.7412551Z   fetch-depth: 0\n2026-11-03T13:14:33.7413053Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.7416954Z   token: ***\n2026-11-03T13:14:33.7417395Z   ssh-strict: true\n2026-11-03T13:14:33.7417839Z   ssh-user: git\n2026-11-03T13:14:33.7418294Z   persist-credentials: true\n2026-11-03T13:14:33.7418800Z   clean: true\n2026-11-03T13:14:33.7419253Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.7419782Z   fetch-tags: false\n2026-11-03T13:14:33.7420431Z   show-progress: true\n2026-11-03T13:14:33.7420902Z   lfs: false\n2026-11-03T13:14:33.7421324Z   submodules: false\n2026-11-03T13:14:33.7421783Z   set-safe-directory: true\n2026-11-03T13:14:33.7422302Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.7423089Z env:\n2026-11-03T13:14:33.7423513Z   GOPATH: /opt/go\n2026-11-03T13:14:33.7424161Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.7424948Z ##[endgroup]\n2026-11-03T13:14:36.2772345Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:36.2772633Z with:\n2026-11-03T13:14:36.2772846Z   go-version-file: go.mod\n2026-11-03T13:14:36.2773416Z   check-latest: false\n2026-11-03T13:14:36.2776097Z   token: ***\n2026-11-03T13:14:36.2776289Z   cache: true\n2026-11-03T13:14:36.2776470Z env:\n2026-11-03T13:14:36.2776644Z   GOPATH: /opt/go\n2026-11-03T13:14:36.2776963Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:36.2777349Z ##[endgroup]\n2026-11-03T13:14:50.5359073Z ##[group]Run make unit-tests-consensus\n2026-11-03T13:14:50.5359652Z \u001b[36;1mmake unit-tests-consensus\u001b[0m\n2026-11-03T13:14:50.5393136Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:50.5393559Z env:\n2026-11-03T13:14:50.5393866Z   GOPATH: /opt/go\n2026-11-03T13:14:50.5394419Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:50.5395096Z   GOTOOLCHAIN: local\n2026-11-03T13:14:50.5395465Z ##[endgroup]",
+  "125939517698": "2026-11-03T13:14:33.1138384Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.1138799Z with:\n2026-11-03T13:14:33.1139033Z   fetch-depth: 0\n2026-11-03T13:14:33.1139302Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.1141475Z   token: ***\n2026-11-03T13:14:33.1141712Z   ssh-strict: true\n2026-11-03T13:14:33.1141952Z   ssh-user: git\n2026-11-03T13:14:33.1142195Z   persist-credentials: true\n2026-11-03T13:14:33.1142462Z   clean: true\n2026-11-03T13:14:33.1142708Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.1142997Z   fetch-tags: false\n2026-11-03T13:14:33.1143241Z   show-progress: true\n2026-11-03T13:14:33.1143495Z   lfs: false\n2026-11-03T13:14:33.1143740Z   submodules: false\n2026-11-03T13:14:33.1143990Z   set-safe-directory: true\n2026-11-03T13:14:33.1144270Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.1144631Z env:\n2026-11-03T13:14:33.1144892Z   GOPATH: /opt/go\n2026-11-03T13:14:33.1145248Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.1145690Z ##[endgroup]\n2026-11-03T13:14:35.2999289Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:35.2999810Z with:\n2026-11-03T13:14:35.2999967Z   go-version-file: go.mod\n2026-11-03T13:14:35.3000149Z   check-latest: false\n2026-11-03T13:14:35.3001533Z   token: ***\n2026-11-03T13:14:35.3001677Z   cache: true\n2026-11-03T13:14:35.3001818Z env:\n2026-11-03T13:14:35.3001961Z   GOPATH: /opt/go\n2026-11-03T13:14:35.3002185Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:35.3002433Z ##[endgroup]\n2026-11-03T13:14:48.1142534Z ##[group]Run docker/setup-compose-action@v1\n2026-11-03T13:14:48.1142723Z with:\n2026-11-03T13:14:48.1142843Z   version: latest\n2026-11-03T13:14:48.1142963Z   cache-binary: true\n2026-11-03T13:14:48.1143084Z env:\n2026-11-03T13:14:48.1143194Z   GOPATH: /opt/go\n2026-11-03T13:14:48.1143385Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:48.1143600Z   GOTOOLCHAIN: local\n2026-11-03T13:14:48.1143721Z ##[endgroup]\n2026-11-03T13:14:50.0104194Z ##[group]Run make sample-tests\n2026-11-03T13:14:50.0104418Z \u001b[36;1mmake sample-tests\u001b[0m\n2026-11-03T13:14:50.0123014Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:50.0123166Z env:\n2026-11-03T13:14:50.0123279Z   GOPATH: /opt/go\n2026-11-03T13:14:50.0123470Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:50.0123686Z   GOTOOLCHAIN: local\n2026-11-03T13:14:50.0123815Z ##[endgroup]\n2026-11-03T13:16:17.1259590Z ##[group]Run make build-test-node-image\n2026-11-03T13:16:17.1260150Z \u001b[36;1mmake build-test-node-image\u001b[0m\n2026-11-03T13:16:17.1276093Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:16:17.1276260Z env:\n2026-11-03T13:16:17.1276374Z   GOPATH: /opt/go\n2026-11-03T13:16:17.1276567Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:16:17.1276782Z   GOTOOLCHAIN: local\n2026-11-03T13:16:17.1276910Z ##[endgroup]",
+  "125939517670": "2026-11-03T13:14:32.5724029Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.5725134Z with:\n2026-11-03T13:14:32.5725590Z   fetch-depth: 0\n2026-11-03T13:14:32.5726104Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.5730333Z   token: ***\n2026-11-03T13:14:32.5730801Z   ssh-strict: true\n2026-11-03T13:14:32.5731269Z   ssh-user: git\n2026-11-03T13:14:32.5731747Z   persist-credentials: true\n2026-11-03T13:14:32.5732265Z   clean: true\n2026-11-03T13:14:32.5732732Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.5733276Z   fetch-tags: false\n2026-11-03T13:14:32.5733737Z   show-progress: true\n2026-11-03T13:14:32.5734201Z   lfs: false\n2026-11-03T13:14:32.5734640Z   submodules: false\n2026-11-03T13:14:32.5735226Z   set-safe-directory: true\n2026-11-03T13:14:32.5735759Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.5736498Z env:\n2026-11-03T13:14:32.5736930Z   GOPATH: /opt/go\n2026-11-03T13:14:32.5737578Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.5738358Z ##[endgroup]\n2026-11-03T13:14:34.8292627Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:34.8292934Z with:\n2026-11-03T13:14:34.8293173Z   go-version-file: go.mod\n2026-11-03T13:14:34.8293695Z   check-latest: false\n2026-11-03T13:14:34.8296776Z   token: ***\n2026-11-03T13:14:34.8297027Z   cache: true\n2026-11-03T13:14:34.8297260Z env:\n2026-11-03T13:14:34.8297489Z   GOPATH: /opt/go\n2026-11-03T13:14:34.8297856Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:34.8298265Z ##[endgroup]\n2026-11-03T13:14:49.2360230Z ##[group]Run make integration-faulttolerance\n2026-11-03T13:14:49.2360651Z \u001b[36;1mmake integration-faulttolerance\u001b[0m\n2026-11-03T13:14:49.2388818Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:49.2389125Z env:\n2026-11-03T13:14:49.2389343Z   GOPATH: /opt/go\n2026-11-03T13:14:49.2389704Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:49.2390109Z   GOTOOLCHAIN: local\n2026-11-03T13:14:49.2390355Z ##[endgroup]",
+  "125939517575": "2026-11-03T13:14:33.4078030Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.4079016Z with:\n2026-11-03T13:14:33.4079496Z   fetch-depth: 0\n2026-11-03T13:14:33.4080047Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.4084338Z   token: ***\n2026-11-03T13:14:33.4084830Z   ssh-strict: true\n2026-11-03T13:14:33.4085321Z   ssh-user: git\n2026-11-03T13:14:33.4085823Z   persist-credentials: true\n2026-11-03T13:14:33.4086367Z   clean: true\n2026-11-03T13:14:33.4087069Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.4087678Z   fetch-tags: false\n2026-11-03T13:14:33.4088175Z   show-progress: true\n2026-11-03T13:14:33.4088686Z   lfs: false\n2026-11-03T13:14:33.4089170Z   submodules: false\n2026-11-03T13:14:33.4089691Z   set-safe-directory: true\n2026-11-03T13:14:33.4090250Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.4091094Z env:\n2026-11-03T13:14:33.4091554Z   GOPATH: /opt/go\n2026-11-03T13:14:33.4092250Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.4093098Z ##[endgroup]\n2026-11-03T13:14:37.1721821Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:37.1722184Z with:\n2026-11-03T13:14:37.1722439Z   go-version-file: go.mod\n2026-11-03T13:14:37.1722980Z   check-latest: false\n2026-11-03T13:14:37.1725925Z   token: ***\n2026-11-03T13:14:37.1726201Z   cache: true\n2026-11-03T13:14:37.1726438Z env:\n2026-11-03T13:14:37.1726681Z   GOPATH: /opt/go\n2026-11-03T13:14:37.1727484Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:37.1727936Z ##[endgroup]\n2026-11-03T13:14:54.8879452Z ##[group]Run make integration-reconfig-membership-rejoin-single-party\n2026-11-03T13:14:54.8880078Z \u001b[36;1mmake integration-reconfig-membership-rejoin-single-party\u001b[0m\n2026-11-03T13:14:54.8906228Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:54.8906499Z env:\n2026-11-03T13:14:54.8906694Z   GOPATH: /opt/go\n2026-11-03T13:14:54.8907237Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:54.8907632Z   GOTOOLCHAIN: local\n2026-11-03T13:14:54.8907850Z ##[endgroup]",
+  "125939517499": "2026-11-03T13:14:32.6098838Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:32.6100072Z with:\n2026-11-03T13:14:32.6100546Z   fetch-depth: 0\n2026-11-03T13:14:32.6101090Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:32.6105839Z   token: ***\n2026-11-03T13:14:32.6106312Z   ssh-strict: true\n2026-11-03T13:14:32.6106802Z   ssh-user: git\n2026-11-03T13:14:32.6107284Z   persist-credentials: true\n2026-11-03T13:14:32.6107813Z   clean: true\n2026-11-03T13:14:32.6108295Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:32.6108864Z   fetch-tags: false\n2026-11-03T13:14:32.6109506Z   show-progress: true\n2026-11-03T13:14:32.6110002Z   lfs: false\n2026-11-03T13:14:32.6110452Z   submodules: false\n2026-11-03T13:14:32.6110936Z   set-safe-directory: true\n2026-11-03T13:14:32.6111492Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:32.6112302Z env:\n2026-11-03T13:14:32.6112745Z   GOPATH: /opt/go\n2026-11-03T13:14:32.6113428Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:32.6114267Z ##[endgroup]\n2026-11-03T13:14:34.9109108Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:34.9110016Z with:\n2026-11-03T13:14:34.9110583Z   go-version-file: go.mod\n2026-11-03T13:14:34.9111408Z   check-latest: false\n2026-11-03T13:14:34.9115676Z   token: ***\n2026-11-03T13:14:34.9116156Z   cache: true\n2026-11-03T13:14:34.9116623Z env:\n2026-11-03T13:14:34.9117079Z   GOPATH: /opt/go\n2026-11-03T13:14:34.9117744Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:34.9118493Z ##[endgroup]\n2026-11-03T13:14:49.9878738Z ##[group]Run make integration-reconfig-membership-full-parties-replacement\n2026-11-03T13:14:49.9879858Z \u001b[36;1mmake integration-reconfig-membership-full-parties-replacement\u001b[0m\n2026-11-03T13:14:49.9906183Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:49.9906559Z env:\n2026-11-03T13:14:49.9906835Z   GOPATH: /opt/go\n2026-11-03T13:14:49.9907325Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:49.9907925Z   GOTOOLCHAIN: local\n2026-11-03T13:14:49.9908243Z ##[endgroup]",
+  "125939517494": "2026-11-03T13:14:33.4981612Z ##[group]Run actions/checkout@v5\n2026-11-03T13:14:33.4982038Z with:\n2026-11-03T13:14:33.4982269Z   fetch-depth: 0\n2026-11-03T13:14:33.4982538Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:14:33.4984467Z   token: ***\n2026-11-03T13:14:33.4984703Z   ssh-strict: true\n2026-11-03T13:14:33.4984945Z   ssh-user: git\n2026-11-03T13:14:33.4985197Z   persist-credentials: true\n2026-11-03T13:14:33.4985465Z   clean: true\n2026-11-03T13:14:33.4985713Z   sparse-checkout-cone-mode: true\n2026-11-03T13:14:33.4986002Z   fetch-tags: false\n2026-11-03T13:14:33.4986247Z   show-progress: true\n2026-11-03T13:14:33.4986748Z   lfs: false\n2026-11-03T13:14:33.4986980Z   submodules: false\n2026-11-03T13:14:33.4987226Z   set-safe-directory: true\n2026-11-03T13:14:33.4987504Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:14:33.4987876Z env:\n2026-11-03T13:14:33.4988098Z   GOPATH: /opt/go\n2026-11-03T13:14:33.4988446Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:33.4988860Z ##[endgroup]\n2026-11-03T13:14:35.8314977Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:14:35.8315641Z with:\n2026-11-03T13:14:35.8316142Z   go-version-file: go.mod\n2026-11-03T13:14:35.8316955Z   check-latest: false\n2026-11-03T13:14:35.8322325Z   token: ***\n2026-11-03T13:14:35.8322820Z   cache: true\n2026-11-03T13:14:35.8323307Z env:\n2026-11-03T13:14:35.8323750Z   GOPATH: /opt/go\n2026-11-03T13:14:35.8324512Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:35.8325458Z ##[endgroup]\n2026-11-03T13:14:48.8876707Z ##[group]Run make unit-tests-consensus-full-replacement\n2026-11-03T13:14:48.8877031Z \u001b[36;1mmake unit-tests-consensus-full-replacement\u001b[0m\n2026-11-03T13:14:48.8896842Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:14:48.8897017Z env:\n2026-11-03T13:14:48.8897140Z   GOPATH: /opt/go\n2026-11-03T13:14:48.8897328Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:14:48.8897541Z   GOTOOLCHAIN: local\n2026-11-03T13:14:48.8897672Z ##[endgroup]",
+  "125937758823": "2026-11-03T13:11:02.4569000Z ##[group]Run actions/checkout@v5\n2026-11-03T13:11:02.4570066Z with:\n2026-11-03T13:11:02.4570566Z   fetch-depth: 0\n2026-11-03T13:11:02.4571359Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T13:11:02.4575431Z   token: ***\n2026-11-03T13:11:02.4575925Z   ssh-strict: true\n2026-11-03T13:11:02.4576427Z   ssh-user: git\n2026-11-03T13:11:02.4576936Z   persist-credentials: true\n2026-11-03T13:11:02.4577486Z   clean: true\n2026-11-03T13:11:02.4577989Z   sparse-checkout-cone-mode: true\n2026-11-03T13:11:02.4578574Z   fetch-tags: false\n2026-11-03T13:11:02.4579131Z   show-progress: true\n2026-11-03T13:11:02.4579649Z   lfs: false\n2026-11-03T13:11:02.4580125Z   submodules: false\n2026-11-03T13:11:02.4580655Z   set-safe-directory: true\n2026-11-03T13:11:02.4581436Z   allow-unsafe-pr-checkout: false\n2026-11-03T13:11:02.4582403Z env:\n2026-11-03T13:11:02.4582884Z   GOPATH: /opt/go\n2026-11-03T13:11:02.4583599Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:02.4584475Z ##[endgroup]\n2026-11-03T13:11:05.1754543Z ##[group]Run actions/setup-go@v6\n2026-11-03T13:11:05.1754835Z with:\n2026-11-03T13:11:05.1755043Z   go-version-file: go.mod\n2026-11-03T13:11:05.1755530Z   check-latest: false\n2026-11-03T13:11:05.1757906Z   token: ***\n2026-11-03T13:11:05.1758112Z   cache: true\n2026-11-03T13:11:05.1758297Z env:\n2026-11-03T13:11:05.1758475Z   GOPATH: /opt/go\n2026-11-03T13:11:05.1758799Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:05.1759186Z ##[endgroup]\n2026-11-03T13:11:22.2186175Z ##[group]Run go install golang.org/x/tools/cmd/goimports@latest\n2026-11-03T13:11:22.2186755Z \u001b[36;1mgo install golang.org/x/tools/cmd/goimports@latest\u001b[0m\n2026-11-03T13:11:22.2213912Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:11:22.2214207Z env:\n2026-11-03T13:11:22.2214410Z   GOPATH: /opt/go\n2026-11-03T13:11:22.2214753Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:22.2215160Z   GOTOOLCHAIN: local\n2026-11-03T13:11:22.2215390Z ##[endgroup]\n2026-11-03T13:11:23.3194365Z ##[group]Run go install mvdan.cc/gofumpt@latest\n2026-11-03T13:11:23.3194785Z \u001b[36;1mgo install mvdan.cc/gofumpt@latest\u001b[0m\n2026-11-03T13:11:23.3215763Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:11:23.3216031Z env:\n2026-11-03T13:11:23.3216232Z   GOPATH: /opt/go\n2026-11-03T13:11:23.3216717Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:23.3217141Z   GOTOOLCHAIN: local\n2026-11-03T13:11:23.3217364Z ##[endgroup]\n2026-11-03T13:11:24.6826212Z ##[group]Run go install honnef.co/go/tools/cmd/staticcheck@latest\n2026-11-03T13:11:24.6826718Z \u001b[36;1mgo install honnef.co/go/tools/cmd/staticcheck@latest\u001b[0m\n2026-11-03T13:11:24.6846648Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:11:24.6846906Z env:\n2026-11-03T13:11:24.6847103Z   GOPATH: /opt/go\n2026-11-03T13:11:24.6847439Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:24.6847846Z   GOTOOLCHAIN: local\n2026-11-03T13:11:24.6848063Z ##[endgroup]\n2026-11-03T13:11:41.6545167Z ##[group]Run go install github.com/golang/protobuf/protoc-gen-go@latest\n2026-11-03T13:11:41.6545722Z \u001b[36;1mgo install github.com/golang/protobuf/protoc-gen-go@latest\u001b[0m\n2026-11-03T13:11:41.6566187Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:11:41.6566447Z env:\n2026-11-03T13:11:41.6566656Z   GOPATH: /opt/go\n2026-11-03T13:11:41.6567000Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:41.6567417Z   GOTOOLCHAIN: local\n2026-11-03T13:11:41.6567674Z ##[endgroup]\n2026-11-03T13:11:45.0067317Z ##[group]Run make basic-checks\n2026-11-03T13:11:45.0067699Z \u001b[36;1mmake basic-checks\u001b[0m\n2026-11-03T13:11:45.0087292Z shell: /usr/bin/bash -e {0}\n2026-11-03T13:11:45.0087552Z env:\n2026-11-03T13:11:45.0087750Z   GOPATH: /opt/go\n2026-11-03T13:11:45.0088089Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T13:11:45.0088493Z   GOTOOLCHAIN: local\n2026-11-03T13:11:45.0088727Z ##[endgroup]",
+  "125869130514": "2026-11-03T10:44:53.0966645Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.0967068Z with:\n2026-11-03T10:44:53.0967299Z   fetch-depth: 0\n2026-11-03T10:44:53.0967565Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.0969775Z   token: ***\n2026-11-03T10:44:53.0969998Z   ssh-strict: true\n2026-11-03T10:44:53.0970230Z   ssh-user: git\n2026-11-03T10:44:53.0970467Z   persist-credentials: true\n2026-11-03T10:44:53.0970725Z   clean: true\n2026-11-03T10:44:53.0970968Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.0971241Z   fetch-tags: false\n2026-11-03T10:44:53.0971478Z   show-progress: true\n2026-11-03T10:44:53.0971717Z   lfs: false\n2026-11-03T10:44:53.0971936Z   submodules: false\n2026-11-03T10:44:53.0972174Z   set-safe-directory: true\n2026-11-03T10:44:53.0972446Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.0972777Z env:\n2026-11-03T10:44:53.0972992Z   GOPATH: /opt/go\n2026-11-03T10:44:53.0973326Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.0973736Z ##[endgroup]\n2026-11-03T10:44:55.1617628Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.1618370Z with:\n2026-11-03T10:44:55.1618928Z   go-version-file: go.mod\n2026-11-03T10:44:55.1619738Z   check-latest: false\n2026-11-03T10:44:55.1625706Z   token: ***\n2026-11-03T10:44:55.1626263Z   cache: true\n2026-11-03T10:44:55.1626807Z env:\n2026-11-03T10:44:55.1627317Z   GOPATH: /opt/go\n2026-11-03T10:44:55.1628135Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.1629118Z ##[endgroup]\n2026-11-03T10:45:08.2795133Z ##[group]Run make unit-tests-batcher\n2026-11-03T10:45:08.2795478Z \u001b[36;1mmake unit-tests-batcher\u001b[0m\n2026-11-03T10:45:08.2814659Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:08.2814811Z env:\n2026-11-03T10:45:08.2814923Z   GOPATH: /opt/go\n2026-11-03T10:45:08.2815105Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:08.2815430Z   GOTOOLCHAIN: local\n2026-11-03T10:45:08.2815552Z ##[endgroup]",
+  "125869130452": "2026-11-03T10:44:53.7672889Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.7673565Z with:\n2026-11-03T10:44:53.7674081Z   fetch-depth: 0\n2026-11-03T10:44:53.7674487Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.7677676Z   token: ***\n2026-11-03T10:44:53.7678030Z   ssh-strict: true\n2026-11-03T10:44:53.7678401Z   ssh-user: git\n2026-11-03T10:44:53.7678768Z   persist-credentials: true\n2026-11-03T10:44:53.7679161Z   clean: true\n2026-11-03T10:44:53.7679519Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.7679942Z   fetch-tags: false\n2026-11-03T10:44:53.7680305Z   show-progress: true\n2026-11-03T10:44:53.7680679Z   lfs: false\n2026-11-03T10:44:53.7681010Z   submodules: false\n2026-11-03T10:44:53.7681371Z   set-safe-directory: true\n2026-11-03T10:44:53.7681777Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.7682334Z env:\n2026-11-03T10:44:53.7682662Z   GOPATH: /opt/go\n2026-11-03T10:44:53.7683158Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.7683764Z ##[endgroup]\n2026-11-03T10:44:55.9673781Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.9674800Z with:\n2026-11-03T10:44:55.9675497Z   go-version-file: go.mod\n2026-11-03T10:44:55.9676480Z   check-latest: false\n2026-11-03T10:44:55.9683422Z   token: ***\n2026-11-03T10:44:55.9684221Z   cache: true\n2026-11-03T10:44:55.9684910Z env:\n2026-11-03T10:44:55.9685563Z   GOPATH: /opt/go\n2026-11-03T10:44:55.9686581Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.9687769Z ##[endgroup]\n2026-11-03T10:45:13.8076533Z ##[group]Run make unit-tests-consensus-full-replacement\n2026-11-03T10:45:13.8076975Z \u001b[36;1mmake unit-tests-consensus-full-replacement\u001b[0m\n2026-11-03T10:45:13.8098881Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:13.8099113Z env:\n2026-11-03T10:45:13.8099286Z   GOPATH: /opt/go\n2026-11-03T10:45:13.8099567Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:13.8099905Z   GOTOOLCHAIN: local\n2026-11-03T10:45:13.8100095Z ##[endgroup]",
+  "125869130450": "2026-11-03T10:44:54.0397116Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:54.0398134Z with:\n2026-11-03T10:44:54.0398872Z   fetch-depth: 0\n2026-11-03T10:44:54.0399453Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:54.0403452Z   token: ***\n2026-11-03T10:44:54.0403946Z   ssh-strict: true\n2026-11-03T10:44:54.0404484Z   ssh-user: git\n2026-11-03T10:44:54.0405030Z   persist-credentials: true\n2026-11-03T10:44:54.0405622Z   clean: true\n2026-11-03T10:44:54.0406174Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:54.0406797Z   fetch-tags: false\n2026-11-03T10:44:54.0407332Z   show-progress: true\n2026-11-03T10:44:54.0407872Z   lfs: false\n2026-11-03T10:44:54.0408383Z   submodules: false\n2026-11-03T10:44:54.0409458Z   set-safe-directory: true\n2026-11-03T10:44:54.0410110Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:54.0411620Z env:\n2026-11-03T10:44:54.0412981Z   GOPATH: /opt/go\n2026-11-03T10:44:54.0413717Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:54.0414633Z ##[endgroup]\n2026-11-03T10:44:57.3351262Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:57.3351550Z with:\n2026-11-03T10:44:57.3351769Z   go-version-file: go.mod\n2026-11-03T10:44:57.3352188Z   check-latest: false\n2026-11-03T10:44:57.3354523Z   token: ***\n2026-11-03T10:44:57.3354730Z   cache: true\n2026-11-03T10:44:57.3354930Z env:\n2026-11-03T10:44:57.3355140Z   GOPATH: /opt/go\n2026-11-03T10:44:57.3355476Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:57.3355862Z ##[endgroup]\n2026-11-03T10:45:12.0234213Z ##[group]Run make integration-reconfig-identity\n2026-11-03T10:45:12.0234696Z \u001b[36;1mmake integration-reconfig-identity\u001b[0m\n2026-11-03T10:45:12.0253881Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:12.0254152Z env:\n2026-11-03T10:45:12.0254358Z   GOPATH: /opt/go\n2026-11-03T10:45:12.0254706Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:12.0255079Z   GOTOOLCHAIN: local\n2026-11-03T10:45:12.0255294Z ##[endgroup]",
+  "125869130440": "2026-11-03T10:44:53.4512430Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.4513343Z with:\n2026-11-03T10:44:53.4513782Z   fetch-depth: 0\n2026-11-03T10:44:53.4514271Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.4518288Z   token: ***\n2026-11-03T10:44:53.4518726Z   ssh-strict: true\n2026-11-03T10:44:53.4519182Z   ssh-user: git\n2026-11-03T10:44:53.4519631Z   persist-credentials: true\n2026-11-03T10:44:53.4520342Z   clean: true\n2026-11-03T10:44:53.4520824Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.4521360Z   fetch-tags: false\n2026-11-03T10:44:53.4521818Z   show-progress: true\n2026-11-03T10:44:53.4522278Z   lfs: false\n2026-11-03T10:44:53.4522704Z   submodules: false\n2026-11-03T10:44:53.4523167Z   set-safe-directory: true\n2026-11-03T10:44:53.4523679Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.4524459Z env:\n2026-11-03T10:44:53.4524879Z   GOPATH: /opt/go\n2026-11-03T10:44:53.4525517Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.4526289Z ##[endgroup]\n2026-11-03T10:44:55.7092122Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.7092667Z with:\n2026-11-03T10:44:55.7093080Z   go-version-file: go.mod\n2026-11-03T10:44:55.7093714Z   check-latest: false\n2026-11-03T10:44:55.7096900Z   token: ***\n2026-11-03T10:44:55.7097294Z   cache: true\n2026-11-03T10:44:55.7097668Z env:\n2026-11-03T10:44:55.7098029Z   GOPATH: /opt/go\n2026-11-03T10:44:55.7098577Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.7099196Z ##[endgroup]\n2026-11-03T10:45:10.5033252Z ##[group]Run make integration-reconfig-membership\n2026-11-03T10:45:10.5033926Z \u001b[36;1mmake integration-reconfig-membership\u001b[0m\n2026-11-03T10:45:10.5060816Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:10.5061118Z env:\n2026-11-03T10:45:10.5061325Z   GOPATH: /opt/go\n2026-11-03T10:45:10.5061815Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:10.5062229Z   GOTOOLCHAIN: local\n2026-11-03T10:45:10.5062456Z ##[endgroup]",
+  "125869130338": "2026-11-03T10:44:53.0934675Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.0935636Z with:\n2026-11-03T10:44:53.0936073Z   fetch-depth: 0\n2026-11-03T10:44:53.0936573Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.0940426Z   token: ***\n2026-11-03T10:44:53.0940882Z   ssh-strict: true\n2026-11-03T10:44:53.0941339Z   ssh-user: git\n2026-11-03T10:44:53.0941802Z   persist-credentials: true\n2026-11-03T10:44:53.0942315Z   clean: true\n2026-11-03T10:44:53.0942781Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.0943315Z   fetch-tags: false\n2026-11-03T10:44:53.0943974Z   show-progress: true\n2026-11-03T10:44:53.0944451Z   lfs: false\n2026-11-03T10:44:53.0944883Z   submodules: false\n2026-11-03T10:44:53.0945342Z   set-safe-directory: true\n2026-11-03T10:44:53.0945869Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.0946643Z env:\n2026-11-03T10:44:53.0947061Z   GOPATH: /opt/go\n2026-11-03T10:44:53.0947702Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.0948474Z ##[endgroup]\n2026-11-03T10:44:55.2838450Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.2838769Z with:\n2026-11-03T10:44:55.2838996Z   go-version-file: go.mod\n2026-11-03T10:44:55.2839557Z   check-latest: false\n2026-11-03T10:44:55.2842199Z   token: ***\n2026-11-03T10:44:55.2842418Z   cache: true\n2026-11-03T10:44:55.2842623Z env:\n2026-11-03T10:44:55.2842825Z   GOPATH: /opt/go\n2026-11-03T10:44:55.2843182Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.2843592Z ##[endgroup]\n2026-11-03T10:45:09.3909857Z ##[group]Run make integration-basic\n2026-11-03T10:45:09.3910219Z \u001b[36;1mmake integration-basic\u001b[0m\n2026-11-03T10:45:09.3935484Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:09.3935754Z env:\n2026-11-03T10:45:09.3935951Z   GOPATH: /opt/go\n2026-11-03T10:45:09.3936317Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:09.3936731Z   GOTOOLCHAIN: local\n2026-11-03T10:45:09.3936955Z ##[endgroup]",
+  "125869130306": "2026-11-03T10:44:53.1683039Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.1683508Z with:\n2026-11-03T10:44:53.1683759Z   fetch-depth: 0\n2026-11-03T10:44:53.1684043Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.1686401Z   token: ***\n2026-11-03T10:44:53.1686653Z   ssh-strict: true\n2026-11-03T10:44:53.1686911Z   ssh-user: git\n2026-11-03T10:44:53.1687172Z   persist-credentials: true\n2026-11-03T10:44:53.1687531Z   clean: true\n2026-11-03T10:44:53.1687793Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.1688095Z   fetch-tags: false\n2026-11-03T10:44:53.1688358Z   show-progress: true\n2026-11-03T10:44:53.1688618Z   lfs: false\n2026-11-03T10:44:53.1688862Z   submodules: false\n2026-11-03T10:44:53.1689122Z   set-safe-directory: true\n2026-11-03T10:44:53.1689417Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.1689807Z env:\n2026-11-03T10:44:53.1690045Z   GOPATH: /opt/go\n2026-11-03T10:44:53.1690406Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.1690840Z ##[endgroup]\n2026-11-03T10:44:55.5428473Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.5428809Z with:\n2026-11-03T10:44:55.5429082Z   go-version-file: go.mod\n2026-11-03T10:44:55.5429499Z   check-latest: false\n2026-11-03T10:44:55.5431236Z   token: ***\n2026-11-03T10:44:55.5431487Z   cache: true\n2026-11-03T10:44:55.5431725Z env:\n2026-11-03T10:44:55.5431969Z   GOPATH: /opt/go\n2026-11-03T10:44:55.5432325Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.5432692Z ##[endgroup]\n2026-11-03T10:45:08.3979104Z ##[group]Run make integration-reconfig-params\n2026-11-03T10:45:08.3979543Z \u001b[36;1mmake integration-reconfig-params\u001b[0m\n2026-11-03T10:45:08.4006929Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:08.4007178Z env:\n2026-11-03T10:45:08.4007362Z   GOPATH: /opt/go\n2026-11-03T10:45:08.4007662Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:08.4008007Z   GOTOOLCHAIN: local\n2026-11-03T10:45:08.4008206Z ##[endgroup]",
+  "125869130291": "2026-11-03T10:44:54.6849338Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:54.6850331Z with:\n2026-11-03T10:44:54.6850810Z   fetch-depth: 0\n2026-11-03T10:44:54.6851347Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:54.6855430Z   token: ***\n2026-11-03T10:44:54.6855912Z   ssh-strict: true\n2026-11-03T10:44:54.6856607Z   ssh-user: git\n2026-11-03T10:44:54.6857136Z   persist-credentials: true\n2026-11-03T10:44:54.6857696Z   clean: true\n2026-11-03T10:44:54.6858193Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:54.6858792Z   fetch-tags: false\n2026-11-03T10:44:54.6859293Z   show-progress: true\n2026-11-03T10:44:54.6859853Z   lfs: false\n2026-11-03T10:44:54.6860328Z   submodules: false\n2026-11-03T10:44:54.6860843Z   set-safe-directory: true\n2026-11-03T10:44:54.6861404Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:54.6862272Z env:\n2026-11-03T10:44:54.6862733Z   GOPATH: /opt/go\n2026-11-03T10:44:54.6863436Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:54.6864309Z ##[endgroup]\n2026-11-03T10:44:57.3285910Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:57.3286618Z with:\n2026-11-03T10:44:57.3286830Z   go-version-file: go.mod\n2026-11-03T10:44:57.3287070Z   check-latest: false\n2026-11-03T10:44:57.3289567Z   token: ***\n2026-11-03T10:44:57.3289773Z   cache: true\n2026-11-03T10:44:57.3289960Z env:\n2026-11-03T10:44:57.3290142Z   GOPATH: /opt/go\n2026-11-03T10:44:57.3290470Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:57.3290875Z ##[endgroup]\n2026-11-03T10:45:15.2940253Z ##[group]Run docker/setup-compose-action@v1\n2026-11-03T10:45:15.2940619Z with:\n2026-11-03T10:45:15.2940821Z   version: latest\n2026-11-03T10:45:15.2941036Z   cache-binary: true\n2026-11-03T10:45:15.2941252Z env:\n2026-11-03T10:45:15.2941435Z   GOPATH: /opt/go\n2026-11-03T10:45:15.2941767Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:15.2942161Z   GOTOOLCHAIN: local\n2026-11-03T10:45:15.2942376Z ##[endgroup]\n2026-11-03T10:45:17.8930681Z ##[group]Run make sample-tests\n2026-11-03T10:45:17.8931062Z \u001b[36;1mmake sample-tests\u001b[0m\n2026-11-03T10:45:17.8954533Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:17.8954808Z env:\n2026-11-03T10:45:17.8955011Z   GOPATH: /opt/go\n2026-11-03T10:45:17.8955388Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:17.8955802Z   GOTOOLCHAIN: local\n2026-11-03T10:45:17.8956030Z ##[endgroup]\n2026-11-03T10:46:57.8539319Z ##[group]Run make build-test-node-image\n2026-11-03T10:46:57.8539867Z \u001b[36;1mmake build-test-node-image\u001b[0m\n2026-11-03T10:46:57.8563679Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:46:57.8563943Z env:\n2026-11-03T10:46:57.8564143Z   GOPATH: /opt/go\n2026-11-03T10:46:57.8564487Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:46:57.8564884Z   GOTOOLCHAIN: local\n2026-11-03T10:46:57.8565111Z ##[endgroup]",
+  "125869130241": "2026-11-03T10:44:53.0799289Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.0799693Z with:\n2026-11-03T10:44:53.0799913Z   fetch-depth: 0\n2026-11-03T10:44:53.0800168Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.0802238Z   token: ***\n2026-11-03T10:44:53.0802465Z   ssh-strict: true\n2026-11-03T10:44:53.0802701Z   ssh-user: git\n2026-11-03T10:44:53.0802943Z   persist-credentials: true\n2026-11-03T10:44:53.0803201Z   clean: true\n2026-11-03T10:44:53.0803436Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.0803711Z   fetch-tags: false\n2026-11-03T10:44:53.0803948Z   show-progress: true\n2026-11-03T10:44:53.0804185Z   lfs: false\n2026-11-03T10:44:53.0804406Z   submodules: false\n2026-11-03T10:44:53.0804646Z   set-safe-directory: true\n2026-11-03T10:44:53.0804913Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.0805254Z env:\n2026-11-03T10:44:53.0805468Z   GOPATH: /opt/go\n2026-11-03T10:44:53.0805806Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.0806200Z ##[endgroup]\n2026-11-03T10:44:55.0847108Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.0847835Z with:\n2026-11-03T10:44:55.0848408Z   go-version-file: go.mod\n2026-11-03T10:44:55.0849219Z   check-latest: false\n2026-11-03T10:44:55.0854976Z   token: ***\n2026-11-03T10:44:55.0855536Z   cache: true\n2026-11-03T10:44:55.0856072Z env:\n2026-11-03T10:44:55.0856574Z   GOPATH: /opt/go\n2026-11-03T10:44:55.0857414Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.0858406Z ##[endgroup]\n2026-11-03T10:45:08.2025593Z ##[group]Run make integration-reconfig-configtx\n2026-11-03T10:45:08.2025990Z \u001b[36;1mmake integration-reconfig-configtx\u001b[0m\n2026-11-03T10:45:08.2049617Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:08.2049766Z env:\n2026-11-03T10:45:08.2049880Z   GOPATH: /opt/go\n2026-11-03T10:45:08.2050067Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:08.2050276Z   GOTOOLCHAIN: local\n2026-11-03T10:45:08.2050398Z ##[endgroup]",
+  "125869130238": "2026-11-03T10:44:54.3046568Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:54.3047515Z with:\n2026-11-03T10:44:54.3047955Z   fetch-depth: 0\n2026-11-03T10:44:54.3048458Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:54.3052581Z   token: ***\n2026-11-03T10:44:54.3053028Z   ssh-strict: true\n2026-11-03T10:44:54.3053479Z   ssh-user: git\n2026-11-03T10:44:54.3053925Z   persist-credentials: true\n2026-11-03T10:44:54.3054423Z   clean: true\n2026-11-03T10:44:54.3055165Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:54.3055721Z   fetch-tags: false\n2026-11-03T10:44:54.3056180Z   show-progress: true\n2026-11-03T10:44:54.3056638Z   lfs: false\n2026-11-03T10:44:54.3057057Z   submodules: false\n2026-11-03T10:44:54.3057663Z   set-safe-directory: true\n2026-11-03T10:44:54.3058190Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:54.3059022Z env:\n2026-11-03T10:44:54.3059447Z   GOPATH: /opt/go\n2026-11-03T10:44:54.3060095Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:54.3060878Z ##[endgroup]\n2026-11-03T10:44:57.1018967Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:57.1019443Z with:\n2026-11-03T10:44:57.1019791Z   go-version-file: go.mod\n2026-11-03T10:44:57.1020602Z   check-latest: false\n2026-11-03T10:44:57.1026587Z   token: ***\n2026-11-03T10:44:57.1026957Z   cache: true\n2026-11-03T10:44:57.1027294Z env:\n2026-11-03T10:44:57.1027610Z   GOPATH: /opt/go\n2026-11-03T10:44:57.1028163Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:57.1028570Z ##[endgroup]\n2026-11-03T10:45:18.0835475Z ##[group]Run make integration-reconfig-endpoints\n2026-11-03T10:45:18.0835949Z \u001b[36;1mmake integration-reconfig-endpoints\u001b[0m\n2026-11-03T10:45:18.0861953Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:18.0862220Z env:\n2026-11-03T10:45:18.0862415Z   GOPATH: /opt/go\n2026-11-03T10:45:18.0862746Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:18.0863148Z   GOTOOLCHAIN: local\n2026-11-03T10:45:18.0863364Z ##[endgroup]",
+  "125869130225": "2026-11-03T10:44:53.2612297Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.2612735Z with:\n2026-11-03T10:44:53.2612978Z   fetch-depth: 0\n2026-11-03T10:44:53.2613263Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.2615657Z   token: ***\n2026-11-03T10:44:53.2615900Z   ssh-strict: true\n2026-11-03T10:44:53.2616156Z   ssh-user: git\n2026-11-03T10:44:53.2616417Z   persist-credentials: true\n2026-11-03T10:44:53.2616856Z   clean: true\n2026-11-03T10:44:53.2617116Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.2617415Z   fetch-tags: false\n2026-11-03T10:44:53.2617672Z   show-progress: true\n2026-11-03T10:44:53.2617930Z   lfs: false\n2026-11-03T10:44:53.2618180Z   submodules: false\n2026-11-03T10:44:53.2618446Z   set-safe-directory: true\n2026-11-03T10:44:53.2618738Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.2619111Z env:\n2026-11-03T10:44:53.2619345Z   GOPATH: /opt/go\n2026-11-03T10:44:53.2619705Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.2620159Z ##[endgroup]\n2026-11-03T10:44:55.3565624Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.3566331Z with:\n2026-11-03T10:44:55.3567121Z   go-version-file: go.mod\n2026-11-03T10:44:55.3567884Z   check-latest: false\n2026-11-03T10:44:55.3574021Z   token: ***\n2026-11-03T10:44:55.3574566Z   cache: true\n2026-11-03T10:44:55.3575098Z env:\n2026-11-03T10:44:55.3575608Z   GOPATH: /opt/go\n2026-11-03T10:44:55.3576457Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.3577580Z ##[endgroup]\n2026-11-03T10:45:08.0430482Z ##[group]Run make integration-reconfig-membership-full-parties-replacement\n2026-11-03T10:45:08.0431035Z \u001b[36;1mmake integration-reconfig-membership-full-parties-replacement\u001b[0m\n2026-11-03T10:45:08.0456938Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:08.0457167Z env:\n2026-11-03T10:45:08.0457336Z   GOPATH: /opt/go\n2026-11-03T10:45:08.0457622Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:08.0457952Z   GOTOOLCHAIN: local\n2026-11-03T10:45:08.0458142Z ##[endgroup]",
+  "125869130199": "2026-11-03T10:44:53.6216838Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.6217773Z with:\n2026-11-03T10:44:53.6218252Z   fetch-depth: 0\n2026-11-03T10:44:53.6218795Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.6223626Z   token: ***\n2026-11-03T10:44:53.6224470Z   ssh-strict: true\n2026-11-03T10:44:53.6225304Z   ssh-user: git\n2026-11-03T10:44:53.6226055Z   persist-credentials: true\n2026-11-03T10:44:53.6226607Z   clean: true\n2026-11-03T10:44:53.6227108Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.6227697Z   fetch-tags: false\n2026-11-03T10:44:53.6228219Z   show-progress: true\n2026-11-03T10:44:53.6228748Z   lfs: false\n2026-11-03T10:44:53.6229227Z   submodules: false\n2026-11-03T10:44:53.6229948Z   set-safe-directory: true\n2026-11-03T10:44:53.6230957Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.6231902Z env:\n2026-11-03T10:44:53.6232408Z   GOPATH: /opt/go\n2026-11-03T10:44:53.6233110Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.6233958Z ##[endgroup]\n2026-11-03T10:44:56.0467827Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:56.0468169Z with:\n2026-11-03T10:44:56.0468437Z   go-version-file: go.mod\n2026-11-03T10:44:56.0468913Z   check-latest: false\n2026-11-03T10:44:56.0472038Z   token: ***\n2026-11-03T10:44:56.0472335Z   cache: true\n2026-11-03T10:44:56.0472599Z env:\n2026-11-03T10:44:56.0472844Z   GOPATH: /opt/go\n2026-11-03T10:44:56.0473246Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:56.0473691Z ##[endgroup]\n2026-11-03T10:45:10.3841896Z ##[group]Run make unit-tests-other\n2026-11-03T10:45:10.3842319Z \u001b[36;1mmake unit-tests-other\u001b[0m\n2026-11-03T10:45:10.3869700Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:10.3870008Z env:\n2026-11-03T10:45:10.3870224Z   GOPATH: /opt/go\n2026-11-03T10:45:10.3870827Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:10.3871236Z   GOTOOLCHAIN: local\n2026-11-03T10:45:10.3871472Z ##[endgroup]",
+  "125869130182": "2026-11-03T10:44:53.7596224Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.7596970Z with:\n2026-11-03T10:44:53.7597358Z   fetch-depth: 0\n2026-11-03T10:44:53.7597815Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.7601274Z   token: ***\n2026-11-03T10:44:53.7601667Z   ssh-strict: true\n2026-11-03T10:44:53.7602063Z   ssh-user: git\n2026-11-03T10:44:53.7602462Z   persist-credentials: true\n2026-11-03T10:44:53.7602893Z   clean: true\n2026-11-03T10:44:53.7603295Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.7603755Z   fetch-tags: false\n2026-11-03T10:44:53.7604164Z   show-progress: true\n2026-11-03T10:44:53.7604557Z   lfs: false\n2026-11-03T10:44:53.7604932Z   submodules: false\n2026-11-03T10:44:53.7605337Z   set-safe-directory: true\n2026-11-03T10:44:53.7605785Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.7606421Z env:\n2026-11-03T10:44:53.7606779Z   GOPATH: /opt/go\n2026-11-03T10:44:53.7607349Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.7608032Z ##[endgroup]\n2026-11-03T10:44:56.2799734Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:56.2800069Z with:\n2026-11-03T10:44:56.2800298Z   go-version-file: go.mod\n2026-11-03T10:44:56.2800749Z   check-latest: false\n2026-11-03T10:44:56.2803037Z   token: ***\n2026-11-03T10:44:56.2803261Z   cache: true\n2026-11-03T10:44:56.2803482Z env:\n2026-11-03T10:44:56.2803687Z   GOPATH: /opt/go\n2026-11-03T10:44:56.2804018Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:56.2804381Z ##[endgroup]\n2026-11-03T10:45:12.9576078Z ##[group]Run make unit-tests-consensus\n2026-11-03T10:45:12.9576557Z \u001b[36;1mmake unit-tests-consensus\u001b[0m\n2026-11-03T10:45:12.9602045Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:12.9602274Z env:\n2026-11-03T10:45:12.9602440Z   GOPATH: /opt/go\n2026-11-03T10:45:12.9602725Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:12.9603064Z   GOTOOLCHAIN: local\n2026-11-03T10:45:12.9603250Z ##[endgroup]",
+  "125869130166": "2026-11-03T10:44:54.2807909Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:54.2808847Z with:\n2026-11-03T10:44:54.2809279Z   fetch-depth: 0\n2026-11-03T10:44:54.2810584Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:54.2815038Z   token: ***\n2026-11-03T10:44:54.2815539Z   ssh-strict: true\n2026-11-03T10:44:54.2816047Z   ssh-user: git\n2026-11-03T10:44:54.2816562Z   persist-credentials: true\n2026-11-03T10:44:54.2817115Z   clean: true\n2026-11-03T10:44:54.2817633Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:54.2818226Z   fetch-tags: false\n2026-11-03T10:44:54.2818744Z   show-progress: true\n2026-11-03T10:44:54.2819250Z   lfs: false\n2026-11-03T10:44:54.2819729Z   submodules: false\n2026-11-03T10:44:54.2820247Z   set-safe-directory: true\n2026-11-03T10:44:54.2821017Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:54.2821962Z env:\n2026-11-03T10:44:54.2822440Z   GOPATH: /opt/go\n2026-11-03T10:44:54.2823149Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:54.2823980Z ##[endgroup]\n2026-11-03T10:44:56.7378352Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:56.7378805Z with:\n2026-11-03T10:44:56.7379157Z   go-version-file: go.mod\n2026-11-03T10:44:56.7379735Z   check-latest: false\n2026-11-03T10:44:56.7383147Z   token: ***\n2026-11-03T10:44:56.7383494Z   cache: true\n2026-11-03T10:44:56.7383827Z env:\n2026-11-03T10:44:56.7384169Z   GOPATH: /opt/go\n2026-11-03T10:44:56.7384680Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:56.7385204Z ##[endgroup]\n2026-11-03T10:45:14.9644132Z ##[group]Run make integration-reconfig-membership-rejoin-single-party\n2026-11-03T10:45:14.9644789Z \u001b[36;1mmake integration-reconfig-membership-rejoin-single-party\u001b[0m\n2026-11-03T10:45:14.9669869Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:14.9670156Z env:\n2026-11-03T10:45:14.9670406Z   GOPATH: /opt/go\n2026-11-03T10:45:14.9671066Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:14.9671597Z   GOTOOLCHAIN: local\n2026-11-03T10:45:14.9671823Z ##[endgroup]",
+  "125869130158": "2026-11-03T10:44:53.1290800Z ##[group]Run actions/checkout@v5\n2026-11-03T10:44:53.1291713Z with:\n2026-11-03T10:44:53.1292146Z   fetch-depth: 0\n2026-11-03T10:44:53.1292631Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:44:53.1296568Z   token: ***\n2026-11-03T10:44:53.1297051Z   ssh-strict: true\n2026-11-03T10:44:53.1297490Z   ssh-user: git\n2026-11-03T10:44:53.1297937Z   persist-credentials: true\n2026-11-03T10:44:53.1298427Z   clean: true\n2026-11-03T10:44:53.1298893Z   sparse-checkout-cone-mode: true\n2026-11-03T10:44:53.1299425Z   fetch-tags: false\n2026-11-03T10:44:53.1299872Z   show-progress: true\n2026-11-03T10:44:53.1300319Z   lfs: false\n2026-11-03T10:44:53.1300733Z   submodules: false\n2026-11-03T10:44:53.1301185Z   set-safe-directory: true\n2026-11-03T10:44:53.1301693Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:44:53.1302491Z env:\n2026-11-03T10:44:53.1302902Z   GOPATH: /opt/go\n2026-11-03T10:44:53.1303533Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:53.1304465Z ##[endgroup]\n2026-11-03T10:44:55.3934372Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:44:55.3934684Z with:\n2026-11-03T10:44:55.3934898Z   go-version-file: go.mod\n2026-11-03T10:44:55.3935502Z   check-latest: false\n2026-11-03T10:44:55.3937892Z   token: ***\n2026-11-03T10:44:55.3938095Z   cache: true\n2026-11-03T10:44:55.3938283Z env:\n2026-11-03T10:44:55.3938466Z   GOPATH: /opt/go\n2026-11-03T10:44:55.3938837Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:44:55.3939240Z ##[endgroup]\n2026-11-03T10:45:09.7987878Z ##[group]Run make integration-faulttolerance\n2026-11-03T10:45:09.7988314Z \u001b[36;1mmake integration-faulttolerance\u001b[0m\n2026-11-03T10:45:09.8013328Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:45:09.8013594Z env:\n2026-11-03T10:45:09.8014100Z   GOPATH: /opt/go\n2026-11-03T10:45:09.8014461Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:45:09.8014872Z   GOTOOLCHAIN: local\n2026-11-03T10:45:09.8015102Z ##[endgroup]",
+  "125867803227": "2026-11-03T10:42:04.3635034Z ##[group]Run actions/checkout@v5\n2026-11-03T10:42:04.3635747Z with:\n2026-11-03T10:42:04.3636110Z   fetch-depth: 0\n2026-11-03T10:42:04.3636515Z   repository: hyperledger/fabric-x-orderer\n2026-11-03T10:42:04.3639904Z   token: ***\n2026-11-03T10:42:04.3640468Z   ssh-strict: true\n2026-11-03T10:42:04.3640935Z   ssh-user: git\n2026-11-03T10:42:04.3641315Z   persist-credentials: true\n2026-11-03T10:42:04.3641725Z   clean: true\n2026-11-03T10:42:04.3642101Z   sparse-checkout-cone-mode: true\n2026-11-03T10:42:04.3642534Z   fetch-tags: false\n2026-11-03T10:42:04.3643072Z   show-progress: true\n2026-11-03T10:42:04.3643455Z   lfs: false\n2026-11-03T10:42:04.3643807Z   submodules: false\n2026-11-03T10:42:04.3644181Z   set-safe-directory: true\n2026-11-03T10:42:04.3644598Z   allow-unsafe-pr-checkout: false\n2026-11-03T10:42:04.3645301Z env:\n2026-11-03T10:42:04.3645640Z   GOPATH: /opt/go\n2026-11-03T10:42:04.3646177Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:04.3646836Z ##[endgroup]\n2026-11-03T10:42:06.9245075Z ##[group]Run actions/setup-go@v6\n2026-11-03T10:42:06.9245302Z with:\n2026-11-03T10:42:06.9245480Z   go-version-file: go.mod\n2026-11-03T10:42:06.9245894Z   check-latest: false\n2026-11-03T10:42:06.9248120Z   token: ***\n2026-11-03T10:42:06.9248288Z   cache: true\n2026-11-03T10:42:06.9248448Z env:\n2026-11-03T10:42:06.9248613Z   GOPATH: /opt/go\n2026-11-03T10:42:06.9248879Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:06.9249176Z ##[endgroup]\n2026-11-03T10:42:23.5555448Z ##[group]Run go install golang.org/x/tools/cmd/goimports@latest\n2026-11-03T10:42:23.5555916Z \u001b[36;1mgo install golang.org/x/tools/cmd/goimports@latest\u001b[0m\n2026-11-03T10:42:23.5579021Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:42:23.5579280Z env:\n2026-11-03T10:42:23.5579470Z   GOPATH: /opt/go\n2026-11-03T10:42:23.5579758Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:23.5580084Z   GOTOOLCHAIN: local\n2026-11-03T10:42:23.5580295Z ##[endgroup]\n2026-11-03T10:42:24.3702251Z ##[group]Run go install mvdan.cc/gofumpt@latest\n2026-11-03T10:42:24.3702716Z \u001b[36;1mgo install mvdan.cc/gofumpt@latest\u001b[0m\n2026-11-03T10:42:24.3723638Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:42:24.3723859Z env:\n2026-11-03T10:42:24.3724046Z   GOPATH: /opt/go\n2026-11-03T10:42:24.3724321Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:24.3724642Z   GOTOOLCHAIN: local\n2026-11-03T10:42:24.3724833Z ##[endgroup]\n2026-11-03T10:42:25.5168201Z ##[group]Run go install honnef.co/go/tools/cmd/staticcheck@latest\n2026-11-03T10:42:25.5168789Z \u001b[36;1mgo install honnef.co/go/tools/cmd/staticcheck@latest\u001b[0m\n2026-11-03T10:42:25.5187084Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:42:25.5187301Z env:\n2026-11-03T10:42:25.5187460Z   GOPATH: /opt/go\n2026-11-03T10:42:25.5187740Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:25.5188051Z   GOTOOLCHAIN: local\n2026-11-03T10:42:25.5188237Z ##[endgroup]\n2026-11-03T10:42:38.7516396Z ##[group]Run go install github.com/golang/protobuf/protoc-gen-go@latest\n2026-11-03T10:42:38.7516828Z \u001b[36;1mgo install github.com/golang/protobuf/protoc-gen-go@latest\u001b[0m\n2026-11-03T10:42:38.7534848Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:42:38.7535090Z env:\n2026-11-03T10:42:38.7535264Z   GOPATH: /opt/go\n2026-11-03T10:42:38.7535551Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:38.7535882Z   GOTOOLCHAIN: local\n2026-11-03T10:42:38.7536078Z ##[endgroup]\n2026-11-03T10:42:41.4037853Z ##[group]Run make basic-checks\n2026-11-03T10:42:41.4038115Z \u001b[36;1mmake basic-checks\u001b[0m\n2026-11-03T10:42:41.4055646Z shell: /usr/bin/bash -e {0}\n2026-11-03T10:42:41.4055855Z env:\n2026-11-03T10:42:41.4056026Z   GOPATH: /opt/go\n2026-11-03T10:42:41.4056306Z   PATH: /opt/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin\n2026-11-03T10:42:41.4056626Z   GOTOOLCHAIN: local\n2026-11-03T10:42:41.4056815Z ##[endgroup]"
+ }
+}

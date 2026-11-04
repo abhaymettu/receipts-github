@@ -1,0 +1,2629 @@
+{
+ "pull": {
+  "user": {
+   "login": "devin-ai-integration[bot]",
+   "type": "Bot"
+  },
+  "head": {
+   "label": "Open-MBEE:feat/graphical-notation-census",
+   "ref": "feat/graphical-notation-census",
+   "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  "base": {
+   "label": "Open-MBEE:develop",
+   "ref": "develop",
+   "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df"
+  },
+  "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+  "id": 5149179373,
+  "node_id": "PR_kwDOTp2CH88AAAABMuo97Q",
+  "html_url": "https://github.com/Open-MBEE/OpenSysML/pull/1908",
+  "diff_url": "https://github.com/Open-MBEE/OpenSysML/pull/1908.diff",
+  "patch_url": "https://github.com/Open-MBEE/OpenSysML/pull/1908.patch",
+  "issue_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/issues/1908",
+  "commits_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908/commits",
+  "review_comments_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908/comments",
+  "review_comment_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/issues/1908/comments",
+  "statuses_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/statuses/eb8e5c75b38532978e15285c6c68a8805e4aebce",
+  "number": 1908,
+  "state": "open",
+  "locked": false,
+  "title": "feat(tools): census and gate of the SysML v2 graphical notation (§8.2.3)",
+  "body": "## What and why\n\nThe view renderers (`internal/ir/view`, the VS Code canvas) had no measure of how much of the SysML v2 **graphical** notation they draw. This adds the same kind of census and gate the textual grammar (`tools/census/grammar`) and the v1→v2 mapping (`tools/census/transformation`) have, for clause §8.2.3 \"Graphical Notation\" of the pinned SysML v2.1 Beta 2 specification:\n\n- `tools/census/notation` + `tools/cmd/notation-census`: `Extract` reads the graphical BNF (`name =` / `name =|` statements under the `8.2.3.n` headings) out of `build/spec-docs/sysml.txt`, handling the `pdftotext -layout` artifacts explicitly (form-feed-prefixed headings and statements, page footers in right-hand sides). It is strict: 27 headings in order, no production in the overview, at least one in every other clause, and a production without a verdict (or a verdict for a production the clause no longer states) is an error, so a text from another pin fails loudly. The full extraction finds **620 statements naming 523 distinct productions** (the brief's 503 was the count without the form-feed-prefixed lines); one census row is one distinct production.\n- Every production is categorised (node, compartment, edge, label, view, textual) and adjudicated `drawn` / `approximate` / `undrawn` / `not-applicable`, with `file:function`, forms and test/golden evidence that `-check` resolves against the Go/TypeScript sources and `testdata/`. The 31 edge rows reuse the notation table of `docs/project/view-rendering-forms.md` rather than restating it.\n- `-measure` rewrites `docs/project/graphical-notation-census-baseline.json` (source pin, totals, per-clause and per-category counts, every non-drawn row with its reason and work package) and the generated blocks of `docs/project/graphical-notation-census.md`; the full table with each row's evidence goes to `build/graphical-notation-census/rows.md`. `-check` verifies the baseline, the pin, the document, the citations and — where the text is present or required — a fresh measurement.\n- CI: `notation-census -check -require-text` beside the transformation census in the gate job that renders the specification text, and a text-free `-check` in the docs job.\n\nTotals: 523 productions — 199 drawn, 55 approximate, 97 undrawn, 172 not applicable. The gaps are grouped into work packages A–F in the census page. Tooling and docs only: no renderer behaviour changes, nothing removed or renamed (patch material under CONTRIBUTING § Versioning). The gaps are not fixed here.\n\n## How it was verified\n\n- `go test -C tools ./census/notation`: extractor tests over a committed excerpt of the rendered text (`testdata/sysml-8.2.3-productions.txt`, every heading and statement line, 15 KiB, so the tests run without the PDF) including the rejected mutations; classifier and notation-table tests; evidence-citation tests; and a measure/check round trip in a staged root that re-measures over the excerpt and expects the committed baseline and document byte for byte, plus the drift, stale-document, changed-text, absent-text, pin-change and broken-citation failures the gate must catch.\n- `go run -C tools ./cmd/notation-census -check -require-text` over the freshly downloaded `build/spec-docs/sysml.txt`.\n- Verdicts were taken by reading the writers and goldens and by rendering fixtures that declare every definition and usage kind, both as nodes and as members of a positioned node (compartments).\n- `gofmt -l .` empty, `go vet ./...`, `make lint`, `go test ./tests/hygiene`, `python3 scripts/check-doc-links.py`, `python -m mkdocs build --strict`, `python3 scripts/changelog.py check`.\n\n## Checklist\n\n- [x] `make test` and `make lint` pass locally\n- [x] Tests added or updated for the change\n- [x] Documentation extended where it already covers the surface (see CONTRIBUTING.md)\n- [x] Changelog entry added as `changes/unreleased/<slug>.<section>.md`, not as an edit to `CHANGELOG.md`\n- [x] baselines regenerated and `make docs-counts` run if a gate count moved (compliance rows need nothing: the census is counted at docs build)\n- [x] No internal work-item labels (waves, slices, `F4`, `K5`) in the body, docs, or changelog\n\n\nLink to Devin session: https://nasa-jpl-demo.devinenterprise.com/sessions/f69248ea76734fab89a931e3a5b28589\nOpen in Devin Desktop: https://nasa-jpl-demo.devinenterprise.com/desktop/session/f69248ea76734fab89a931e3a5b28589?variant=devin\nRequested by: @HuiJun",
+  "labels": [],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-11-04T05:04:15Z",
+  "updated_at": "2026-11-04T05:09:14Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "b299d0f9292259d0669e61c3f662015e4389969c",
+  "assignee": {
+   "login": "HuiJun",
+   "id": 1014891,
+   "node_id": "MDQ6VXNlcjEwMTQ4OTE=",
+   "avatar_url": "https://avatars.githubusercontent.com/u/1014891?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/HuiJun",
+   "html_url": "https://github.com/HuiJun",
+   "followers_url": "https://api.github.com/users/HuiJun/followers",
+   "following_url": "https://api.github.com/users/HuiJun/following{/other_user}",
+   "gists_url": "https://api.github.com/users/HuiJun/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/HuiJun/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/HuiJun/subscriptions",
+   "organizations_url": "https://api.github.com/users/HuiJun/orgs",
+   "repos_url": "https://api.github.com/users/HuiJun/repos",
+   "events_url": "https://api.github.com/users/HuiJun/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/HuiJun/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "assignees": [
+   {
+    "login": "HuiJun",
+    "id": 1014891,
+    "node_id": "MDQ6VXNlcjEwMTQ4OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1014891?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/HuiJun",
+    "html_url": "https://github.com/HuiJun",
+    "followers_url": "https://api.github.com/users/HuiJun/followers",
+    "following_url": "https://api.github.com/users/HuiJun/following{/other_user}",
+    "gists_url": "https://api.github.com/users/HuiJun/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/HuiJun/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/HuiJun/subscriptions",
+    "organizations_url": "https://api.github.com/users/HuiJun/orgs",
+    "repos_url": "https://api.github.com/users/HuiJun/repos",
+    "events_url": "https://api.github.com/users/HuiJun/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/HuiJun/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+   }
+  ],
+  "requested_reviewers": [
+   {
+    "login": "HuiJun",
+    "id": 1014891,
+    "node_id": "MDQ6VXNlcjEwMTQ4OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1014891?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/HuiJun",
+    "html_url": "https://github.com/HuiJun",
+    "followers_url": "https://api.github.com/users/HuiJun/followers",
+    "following_url": "https://api.github.com/users/HuiJun/following{/other_user}",
+    "gists_url": "https://api.github.com/users/HuiJun/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/HuiJun/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/HuiJun/subscriptions",
+    "organizations_url": "https://api.github.com/users/HuiJun/orgs",
+    "repos_url": "https://api.github.com/users/HuiJun/repos",
+    "events_url": "https://api.github.com/users/HuiJun/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/HuiJun/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+   }
+  ],
+  "requested_teams": [],
+  "author_association": "CONTRIBUTOR",
+  "auto_merge": null,
+  "draft": false,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": true,
+  "mergeable_state": "blocked",
+  "merged_by": null,
+  "comments": 1,
+  "review_comments": 4,
+  "maintainer_can_modify": false,
+  "commits": 2,
+  "additions": 6124,
+  "deletions": 0,
+  "changed_files": 19
+ },
+ "files": [
+  {
+   "sha": "1cb59893888fd3e641e02f7c3c468b5becd925d7",
+   "filename": ".github/workflows/pr.yml",
+   "status": "modified",
+   "additions": 13,
+   "deletions": 0,
+   "changes": 13,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/.github%2Fworkflows%2Fpr.yml",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/.github%2Fworkflows%2Fpr.yml",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/.github%2Fworkflows%2Fpr.yml?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "cf5ceabad89dfeb934460c430d8564d036b0987d",
+   "filename": "changes/unreleased/graphical-notation-census.added.md",
+   "status": "added",
+   "additions": 1,
+   "deletions": 0,
+   "changes": 1,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/changes%2Funreleased%2Fgraphical-notation-census.added.md",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/changes%2Funreleased%2Fgraphical-notation-census.added.md",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/changes%2Funreleased%2Fgraphical-notation-census.added.md?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "514a15156cba6addef1057ec99305d78e22ef3b0",
+   "filename": "docs/project/README.md",
+   "status": "modified",
+   "additions": 3,
+   "deletions": 0,
+   "changes": 3,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2FREADME.md",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2FREADME.md",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/docs%2Fproject%2FREADME.md?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "b612e1da507346a5a5d3a05d019e88675be7f58e",
+   "filename": "docs/project/graphical-notation-census-baseline.json",
+   "status": "added",
+   "additions": 2728,
+   "deletions": 0,
+   "changes": 2728,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fgraphical-notation-census-baseline.json",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fgraphical-notation-census-baseline.json",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/docs%2Fproject%2Fgraphical-notation-census-baseline.json?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "d15de8e96967c27c1bba8e2a82689ca80b1f9160",
+   "filename": "docs/project/graphical-notation-census.md",
+   "status": "added",
+   "additions": 484,
+   "deletions": 0,
+   "changes": 484,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fgraphical-notation-census.md",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fgraphical-notation-census.md",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/docs%2Fproject%2Fgraphical-notation-census.md?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "f43e64d1ce1eea773cbd0c9fa96970f41907ef32",
+   "filename": "docs/project/view-rendering-forms.md",
+   "status": "modified",
+   "additions": 3,
+   "deletions": 0,
+   "changes": 3,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fview-rendering-forms.md",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/docs%2Fproject%2Fview-rendering-forms.md",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/docs%2Fproject%2Fview-rendering-forms.md?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "5832daf4be169ef37b3711a7922830f79357e2bc",
+   "filename": "mkdocs.yml",
+   "status": "modified",
+   "additions": 1,
+   "deletions": 0,
+   "changes": 1,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/mkdocs.yml",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/mkdocs.yml",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/mkdocs.yml?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "123dcfa6033164eab1f6517647341d87de754deb",
+   "filename": "tools/census/notation/baseline.go",
+   "status": "added",
+   "additions": 398,
+   "deletions": 0,
+   "changes": 398,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fbaseline.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fbaseline.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fbaseline.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "da50d8a289ebb59ea58814fce44db81c4cf2b6aa",
+   "filename": "tools/census/notation/document.go",
+   "status": "added",
+   "additions": 209,
+   "deletions": 0,
+   "changes": 209,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fdocument.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fdocument.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fdocument.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "747f3de18d3e8649dab5aa669a4de4d04fa34e48",
+   "filename": "tools/census/notation/evidence.go",
+   "status": "added",
+   "additions": 125,
+   "deletions": 0,
+   "changes": 125,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fevidence.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fevidence.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fevidence.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "f78817f502c406c8603e5948a863f3118b52bf51",
+   "filename": "tools/census/notation/extract.go",
+   "status": "added",
+   "additions": 170,
+   "deletions": 0,
+   "changes": 170,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fextract.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fextract.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fextract.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "bc4a30012a3b60c79a3b9d6c75c35316c9482590",
+   "filename": "tools/census/notation/extract_test.go",
+   "status": "added",
+   "additions": 138,
+   "deletions": 0,
+   "changes": 138,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fextract_test.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fextract_test.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fextract_test.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "74997847776f38aa170b4a3ddf627fa6de7638a9",
+   "filename": "tools/census/notation/main.go",
+   "status": "added",
+   "additions": 206,
+   "deletions": 0,
+   "changes": 206,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fmain.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fmain.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fmain.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "557c55b535d3758fd1d79177a2e960d2b3372935",
+   "filename": "tools/census/notation/main_test.go",
+   "status": "added",
+   "additions": 303,
+   "deletions": 0,
+   "changes": 303,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fmain_test.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fmain_test.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fmain_test.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "3b8743b64f411782fb244653e5085abb8092f671",
+   "filename": "tools/census/notation/table.go",
+   "status": "added",
+   "additions": 121,
+   "deletions": 0,
+   "changes": 121,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Ftable.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Ftable.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Ftable.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "2e0665bf4c1eecdd4507e920347fefae53fba5a3",
+   "filename": "tools/census/notation/testdata/sysml-8.2.3-productions.txt",
+   "status": "added",
+   "additions": 651,
+   "deletions": 0,
+   "changes": 651,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Ftestdata%2Fsysml-8.2.3-productions.txt",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Ftestdata%2Fsysml-8.2.3-productions.txt",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Ftestdata%2Fsysml-8.2.3-productions.txt?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "f81d4677acbd31f77c6e592de464db1f68129fce",
+   "filename": "tools/census/notation/verdicts.go",
+   "status": "added",
+   "additions": 389,
+   "deletions": 0,
+   "changes": 389,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fverdicts.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fverdicts.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fverdicts.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "19aefb98a9062d85d3432025fff7c4a9663781df",
+   "filename": "tools/census/notation/verdicts_test.go",
+   "status": "added",
+   "additions": 168,
+   "deletions": 0,
+   "changes": 168,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fverdicts_test.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcensus%2Fnotation%2Fverdicts_test.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcensus%2Fnotation%2Fverdicts_test.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  },
+  {
+   "sha": "883305edce6710e8023b78024ab572412be02bf8",
+   "filename": "tools/cmd/notation-census/main.go",
+   "status": "added",
+   "additions": 13,
+   "deletions": 0,
+   "changes": 13,
+   "blob_url": "https://github.com/Open-MBEE/OpenSysML/blob/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcmd%2Fnotation-census%2Fmain.go",
+   "raw_url": "https://github.com/Open-MBEE/OpenSysML/raw/eb8e5c75b38532978e15285c6c68a8805e4aebce/tools%2Fcmd%2Fnotation-census%2Fmain.go",
+   "contents_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/contents/tools%2Fcmd%2Fnotation-census%2Fmain.go?ref=eb8e5c75b38532978e15285c6c68a8805e4aebce"
+  }
+ ],
+ "commits": [
+  {
+   "author": {
+    "login": "devin-ai-integration[bot]",
+    "type": "Bot"
+   },
+   "committer": {
+    "login": "devin-ai-integration[bot]",
+    "type": "Bot"
+   },
+   "sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+   "node_id": "C_kwDOTp2CH9oAKDYzYzRkYzM1YmVmZDdhMmQ2YWRjNmQ5NzczOTlmZTEzOGQyNzYyYzE",
+   "commit": {
+    "author": {
+     "name": "Devin AI",
+     "email": "158243242+devin-ai-integration[bot]@users.noreply.github.com",
+     "date": "2026-11-04T05:03:30Z"
+    },
+    "committer": {
+     "name": "Devin AI",
+     "email": "158243242+devin-ai-integration[bot]@users.noreply.github.com",
+     "date": "2026-11-04T05:03:30Z"
+    },
+    "message": "feat(tools): census and gate of the SysML v2 graphical notation (§8.2.3)\n\ntools/census/notation extracts the 523 productions of clause 8.2.3 from the\npinned specification text, adjudicates each against the view renderers with\ncode and golden evidence, and holds the committed baseline and census page to\nthe measurement; notation-census -check runs in CI beside the transformation\ncensus.\n\nCo-Authored-By: jason.han <hanhuijun@gmail.com>",
+    "tree": {
+     "sha": "740cbeb4a8a8e9be0c1efc39b560150cce4bd396",
+     "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/git/trees/740cbeb4a8a8e9be0c1efc39b560150cce4bd396"
+    },
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/git/commits/63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "comment_count": 0,
+    "verification": {
+     "verified": false,
+     "reason": "unsigned",
+     "signature": null,
+     "payload": null,
+     "verified_at": null
+    }
+   },
+   "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+   "html_url": "https://github.com/Open-MBEE/OpenSysML/commit/63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+   "comments_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/63c4dc35befd7a2d6adc6d977399fe138d2762c1/comments",
+   "parents": [
+    {
+     "sha": "6e86049b3be65f0cbbbb17f3850903b0f76291e4",
+     "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/6e86049b3be65f0cbbbb17f3850903b0f76291e4",
+     "html_url": "https://github.com/Open-MBEE/OpenSysML/commit/6e86049b3be65f0cbbbb17f3850903b0f76291e4"
+    }
+   ]
+  },
+  {
+   "author": {
+    "login": "devin-ai-integration[bot]",
+    "type": "Bot"
+   },
+   "committer": {
+    "login": "devin-ai-integration[bot]",
+    "type": "Bot"
+   },
+   "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+   "node_id": "C_kwDOTp2CH9oAKGViOGU1Yzc1YjM4NTMyOTc4ZTE1Mjg1YzZjNjhhODgwNWU0YWViY2U",
+   "commit": {
+    "author": {
+     "name": "Devin AI",
+     "email": "158243242+devin-ai-integration[bot]@users.noreply.github.com",
+     "date": "2026-11-04T05:08:18Z"
+    },
+    "committer": {
+     "name": "Devin AI",
+     "email": "158243242+devin-ai-integration[bot]@users.noreply.github.com",
+     "date": "2026-11-04T05:08:18Z"
+    },
+    "message": "fix(tools): notation census rejects unreviewed compartment productions and unknown table statuses\n\nEvery compartment-contents/element production is adjudicated by name, so a\nproduction new to the specification fails rather than passing as textual,\nand the notation table's status cell must be conformant, approximate or\ndiffers from pilot.\n\nCo-Authored-By: jason.han <hanhuijun@gmail.com>",
+    "tree": {
+     "sha": "149750695c7383f304fb6689a6981202b8791f68",
+     "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/git/trees/149750695c7383f304fb6689a6981202b8791f68"
+    },
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/git/commits/eb8e5c75b38532978e15285c6c68a8805e4aebce",
+    "comment_count": 0,
+    "verification": {
+     "verified": false,
+     "reason": "unsigned",
+     "signature": null,
+     "payload": null,
+     "verified_at": null
+    }
+   },
+   "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/eb8e5c75b38532978e15285c6c68a8805e4aebce",
+   "html_url": "https://github.com/Open-MBEE/OpenSysML/commit/eb8e5c75b38532978e15285c6c68a8805e4aebce",
+   "comments_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/eb8e5c75b38532978e15285c6c68a8805e4aebce/comments",
+   "parents": [
+    {
+     "sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+     "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/commits/63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+     "html_url": "https://github.com/Open-MBEE/OpenSysML/commit/63c4dc35befd7a2d6adc6d977399fe138d2762c1"
+    }
+   ]
+  }
+ ],
+ "checkRuns": {
+  "eb8e5c75b38532978e15285c6c68a8805e4aebce": [],
+  "63c4dc35befd7a2d6adc6d977399fe138d2762c1": [
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400850377,
+    "name": "SysON plugin",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPpyQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "a5fa1fde-a37a-5b3c-8c47-f5ffccbb3557",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850377",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850377",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850377",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850377/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400850259,
+    "name": "Julia client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPpUw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "d6b414c8-495b-5e24-8afb-04959a5c667f",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850259",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850259",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850259",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850259/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400850226,
+    "name": "MATLAB/Octave client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPpMg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "867372f6-6fee-5f7e-9b01-231451935bde",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850226",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850226",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850226",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850226/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400850136,
+    "name": "Rust client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPo2A",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "90658238-9e51-5930-a0eb-ceb125246cfe",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850136",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850136",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400850136",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400850136/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849967,
+    "name": "Python client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPoLw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "4100cb1a-e59e-5a10-b8c4-d871a5570b5d",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849967",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849967",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849967",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849967/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849952,
+    "name": "Node client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPoIA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "de2ef01f-047e-5752-914d-b90ce0f06495",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849952",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849952",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849952",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849952/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849927,
+    "name": "Build binaries",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPoBw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "fa5c506f-c4d1-57f6-9ac7-d1121894b814",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849927",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849927",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849927",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849927/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849809,
+    "name": "Xpect oracle reproduces its baseline",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPnkQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "618a822a-9aa3-5c3a-84f3-59fc8132efca",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849809",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849809",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849809",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849809/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849749,
+    "name": "Go ${{ (((needs.changes.outputs.tier == 'full') && 'race ') || '') }}tests (${{ matrix.shard }})",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPnVQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "2d3f3516-5bf9-5d3c-817e-59045278a103",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849749",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849749",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849749",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849749/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849685,
+    "name": "Conformance suite",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPnFQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "f6d226cf-3062-566a-b51f-a4bf94d1d3c8",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849685",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849685",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849685",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849685/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849662,
+    "name": "Magic MDK plugin",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPm_g",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "d7e3b610-5a55-5e18-bab7-f36f394a37ee",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849662",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849662",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849662",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849662/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849548,
+    "name": "Java client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPmjA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "dbe17285-f2ad-57db-a97e-b920f884574e",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849548",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849548",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849548",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849548/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849469,
+    "name": "VS Code extension",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPmPQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "64c04886-01ec-5859-9af7-4ba2efc90098",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849469",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849469",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849469",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849469/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849419,
+    "name": "WebAssembly gate",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPmCw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "5239940e-c488-561d-836f-2fd2def5449f",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849419",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849419",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849419",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849419/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849314,
+    "name": "Documentation site",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPlog",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "1d12b9b4-6bc7-5950-b86f-34472ba81d88",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849314",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849314",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849314",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849314/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849261,
+    "name": "Go race coverage",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPlbQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "2ab0bd47-a3dd-5712-95e9-8a7b62c4a569",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849261",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849261",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849261",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849261/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849148,
+    "name": "Go static and integrity checks",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPk_A",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "cd7afaad-2c3d-5fd9-b28b-0d49e34673db",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849148",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849148",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849148",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849148/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849123,
+    "name": "JupyterLab extension",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPk4w",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "f7291d4f-129a-597f-9f18-558dbe6aaf43",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849123",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849123",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849123",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849123/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400849061,
+    "name": "PDF toolchain tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPkpQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "a63a0bb8-a47e-5594-9001-33823bac0754",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849061",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849061",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400849061",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400849061/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126400848996,
+    "name": "Build and test",
+    "node_id": "CR_kwDOTp2CH88AAAAdbhPkZA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "c913365a-3275-5b33-9e63-64d780fc296d",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400848996",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400848996",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126400848996",
+    "status": "queued",
+    "conclusion": null,
+    "started_at": "2026-11-04T05:08:27Z",
+    "completed_at": null,
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126400848996/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399903871,
+    "name": "Changed areas",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgV4fw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "62454d3f-a002-57ab-9e1b-3cc6e05b604b",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399903871",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126399903871",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41777032890/job/126399903871",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:05:37Z",
+    "completed_at": "2026-11-04T05:08:27Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399903871/annotations"
+    },
+    "check_suite": {
+     "id": 113205430257
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399682063,
+    "name": "MATLAB/Octave client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIWDw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "bfbdb0df-174d-57c7-8889-2037ab615047",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399682063",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399682063",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399682063",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399682063/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681973,
+    "name": "SysON plugin",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIVtQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "2f6e788e-844b-5be3-9f38-30a80ba5c1f6",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681973",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681973",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681973",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681973/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681919,
+    "name": "Magic MDK plugin",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIVfw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "44835761-b342-5a49-8c5f-f2f2b1302f49",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681919",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681919",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681919",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681919/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681563,
+    "name": "Build binaries",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIUGw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "54b4b952-f2e1-5a4f-a4ed-de1cd3fc24d3",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681563",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681563",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681563",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681563/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681557,
+    "name": "Go race coverage",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIUFQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "c79f5893-981e-5de5-a0e5-3cbd165c960e",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681557",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681557",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681557",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681557/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681527,
+    "name": "Rust client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIT9w",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "3420a27d-cc54-51b7-9f25-af32ad7e5cfb",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681527",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681527",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681527",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681527/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681427,
+    "name": "Go ${{ (((needs.changes.outputs.tier == 'full') && 'race ') || '') }}tests (${{ matrix.shard }})",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgITkw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "f4733ed9-696f-52d0-90bd-e2e8b6642185",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681427",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681427",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681427",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681427/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681410,
+    "name": "Julia client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgITgg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "a53e41ac-5b96-5c42-abdb-e4771ed7d201",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681410",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681410",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681410",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681410/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681333,
+    "name": "Python client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgITNQ",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "15aabc19-bcb7-5b61-9f8d-4e47ab5b12b4",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681333",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681333",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681333",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681333/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681312,
+    "name": "Documentation site",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgITIA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "abe42465-6be8-5d6f-83f5-107c83c27ffa",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681312",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681312",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681312",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681312/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681311,
+    "name": "VS Code extension",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgITHw",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "eab24ba4-69fd-5537-b5d6-9a08ed5c40ca",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681311",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681311",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681311",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681311/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681243,
+    "name": "WebAssembly gate",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIS2w",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "4c5f1177-f891-5105-ab72-ac658a636846",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681243",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681243",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681243",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681243/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681214,
+    "name": "Node client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgISvg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "9a8790c1-812b-5994-a270-ef6167c23c65",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681214",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681214",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681214",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681214/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681158,
+    "name": "Java client tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIShg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "1d92d3e0-e465-5ebc-97ee-eb717cd39933",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681158",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681158",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681158",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681158/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399681144,
+    "name": "PDF toolchain tests",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgISeA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "6e9847b2-41fc-5704-b31b-134b9951efe8",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681144",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681144",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399681144",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399681144/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399680942,
+    "name": "Conformance suite",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIRrg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "c660ce51-d9dd-590b-b86c-38cdb0512d76",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680942",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680942",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680942",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680942/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399680932,
+    "name": "Xpect oracle reproduces its baseline",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIRpA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "8dac3856-c0dc-5a62-bbcb-58bec58dbdf5",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680932",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680932",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680932",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680932/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399680846,
+    "name": "Go static and integrity checks",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIRTg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "26a86091-96aa-58de-bccc-7e40e00d00dc",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680846",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680846",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680846",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680846/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399680814,
+    "name": "JupyterLab extension",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIRLg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "7e8d52be-7ca4-59e4-81b2-b73260eb43d2",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680814",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680814",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680814",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:58Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 0,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680814/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399680374,
+    "name": "Build and test",
+    "node_id": "CR_kwDOTp2CH88AAAAdbgIPdg",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "6cddf9ee-14a8-58fd-8608-ccce38a152b3",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680374",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680374",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399680374",
+    "status": "completed",
+    "conclusion": "failure",
+    "started_at": "2026-11-04T05:05:33Z",
+    "completed_at": "2026-11-04T05:05:37Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 2,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399680374/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   },
+   {
+    "app": {
+     "slug": "github-actions"
+    },
+    "id": 126399478884,
+    "name": "Changed areas",
+    "node_id": "CR_kwDOTp2CH88AAAAdbf78ZA",
+    "head_sha": "63c4dc35befd7a2d6adc6d977399fe138d2762c1",
+    "external_id": "bd91e9e9-0b6b-5b9d-8b8e-24367a116b1b",
+    "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399478884",
+    "html_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399478884",
+    "details_url": "https://github.com/Open-MBEE/OpenSysML/actions/runs/41776971646/job/126399478884",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "started_at": "2026-11-04T05:04:19Z",
+    "completed_at": "2026-11-04T05:04:57Z",
+    "output": {
+     "title": null,
+     "summary": null,
+     "text": null,
+     "annotations_count": 1,
+     "annotations_url": "https://api.github.com/repos/Open-MBEE/OpenSysML/check-runs/126399478884/annotations"
+    },
+    "check_suite": {
+     "id": 113205266191
+    },
+    "pull_requests": [
+     {
+      "url": "https://api.github.com/repos/Open-MBEE/OpenSysML/pulls/1908",
+      "id": 5149179373,
+      "number": 1908,
+      "head": {
+       "ref": "feat/graphical-notation-census",
+       "sha": "eb8e5c75b38532978e15285c6c68a8805e4aebce",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      },
+      "base": {
+       "ref": "develop",
+       "sha": "4e3b7b5a6b3856d8235edf70e6be43524a1856df",
+       "repo": {
+        "id": 1318945311,
+        "url": "https://api.github.com/repos/Open-MBEE/OpenSysML",
+        "name": "OpenSysML"
+       }
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "statuses": {
+  "eb8e5c75b38532978e15285c6c68a8805e4aebce": [],
+  "63c4dc35befd7a2d6adc6d977399fe138d2762c1": []
+ },
+ "logs": {}
+}
